@@ -17,8 +17,10 @@ class Software(models.Model):
     def __str__(self):
         return f"{self.name}: {self.version}"
 
+
 class Computer(models.Model):
     device_uid = models.CharField(unique=True, max_length=255, null=True)
     softwares = models.ManyToManyField(Software)
 
     def __str__(self):
+        return f"{self.device_uid}"
