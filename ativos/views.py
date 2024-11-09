@@ -38,6 +38,9 @@ class InventoryView(APIView):
         if "PROLOG" in data.get("QUERY"):
             return Response({"PROLOG_FREQ": "24", "RESPONSE": "SEND"})
 
+        if "CONTENT" not in data:
+            return Response(status=422, data="Invalid XML format.")
+
         software_list = []
 
         # FIXME: lento demais
@@ -59,7 +62,11 @@ class InventoryView(APIView):
 
             software_list.append(software)
 
-        computer, is_new = Computer.objects.get_or_create(device_uid=data["DEVICEID"])
+        print(data["CONTENT"]["HARDWARE"]["NAME"])
+        computer, is_new = Computer.objects.get_or_create(
+            device_uid=data["DEVICEID"],
+            hostname=data["CONTENT"]["HARDWARE"]["NAME"]
+        )
 
         if is_new:
             computer.save()
