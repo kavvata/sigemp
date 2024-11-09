@@ -41,10 +41,17 @@ class InventoryView(APIView):
         if "CONTENT" not in data:
             return Response(status=422, data="Invalid XML format.")
 
-        software_list = []
+        computer, is_new = Computer.objects.get_or_create(
+            hostname=data["CONTENT"]["HARDWARE"]["NAME"]
+        )
 
-        # FIXME: lento demais
-        # TODO: implementar transaction
+        if is_new:
+            computer.device_uid = data["DEVICEID"]
+            computer.save()
+
+        new_software_list = []
+
+        # NOTE: primeiro inventario muito lento. too bad!
         for software_data in data["CONTENT"]["SOFTWARES"]:
             try:
                 install_date = datetime.strptime(software_data.get("INSTALLDATE"), "%d/%m/%Y")
@@ -60,17 +67,13 @@ class InventoryView(APIView):
                 install_date=install_date,
             )
 
-            software_list.append(software)
+            new_software_list.append(software)
 
-        print(data["CONTENT"]["HARDWARE"]["NAME"])
-        computer, is_new = Computer.objects.get_or_create(
-            device_uid=data["DEVICEID"],
-            hostname=data["CONTENT"]["HARDWARE"]["NAME"]
-        )
+        if list(computer.softwares.all()) != new_software_list:
+            print('something changed!')
+            # TODO: handle software was altered.
 
-        if is_new:
-            computer.save()
+        computer.softwares.set(new_software_list)
 
-        computer.softwares.set(software_list)
-
+        # TODO: retornar resposta valida para o agent
         return Response(status=200)
