@@ -11,9 +11,11 @@
 
 	<body class="bg-gray-50 leading-normal tracking-normal w-screen h-screen">
         {% include "navigation.html" %}
-        <div class="h-screen flex-col items-center justify-center">
+        <div class="pt-6 bg-gray-200 h-screen flex-col items-center justify-center">
+          <div class="pt-6">
             {% block content %}
             {% endblock %}
+          </div>
         </div>
 	</body>
 </html>
