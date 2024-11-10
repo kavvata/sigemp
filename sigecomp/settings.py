@@ -30,6 +30,12 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
+
+TAILWIND_APP_NAME = "theme"
+
 INSTALLED_APPS = [
     "ativos.apps.AtivosConfig",
     "django.contrib.admin",
@@ -39,6 +45,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "tailwind",
+    "theme",
 ]
 
 MIDDLEWARE = [
