@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from django.views.generic import ListView
 from rest_framework.decorators import APIView, api_view
 from rest_framework.response import Response
 from rest_framework.views import Request
@@ -24,6 +25,14 @@ def get_softwares(pair):
 def fetch(request):
     return Response(ComputerSerializer(Computer.objects.all(), many=True).data)
 
+
+class ComputerView(ListView):
+    model = Computer
+    template_name = "ativos/computer_list.html"
+    context_object_name = "computers"
+
+    def get_queryset(self):
+        return Computer.objects.all()
 
 class InventoryView(APIView):
     parser_classes = [ZlibXMLParser, XMLParser]
