@@ -1,28 +1,28 @@
 @startuml usecases
-left to right direction
-package "Sigecomp" {
-  :Usuário: as user
-  user -> (Fazer login)
-  user --> (Manter cadastro)
-  
-  :Técnico: as tec
-  tec .r.> user: <<extends>>
-  tec --> (Manter computadores)
-  tec --> (Manter softwares)
-  "Visualizar dashboard" as (dash)
-  tec --> dash
-  dash ..> (Visualizar próximos inventários) : <<include>>
-  dash ..> (Visualizar inventários pendentes) : <<include>>
-  "Manter alunos" as (alunos)
-  tec --> alunos
-  tec --> (Vincular computador a um aluno)
-  
-  :Admin: as admin
-  admin .d.> tec : <<extends>>
-  admin -l-> (Manter usuários)
-}
-:Aluno: as alu
-alu --> (Receber e-mail de inventário próximo)
-:Computador: as comp
-comp --> (Realizar inventário)
+  left to right direction
+  package "Sistema web" {
+    :Usuário: as user
+    user -l-> (Fazer login)
+    user --> (Manter cadastro)
+
+    :Técnico: as tec <<Role>>
+    tec -l-|> user
+    tec --> (Manter computadores)
+    tec --> (Manter softwares)
+    "Visualizar dashboard" as (dash)
+    tec --> dash
+    dash ..> (Visualizar próximos inventários) : <<include>>
+    dash ..> (Visualizar inventários pendentes) : <<include>>
+    tec --> (Vincular computador a um aluno)
+
+    :Administrador: as admin <<Role>>
+    admin -d-|> tec
+    admin -l-> (Manter usuários)
+    admin -l-> (Manter roles)
+    admin -> (Manter alunos)
+  }
+  :Aluno: as alu
+  alu --> (Receber e-mail de inventário próximo)
+  :Computador: as comp <<Application>>
+  comp --> (Realizar inventário)
 @enduml
