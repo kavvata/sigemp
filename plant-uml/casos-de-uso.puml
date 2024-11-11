@@ -1,29 +1,35 @@
 @startuml usecases
   left to right direction
+
   package "Sistema web" {
     :Usuário: as user
+    :Técnico: as tec <<Role>>
+    :Administrador: as admin <<Role>>
+
+    /' Usuário '/
     user -l-> (Fazer login)
     user --> (Manter cadastro)
 
-    :Técnico: as tec <<Role>>
-    tec -l-|> user
-    "Manter computadores" as (crudcomp)
-    tec --> crudcomp
-    tec --> (Manter softwares)
+    /' Técnico '/
     "Visualizar dashboard" as (dash)
+    "Manter computadores" as (crudcomp)
+    tec -l-|> user
+    tec --> (Manter softwares)
+    tec --> (Manter imagens)
+    tec --> crudcomp
     tec --> dash
     dash ..> (Visualizar próximos inventários) : <<include>>
     dash ..> (Visualizar inventários pendentes) : <<include>>
     crudcomp ..> (Vincular computador a um aluno) : <<include>>
     crudcomp ..> (Vincular computador a uma imagem) : <<include>>
-    tec --> (Manter imagens)
 
-    :Administrador: as admin <<Role>>
+    /' Administrador '/
     admin -d-|> tec
     admin -l-> (Manter usuários)
     admin -l-> (Manter roles)
     admin -> (Manter alunos)
   }
+
   :Aluno: as alu
   alu --> (Receber e-mail de inventário próximo)
   :Computador: as comp <<Application>>
