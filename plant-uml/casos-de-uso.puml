@@ -15,13 +15,13 @@
     "Manter computadores" as (crudcomp)
     tec -l-|> user
     tec --> (Manter softwares)
-    tec --> (Manter imagens)
+    tec --> (Manter protótipos)
     tec --> crudcomp
     tec --> dash
     dash ..> (Visualizar próximos inventários) : <<include>>
     dash ..> (Visualizar inventários pendentes) : <<include>>
     crudcomp ..> (Vincular computador a um aluno) : <<include>>
-    crudcomp ..> (Vincular computador a uma imagem) : <<include>>
+    crudcomp ..> (Vincular computador a um protótipo) : <<include>>
 
     /' Administrador '/
     admin -d-|> tec
@@ -32,6 +32,7 @@
 
   :Aluno: as alu
   alu --> (Receber e-mail de inventário próximo)
+  alu --> (Receber e-mail de atualização de imagem)
   :Computador: as comp <<Application>>
   comp --> (Realizar inventário)
 @enduml
