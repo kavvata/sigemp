@@ -34,12 +34,10 @@ class ComputerView(ListView):
     def get_queryset(self):
         return Computer.objects.all()
 
+
 class InventoryView(APIView):
     parser_classes = [ZlibXMLParser, XMLParser]
     renderer_classes = [XMLRenderer]
-
-
-
 
     def post(self, request: Request):
         data = request.data
@@ -63,7 +61,9 @@ class InventoryView(APIView):
         # NOTE: primeiro inventario muito lento. too bad!
         for software_data in data["CONTENT"]["SOFTWARES"]:
             try:
-                install_date = datetime.strptime(software_data.get("INSTALLDATE"), "%d/%m/%Y")
+                install_date = datetime.strptime(
+                    software_data.get("INSTALLDATE"), "%d/%m/%Y"
+                )
             except TypeError:
                 install_date = datetime.today()
 
@@ -78,11 +78,12 @@ class InventoryView(APIView):
 
             new_software_list.append(software)
 
-        if list(computer.softwares.all()) != new_software_list:
-            print('something changed!')
+        if not is_new and list(computer.softwares.all()) != new_software_list:
+            print("something changed!")
             # TODO: handle software was altered.
 
         computer.softwares.set(new_software_list)
 
         # TODO: retornar resposta valida para o agent
         return Response(status=200)
+

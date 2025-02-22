@@ -17,5 +17,5 @@ class AtivosTestCase(TestCase):
                 content_type="application/x-compress-zlib",
             )
 
-        computador = Computer.objects.get(hostname="PNG-DEV005")
+        computador = Computer.objects.get(hostname="docker-desktop")
         self.assertTrue(computador)
