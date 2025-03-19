@@ -1,0 +1,16 @@
+@startuml
+actor "glpi-agent" as comp
+boundary "Inventario end-point" as endpoint
+entity Software as software
+entity Computador as computador
+
+comp -> endpoint : post XML de inventario
+endpoint -> endpoint : valida dados
+endpoint -> software : cadastra ou recupera softwares
+return listaSoftwares
+endpoint -> computador : cadsatra ou recupera computador
+return computador
+endpoint -> computador : vincula softwares ao computador
+return sucesso
+endpoint --> comp : resposta
+@enduml
