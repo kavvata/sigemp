@@ -11,6 +11,9 @@ defusedxml = "*"
 django-tailwind = {extras = ["reload"], version = "*"}
 
 [dev-packages]
+django-stubs = "*"
+pytest = "*"
+pytest-django = "*"
 
 [requires]
-python_version = "3.12"
+python_version = "3.13"

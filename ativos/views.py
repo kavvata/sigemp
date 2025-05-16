@@ -86,4 +86,3 @@ class InventoryView(APIView):
 
         # TODO: retornar resposta valida para o agent
         return Response(status=200)
-
