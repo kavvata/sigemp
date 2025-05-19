@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+from os import getenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,10 +21,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-^ovvy4za0ld&#&s)4eug!(ab))i(iufhv)yb9j0r8neeun=x5#"
+SECRET_KEY = (
+    getenv("SECRET_KEY")
+    if getenv("SECRET_KEY")
+    else "django-insecure-^ovvy4za0ld&#&s)4eug!(ab))i(iufhv)yb9j0r8neeun=x5#"
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = getenv("DEBUG") if getenv("DEBUG") else True
 
 ALLOWED_HOSTS = ["host.docker.internal", "localhost"]
 
@@ -38,6 +43,7 @@ TAILWIND_APP_NAME = "theme"
 
 INSTALLED_APPS = [
     "ativos.apps.AtivosConfig",
+    "core.apps.CoreConfig",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
