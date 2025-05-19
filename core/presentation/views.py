@@ -32,3 +32,7 @@ def login_view(request: HttpRequest):
             return redirect(reverse("core:home"))
 
     return render(request, "registration/login.html", {"form": LoginForm})
+
+
+def home_view(request: HttpRequest):
+    return render(request, "core/home.html")
