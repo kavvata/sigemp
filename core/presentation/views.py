@@ -1,11 +1,11 @@
 from django.contrib import messages
 from django.contrib.auth import login
-from django.contrib.auth.decorators import login_not_required
 from django.http.request import HttpRequest
 from django.shortcuts import redirect, render
 from django.contrib.auth.models import User
 
-from core.forms import LoginForm
+from core.presentation.forms import LoginForm
+from core.repositories.dj_impl import DjUserRepository
 from core.usecases import login_usecase
 
 
@@ -25,7 +25,7 @@ def login_view(request: HttpRequest):
                 messages.error(request, "Usuario ou senha incorretos.")
                 return redirect("login")
 
-            user: User = result.data
+            user: User = result.value
             login(request, user)
             return redirect("home")
 
