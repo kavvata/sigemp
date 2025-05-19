@@ -1,6 +1,13 @@
-class Result:
+from abc import ABC, abstractmethod
+
+
+class Result(ABC):
     def __init__(self, mensagem="") -> None:
         self.mensagem = mensagem
+
+    @abstractmethod
+    def __bool__(self):
+        pass
 
 
 class ResultSuccess(Result):
