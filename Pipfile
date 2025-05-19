@@ -9,6 +9,7 @@ markdown = "*"
 django-filter = "*"
 defusedxml = "*"
 django-tailwind = {extras = ["reload"], version = "*"}
+django-widget-tweaks = "*"
 
 [dev-packages]
 django-stubs = "*"
