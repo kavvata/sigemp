@@ -5,7 +5,7 @@ from django.shortcuts import redirect, render
 from django.contrib.auth.models import User
 
 from core.presentation.forms import LoginForm
-from core.repositories.dj_impl import DjUserRepository
+from core.repositories.django import DjUserRepository
 from core.usecases import login_usecase
 
 
