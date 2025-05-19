@@ -3,6 +3,7 @@ from django.contrib.auth import login
 from django.http.request import HttpRequest
 from django.shortcuts import redirect, render
 from django.contrib.auth.models import User
+from django.urls import reverse
 
 from core.presentation.forms import LoginForm
 from core.repositories.django import DjUserRepository
@@ -15,6 +16,7 @@ def login_view(request: HttpRequest):
         form = LoginForm(request.POST)
         if form.is_valid():
             repo = DjUserRepository()
+
             result = login_usecase(
                 form.cleaned_data["username"],
                 form.cleaned_data["password"],
@@ -22,11 +24,11 @@ def login_view(request: HttpRequest):
             )
 
             if not result:
-                messages.error(request, "Usuario ou senha incorretos.")
-                return redirect("login")
+                messages.error(request, result.mensagem)
+                return redirect(reverse("core:login"))
 
             user: User = result.value
             login(request, user)
-            return redirect("home")
+            return redirect(reverse("core:home"))
 
     return render(request, "registration/login.html", {"form": LoginForm})
