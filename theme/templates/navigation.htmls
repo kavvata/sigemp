@@ -1,9 +1,0 @@
-<nav class="inline-flex items-center h-16">
-    <h1 class="text-2xl pr-4 pl-2">sigemp</h1>
-    <ul class="inline-flex gap-2">
-        <li>Home</li>
-        <li>Ativos</li>
-        <li>Alunos</li>
-    </ul>
-</nav>
-<hr/>
