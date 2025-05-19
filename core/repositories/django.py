@@ -7,5 +7,5 @@ from core.repositories.contracts import UserRepository
 
 class DjUserRepository(UserRepository):
     @override
-    def authenticate(username: str, password: str) -> User:
-        return authenticate(username, password)
+    def authenticate(self, username: str, password: str) -> User:
+        return authenticate(username=username, password=password)
