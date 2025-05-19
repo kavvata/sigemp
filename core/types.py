@@ -1,0 +1,20 @@
+class Result:
+    def __init__(self, mensagem="") -> None:
+        self.mensagem = mensagem
+
+
+class ResultSuccess(Result):
+    def __init__(self, value: any, mensagem="") -> None:
+        self.value = value
+        super().__init__(mensagem)
+
+    def __bool__(self):
+        return True
+
+
+class ResultError(Result):
+    def __init__(self, mensagem="") -> None:
+        super().__init__(mensagem)
+
+    def __bool__(self):
+        return False
