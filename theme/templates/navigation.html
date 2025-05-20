@@ -1,0 +1,13 @@
+<nav class="flex items-center justify-between h-16 w-dvw px-4">
+    <div class="inline-flex items-center">
+      <h1 class="text-xl font-bold pr-4">sigemp</h1>
+      <ul class="inline-flex gap-2">
+          <li><a href="{% url 'core:home' %}">Home</a></li>
+          <li>Alunos</li>
+      </ul>
+    </div>
+    <div>
+      {{request.user.username}}
+    </div>
+</nav>
+<hr/>

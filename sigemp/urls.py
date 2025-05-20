@@ -1,5 +1,5 @@
 """
-URL configuration for sigecomp project.
+URL configuration for sigemp project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/4.2/topics/http/urls/
@@ -19,6 +19,8 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
+    path("", include("core.presentation.urls")),
     path("admin/", admin.site.urls),
     path("ativos/", include("ativos.urls")),
+    path("__reload__/", include("django_browser_reload.urls")),
 ]

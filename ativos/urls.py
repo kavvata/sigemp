@@ -4,6 +4,6 @@ from . import views
 
 app_name = "ativos"
 urlpatterns = [
-    path("", views.fetch, name="index"),
+    path("", views.ComputerView.as_view(), name="index"),
     path("inventory/", views.InventoryView.as_view(), name="inventory"),
 ]
