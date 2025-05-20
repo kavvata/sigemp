@@ -13,7 +13,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: [3.12, 3.13]
+        python-version: [3.13]
 
     steps:
     - uses: actions/checkout@v4
@@ -25,7 +25,8 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install pipenv
-        pipenv install
+        pipenv install && pipenv install --dev
     - name: Run Tests
       run: |
+        pipenv run pytest
         pipenv run python ./manage.py test
