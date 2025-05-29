@@ -1,0 +1,522 @@
+@startuml sigemp-activity
+start
+repeat
+    :Fazer login;
+repeat while (usuario autenticado?) is (não) not (sim)
+
+:Solicitar página de dashboard;
+
+:Exibir dashboard;
+
+fork
+    :Solicitar página
+    de listagem de bens;
+    repeat
+        :Exibir lista de bens;
+        fork
+            :Solicitar página
+            de cadstro do bem;
+            if (formulario valido?) then (sim)
+                :Exibir mensagem
+                de sucesso;
+            else (não)
+                :Exibir mensagem
+                de erro;
+            endif
+        fork again
+            :Solicitar página
+            de edição do bem;
+            if (bem existe?) then (sim)
+                :Exibir página de edição;
+                fork
+                    :Atualizar bem;
+                    if (formulario valido?) then (sim)
+                        :Exibir mensagem
+                        de sucesso;
+                    else (não)
+                        :Exibir mensagem
+                        de erro;
+                    endif
+                fork again
+                    :Remover bem;
+                    if (remoção de bem confirmada?) then (sim)
+                        :Exibir mensagem
+                        de sucesso;
+                    else (não)
+                        :Exibir mensagem
+                        de erro;
+                    endif
+                end merge
+                repeat
+                repeat while (mais ações?) is (sim) not (não)
+            else (não)
+                :Exibir mensagem de erro;
+            endif
+        end merge
+    repeat while (mais ações?) is (sim) not (não)
+fork again
+    :Solicitar página
+    de listagem
+    de marca/modelo;
+    repeat
+        :Exibir lista de marca/modelo;
+        fork
+            :Solicitar página
+            de cadastro do marca/modelo;
+            if (formulario valido?) then (sim)
+                :Exibir mensagem
+                de sucesso;
+            else (não)
+                :Exibir mensagem
+                de erro;
+            endif
+        fork again
+            :Solicitar página
+            de edição do marca/modelo;
+            if (marca existe?) then (sim)
+                :Exibir página de edição;
+                fork
+                    :Atualizar marca/modelo;
+                    if (formulario valido?) then (sim)
+                        :Exibir mensagem
+                        de sucesso;
+                    else (não)
+                        :Exibir mensagem
+                        de erro;
+                    endif
+                fork again
+                    :Remover marca/modelo;
+                    if (remoção de marca/modelo confirmada?) then (sim)
+                        :Exibir mensagem
+                        de sucesso;
+                    else (não)
+                        :Exibir mensagem
+                        de erro;
+                    endif
+                end merge
+                repeat
+                repeat while (mais ações?) is (sim) not (não)
+            else (não)
+                :Exibir mensagem de erro;
+            endif
+        end merge
+    repeat while (mais ações?) is (sim) not (não)
+fork again
+    :Solicitar página
+    de listagem de tipos de bem;
+    repeat
+        :Exibir lista de tipos de bem;
+        fork
+            :Solicitar página
+            de cadastro do tipo de bem;
+            if (formulario valido?) then (sim)
+                :Exibir mensagem
+                de sucesso;
+            else (não)
+                :Exibir mensagem
+                de erro;
+            endif
+        fork again
+            :Solicitar página
+            de edição do tipo de bem;
+            if (tipo de bem existe?) then (sim)
+                :Exibir página de edição;
+                fork
+                    :Atualizar tipo de bem;
+                    if (formulario valido?) then (sim)
+                        :Exibir mensagem
+                        de sucesso;
+                    else (não)
+                        :Exibir mensagem
+                        de erro;
+                    endif
+                fork again
+                    :Remover tipo de bem;
+                    if (remoção de tipo de bem confirmada?) then (sim)
+                        :Exibir mensagem
+                        de sucesso;
+                    else (não)
+                        :Exibir mensagem
+                        de erro;
+                    endif
+                end merge
+                repeat
+                repeat while (mais ações?) is (sim) not (não)
+            else (não)
+                :Exibir mensagem de erro;
+            endif
+        end merge
+    repeat while (mais ações?) is (sim) not (não)
+fork again
+    :Solicitar página
+    de listagem graus
+    de fragilidade;
+    repeat
+        :Exibir lista de graus de fragilidade;
+        fork
+            :Solicitar página
+            de cadastro do grau de fragilidade;
+            if (usuário tem permissão?) then (sim)
+                if (formulario valido?) then (sim)
+                    :Exibir mensagem
+                    de sucesso;
+                else (não)
+                    :Exibir mensagem
+                    de erro;
+                endif
+            else (não)
+                :Exibir mensagem
+                de erro;
+            endif
+        fork again
+            :Solicitar página
+            de edição do grau de fragilidade;
+            if (usuário tem permissão?) then (sim)
+                if (grau de fragilidade existe?) then (sim)
+                    :Exibir página de edição;
+                    fork
+                        :Atualizar grau de fragilidade;
+                        if (formulario valido?) then (sim)
+                            :Exibir mensagem
+                            de sucesso;
+                        else (não)
+                            :Exibir mensagem
+                            de erro;
+                        endif
+                    fork again
+                        :Remover grau de fragilidade;
+                        if (remoção de grau de fragilidade confirmada?) then (sim)
+                            :Exibir mensagem
+                            de sucesso;
+                        else (não)
+                            :Exibir mensagem
+                            de erro;
+                        endif
+                    end merge
+                    repeat
+                    repeat while (mais ações?) is (sim) not (não)
+                else (não)
+                    :Exibir mensagem de erro;
+                endif
+            else (não)
+                :Exibir mensagem
+                de erro;
+            endif
+        end merge
+    repeat while (mais ações?) is (sim) not (não)
+fork again
+    :Solicitar página de listagem
+    de estados de conservação;
+    repeat
+        :Exibir lista de estados de conservação;
+        fork
+            :Solicitar página
+            de cadastro do estado de conservação;
+            if (usuário tem permissão?) then (sim)
+                if (formulario valido?) then (sim)
+                    :Exibir mensagem
+                    de sucesso;
+                else (não)
+                    :Exibir mensagem
+                    de erro;
+                endif
+            else (não)
+                :Exibir mensagem
+                de erro;
+            endif
+        fork again
+            :Solicitar página
+            de edição do estado de conservação;
+            if (usuário tem permissão?) then (sim)
+                if (estado de conservação existe?) then (sim)
+                    :Exibir página de edição;
+                    fork
+                        :Atualizar estado de conservação;
+                        if (formulario valido?) then (sim)
+                            :Exibir mensagem
+                            de sucesso;
+                        else (não)
+                            :Exibir mensagem
+                            de erro;
+                        endif
+                    fork again
+                        :Remover estado de conservação;
+                        if (remoção de estado de conservação confirmada?) then (sim)
+                            :Exibir mensagem
+                            de sucesso;
+                        else (não)
+                            :Exibir mensagem
+                            de erro;
+                        endif
+                    end merge
+                    repeat
+                    repeat while (mais ações?) is (sim) not (não)
+                else (não)
+                    :Exibir mensagem de erro;
+                endif
+            else (não)
+                :Exibir mensagem
+                de erro;
+            endif
+        end merge
+    repeat while (mais ações?) is (sim) not (não)
+fork again
+    :Solicitar página de listagem
+    de tipos de ocorrência;
+    repeat
+        :Exibir lista de tipos de ocorrência;
+        fork
+            :Solicitar página
+            de cadastro do tipo de ocorrência;
+            if (usuário tem permissão?) then (sim)
+                if (formulario valido?) then (sim)
+                    :Exibir mensagem
+                    de sucesso;
+                else (não)
+                    :Exibir mensagem
+                    de erro;
+                endif
+            else (não)
+                :Exibir mensagem
+                de erro;
+            endif
+        fork again
+            :Solicitar página
+            de edição do tipo de ocorrência;
+            if (usuário tem permissão?) then (sim)
+                if (tipo de ocorrência existe?) then (sim)
+                    :Exibir página de edição;
+                    fork
+                        :Atualizar tipo de ocorrência;
+                        if (formulario valido?) then (sim)
+                            :Exibir mensagem
+                            de sucesso;
+                        else (não)
+                            :Exibir mensagem
+                            de erro;
+                        endif
+                    fork again
+                        :Remover tipo de ocorrência;
+                        if (remoção de tipo de ocorrência confirmada?) then (sim)
+                            :Exibir mensagem
+                            de sucesso;
+                        else (não)
+                            :Exibir mensagem
+                            de erro;
+                        endif
+                    end merge
+                    repeat
+                    repeat while (mais ações?) is (sim) not (não)
+                else (não)
+                    :Exibir mensagem de erro;
+                endif
+            else (não)
+                :Exibir mensagem
+                de erro;
+            endif
+        end merge
+    repeat while (mais ações?) is (sim) not (não)
+fork again
+    :Solicitar página de listagem de campi;
+    repeat
+        :Exibir lista de campi;
+        fork
+            :Solicitar página
+            de cadastro do campus;
+            if (usuário tem permissão?) then (sim)
+                if (formulario valido?) then (sim)
+                    :Exibir mensagem
+                    de sucesso;
+                else (não)
+                    :Exibir mensagem
+                    de erro;
+                endif
+            else (não)
+                :Exibir mensagem
+                de erro;
+            endif
+        fork again
+            :Solicitar página
+            de edição do campus;
+            if (usuário tem permissão?) then (sim)
+                if (campus existe?) then (sim)
+                    :Exibir página de edição;
+                    fork
+                        :Atualizar campus;
+                        if (formulario valido?) then (sim)
+                            :Exibir mensagem
+                            de sucesso;
+                        else (não)
+                            :Exibir mensagem
+                            de erro;
+                        endif
+                    fork again
+                        :Remover campus;
+                        if (remoção de campus confirmada?) then (sim)
+                            :Exibir mensagem
+                            de sucesso;
+                        else (não)
+                            :Exibir mensagem
+                            de erro;
+                        endif
+                    end merge
+                    repeat
+                    repeat while (mais ações?) is (sim) not (não)
+                else (não)
+                    :Exibir mensagem de erro;
+                endif
+            else (não)
+                :Exibir mensagem
+                de erro;
+            endif
+        end merge
+    repeat while (mais ações?) is (sim) not (não)
+fork again
+    :Solicitar página de listagem de cursos;
+    repeat
+        :Exibir lista de cursos;
+        fork
+            :Solicitar página
+            de cadastro do aluno;
+            if (usuário tem permissão?) then (sim)
+                if (formulario valido?) then (sim)
+                    :Exibir mensagem
+                    de sucesso;
+                else (não)
+                    :Exibir mensagem
+                    de erro;
+                endif
+            else (não)
+                :Exibir mensagem
+                de erro;
+            endif
+        fork again
+            :Solicitar página
+            de edição do curso;
+            if (usuário tem permissão?) then (sim)
+                if (curso existe?) then (sim)
+                    :Exibir página de edição;
+                    fork
+                        :Atualizar curso;
+                        if (formulario valido?) then (sim)
+                            :Exibir mensagem
+                            de sucesso;
+                        else (não)
+                            :Exibir mensagem
+                            de erro;
+                        endif
+                    fork again
+                        :Remover curso;
+                        if (remoção de curso confirmada?) then (sim)
+                            :Exibir mensagem
+                            de sucesso;
+                        else (não)
+                            :Exibir mensagem
+                            de erro;
+                        endif
+                    end merge
+                    repeat
+                    repeat while (mais ações?) is (sim) not (não)
+                else (não)
+                    :Exibir mensagem de erro;
+                endif
+            else (não)
+                :Exibir mensagem
+                de erro;
+            endif
+        end merge
+    repeat while (mais ações?) is (sim) not (não)
+fork again
+    :Solicitar página de listagem de alunos;
+    repeat
+        :Exibir lista de alunos;
+        fork
+            :Solicitar página
+            de cadastro do aluno;
+            if (formulario valido?) then (sim)
+                :Exibir mensagem
+                de sucesso;
+            else (não)
+                :Exibir mensagem
+                de erro;
+            endif
+        fork again
+            :Solicitar página
+            de edição do aluno;
+            if (aluno existe?) then (sim)
+                :Exibir página de edição;
+                fork
+                    :Atualizar aluno;
+                    if (formulario valido?) then (sim)
+                        :Exibir mensagem
+                        de sucesso;
+                    else (não)
+                        :Exibir mensagem
+                        de erro;
+                    endif
+                fork again
+                    :Remover aluno;
+                    if (remoção de aluno confirmada?) then (sim)
+                        :Exibir mensagem
+                        de sucesso;
+                    else (não)
+                        :Exibir mensagem
+                        de erro;
+                    endif
+                end merge
+                repeat
+                repeat while (mais ações?) is (sim) not (não)
+            else (não)
+                :Exibir mensagem de erro;
+            endif
+        end merge
+    repeat while (mais ações?) is (sim) not (não)
+fork again
+    :Solicitar página de listagem de membros;
+    if (usuario tem permissão?) then (sim)
+        fork
+            :Solicitar página
+            de cadastro do membro;
+            if (formulario valido?) then (sim)
+                :Exibir mensagem
+                de sucesso;
+            else (não)
+                :Exibir mensagem
+                de erro;
+            endif
+        fork again
+            :Solicitar página
+            de edição do membro;
+            if (membro existe?) then (sim)
+                :Exibir página de edição;
+                fork
+                    :Atualizar membro;
+                    if (formulario valido?) then (sim)
+                        :Exibir mensagem
+                        de sucesso;
+                    else (não)
+                        :Exibir mensagem
+                        de erro;
+                    endif
+                fork again
+                    :Remover membro;
+                    if (remoção de membro confirmada?) then (sim)
+                        :Exibir mensagem
+                        de sucesso;
+                    else (não)
+                        :Exibir mensagem
+                        de erro;
+                    endif
+                end merge
+                repeat
+                repeat while (mais ações?) is (sim) not (não)
+            else (não)
+                :Exibir mensagem de erro;
+            endif
+        end merge
+    else (não)
+        :Exibir mensagem de erro;
+    endif
+end merge
+stop
+@enduml
