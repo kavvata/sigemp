@@ -3,7 +3,7 @@
 
   package "Sistema web" {
     :Usuário: as user
-    :Técnico: as tec <<Role>>
+    :Membro: as tec <<Role>>
     :Administrador: as admin <<Role>>
 
     /' Usuário '/
@@ -11,7 +11,6 @@
     user --> (Manter cadastro)
 
     /' Técnico '/
-    "Visualizar dashboard" as (dash)
     "Manter bens" as (crudbens)
     "Receber notificação" as (notificacao)
     "Realizar empréstimo" as (emp)
@@ -19,25 +18,21 @@
     tec -r-|> user
     tec --> (Manter empréstimos)
     tec --> crudbens
-    tec --> dash
     tec --> notificacao
     tec --> oco
     tec --> emp
+    tec --> (Manter tipos de bem)
+    tec --> (Manter alunos)
     emp ..> (Gerar termo de responsabilidade) :<<include>>
     emp ..> (Gerar termo de devolução) :<<include>>
 
     notificacao ..> (Receber notificação de ocorrências) : <<include>>
-    
-    dash ..> (Visualizar próximos inventários) : <<include>>
-    dash ..> (Visualizar inventários pendentes) : <<include>>
-    dash ..> (Gerar relatórios PDF) : <<include>>
 
     /' Administrador '/
     admin -|> tec
     admin --> (Manter usuários)
     admin --> (Manter roles)
-    admin --> (Manter alunos)
-    admin --> (Manter tipos de bem)
+    
     admin --> (Manter tipos de ocorrencia)
     admin --> (Manter cursos)
     admin --> (Manter estados de conservação)
