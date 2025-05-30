@@ -3,39 +3,56 @@
 
   package "Sistema web" {
     :Usuário: as user
-    :Membro: as tec <<Role>>
+    :Membro: as membro <<Role>>
     :Administrador: as admin <<Role>>
 
     /' Usuário '/
-    user -r-> (Fazer login)
-    user --> (Manter cadastro)
+    rectangle "autenticacao e Perfil" {
+        user -r-> (Fazer login)
+        user --> (Fazer log-off)
+        user --> (Manter cadastro)
+    }
 
-    /' Técnico '/
-    "Manter bens" as (crudbens)
-    "Receber notificação" as (notificacao)
-    "Realizar empréstimo" as (emp)
-    "Registrar ocorrencia" as (oco)
-    tec -r-|> user
-    tec --> (Manter empréstimos)
-    tec --> crudbens
-    tec --> notificacao
-    tec --> oco
-    tec --> emp
-    tec --> (Manter tipos de bem)
-    tec --> (Manter alunos)
-    emp ..> (Gerar termo de responsabilidade) :<<include>>
-    emp ..> (Gerar termo de devolução) :<<include>>
+    /' Membro '/
+    membro -r-|> user
+    rectangle "Gestao de Empréstimos" {
+        "Visualizar detalhes do empréstimo" as (empdetail)
+        membro --> empdetail
+        membro --> (Editar empréstimo)
+        membro --> (Realizar empréstimo)
+        empdetail <.. (Gerar termo de responsabilidade) : <<extend>>
+        empdetail <.. (Gerar termo de devolução) : <<extend>>
+        empdetail <.. (Alterar estado do empréstimo) : <<extend>>
+        empdetail <.. (Registrar ocorrencia) : <<extend>>
+    }
 
-    notificacao ..> (Receber notificação de ocorrências) : <<include>>
+    rectangle "Gestao de Ocorrencias" {
+        "Visualizar detalhes da ocorrencia" as (occdetail)
+        membro --> (Visualizar lista de ocorrências)
+        membro --> occdetail
+        membro --> (Receber notificação de ocorrências)
+        occdetail <.. (Alterar estado da ocorrencia) : <<extend>>
+    }
+
+    rectangle "Cadastros auxiliares" {
+        membro --> (Manter bens)
+        membro --> (Manter tipos de bem)
+        membro --> (Manter alunos)
+        membro --> (Manter marcas/modelo)
+    }
+
 
     /' Administrador '/
-    admin -|> tec
-    admin --> (Manter usuários)
-    admin --> (Manter roles)
-    
-    admin --> (Manter tipos de ocorrencia)
-    admin --> (Manter cursos)
-    admin --> (Manter estados de conservação)
+    rectangle "Administração" {
+        admin -|> membro
+        admin --> (Manter usuários)
+        admin --> (Manter roles)
+        admin --> (Manter tipos de ocorrencia)
+        admin --> (Manter cursos)
+        admin --> (Manter campi)
+        admin --> (Manter graus de fragilidade)
+        admin --> (Manter estados de conservação)
+    }
   }
 
   :Aluno: as aluno
