@@ -9,14 +9,85 @@ repeat while (usuario autenticado?) is (não) not (sim)
 :Exibir dashboard;
 
 split
+    :Solicitar página de listagem de empréstimos;
+    repeat :Exibir lista de empréstimos;
+    split
+        :Solicitar página de registro de empréstimo;
+            repeat :Registrar novo de empréstimo;
+                repeat :Selecionar aluno;
+                    backward:Exibir mensagem aluno inválido;
+                repeat while (Aluno tem empréstimo ativo?) is (sim) not (não)
+                repeat :Selecionar bem;
+                    backward:exibir mensagem bem inválido;
+                repeat while (Bem tem empréstimo ativo?) is (sim) not (não)
+                repeat :Selecionar data de início;
+                    backward:exibir mensagem data de início inválida;
+                repeat while (Data é menor que hoje?) is (sim) not (não)
+                repeat :Selecionar data de fim;
+                    backward:exibir mensagem data de fim inválida;
+                repeat while (Data é menor que data de início?) is (sim) not (não)
+            repeat while (formulário válido?) is (não) not (sim)
+    split again
+        :Solicitar página de detalhes do empréstimo;
+        if (empréstimo existe?) then (sim)
+            :Exibir detalhes do empréstimo;
+            split
+                :Solicitar página de edição de empréstimo;
+                    repeat :Editar empréstimo;
+                        repeat :Selecionar bem;
+                            backward:exibir mensagem bem inválido;
+                        repeat while (Bem tem empréstimo ativo?) is (sim) not (não)
+                        repeat :Selecionar data de início;
+                            backward:exibir mensagem data de início inválida;
+                        repeat while (Data é menor que hoje?) is (sim) not (não)
+                        repeat :Selecionar data de fim;
+                            backward:exibir mensagem data de fim inválida;
+                        repeat while (Data é menor que data de início?) is (sim) not (não)
+                        repeat while (formulário válido?) is (não) not (sim)
+            split again
+                :Registrar ocorrência
+                no empréstimo;
+                if (alterar estado de conservação?) then (sim)
+                    :Alterar estado de conservação;
+                else (não)
+                endif
+            split again
+                :Alterar estado do empréstimo;
+                if (empréstimo ativo?) then (sim)
+                    :Exibir mensagem de sucesso;
+                else (não)
+                    :Exibir mensagem de erro;
+                endif
+            split again
+                :Gerar termo
+                de responsabilidade
+                do empréstimo;
+            split again
+                :Gerar termo
+                de devolução
+                do empréstimo;
+            end split
+        else (não)
+            :Exibir mensagem de erro;
+        endif
+    end split
+    repeat while (mais ações?) is (sim) not (não)
+split again
+    :Solicitar página
+    de listagem de ocorrência;
+    repeat :Exibir lista de ocorrências;
+        :Solicitar página
+        de detalhe da ocorrência;
+        :Exibir detalhes da ocorrência;
+    repeat while (mais ações?) is (sim) not (não)
+split again
     :Solicitar página
     de listagem de bens;
-    repeat
-        :Exibir lista de bens;
+    repeat :Exibir lista de bens;
         split
             :Solicitar página
             de cadstro do bem;
-            :Validar formulário;
+            :Cadastrar bem;
             if (formulario valido?) then (sim)
                 :Exibir mensagem
                 de sucesso;
@@ -57,11 +128,11 @@ split again
     :Solicitar página
     de listagem
     de marca/modelo;
-    repeat
-        :Exibir lista de marca/modelo;
+    repeat :Exibir lista de marca/modelo;
         split
             :Solicitar página
             de cadastro do marca/modelo;
+            :Cadastrar marca/modelo;
             if (formulario valido?) then (sim)
                 :Exibir mensagem
                 de sucesso;
@@ -101,11 +172,11 @@ split again
 split again
     :Solicitar página
     de listagem de tipos de bem;
-    repeat
-        :Exibir lista de tipos de bem;
+    repeat :Exibir lista de tipos de bem;
         split
             :Solicitar página
             de cadastro do tipo de bem;
+            :Cadastrar tipo de bem;
             if (formulario valido?) then (sim)
                 :Exibir mensagem
                 de sucesso;
@@ -146,11 +217,11 @@ split again
     :Solicitar página
     de listagem graus
     de fragilidade;
-    repeat
-        :Exibir lista de graus de fragilidade;
+    repeat :Exibir lista de graus de fragilidade;
         split
             :Solicitar página
             de cadastro do grau de fragilidade;
+            :Cadastrar grau de fragilidade;
             if (usuário tem permissão?) then (sim)
                 if (formulario valido?) then (sim)
                     :Exibir mensagem
@@ -168,7 +239,7 @@ split again
             de edição do grau de fragilidade;
             if (usuário tem permissão?) then (sim)
                 if (grau de fragilidade existe?) then (sim)
-                    :Exibir página de edição;
+                    repeat :Exibir página de edição;
                     split
                         :Atualizar grau de fragilidade;
                         if (formulario valido?) then (sim)
@@ -188,7 +259,6 @@ split again
                             de erro;
                         endif
                     end split
-                    repeat
                     repeat while (mais ações?) is (sim) not (não)
                 else (não)
                     :Exibir mensagem de erro;
@@ -202,11 +272,11 @@ split again
 split again
     :Solicitar página de listagem
     de estados de conservação;
-    repeat
-        :Exibir lista de estados de conservação;
+    repeat :Exibir lista de estados de conservação;
         split
             :Solicitar página
             de cadastro do estado de conservação;
+            :Cadastrar estado de conservação;
             if (usuário tem permissão?) then (sim)
                 if (formulario valido?) then (sim)
                     :Exibir mensagem
@@ -258,11 +328,11 @@ split again
 split again
     :Solicitar página de listagem
     de tipos de ocorrência;
-    repeat
-        :Exibir lista de tipos de ocorrência;
+    repeat :Exibir lista de tipos de ocorrência;
         split
             :Solicitar página
             de cadastro do tipo de ocorrência;
+            :Cadastrar tipo de ocorrência;
             if (usuário tem permissão?) then (sim)
                 if (formulario valido?) then (sim)
                     :Exibir mensagem
@@ -313,12 +383,12 @@ split again
     repeat while (mais ações?) is (sim) not (não)
 split again
     :Solicitar página de listagem de campi;
-    repeat
-        :Exibir lista de campi;
+    repeat :Exibir lista de campi;
         split
             :Solicitar página
             de cadastro do campus;
             if (usuário tem permissão?) then (sim)
+                :Cadastrar campus;
                 if (formulario valido?) then (sim)
                     :Exibir mensagem
                     de sucesso;
@@ -368,12 +438,12 @@ split again
     repeat while (mais ações?) is (sim) not (não)
 split again
     :Solicitar página de listagem de cursos;
-    repeat
-        :Exibir lista de cursos;
+    repeat :Exibir lista de cursos;
         split
             :Solicitar página
-            de cadastro do aluno;
+            de cadastro do curso;
             if (usuário tem permissão?) then (sim)
+                :Cadastrar curso;
                 if (formulario valido?) then (sim)
                     :Exibir mensagem
                     de sucesso;
@@ -423,11 +493,11 @@ split again
     repeat while (mais ações?) is (sim) not (não)
 split again
     :Solicitar página de listagem de alunos;
-    repeat
-        :Exibir lista de alunos;
+    repeat :Exibir lista de alunos;
         split
             :Solicitar página
             de cadastro do aluno;
+            :Cadastrar aluno;
             if (formulario valido?) then (sim)
                 :Exibir mensagem
                 de sucesso;
@@ -465,13 +535,13 @@ split again
         end split
     repeat while (mais ações?) is (sim) not (não)
 split again
-    repeat
-    :Solicitar página de listagem de membros;
+    repeat :Solicitar página de listagem de membros;
     if (usuario tem permissão?) then (sim)
         :Exibir lista de membros;
         split
             :Solicitar página
             de cadastro do membro;
+            :Cadastrar membro;
             if (formulario valido?) then (sim)
                 :Exibir mensagem
                 de sucesso;
@@ -510,39 +580,6 @@ split again
     else (não)
         :Exibir mensagem de erro;
     endif
-    repeat while (mais ações?) is (sim) not (não)
-split again
-    :Solicitar página de listagem de empréstimos;
-    repeat
-    :Exibir lista de empréstimos;
-    split
-        :Solicitar página de registro de empréstimo;
-            :Registrar novo de empréstimo;
-            repeat
-            :Validar formulário;
-            if (Aluno tem valido?) then (sim)
-                :Exibir mensagem
-                de sucesso;
-            else (não)
-                :Exibir mensagem
-                de erro;
-            endif
-            repeat while (formulário válido?) is (não) not (sim)
-    split again
-        :Solicitar página de edição de empréstimo;
-        if (empréstimo existe?) then (sim)
-            :Editar empréstimo;
-            if (formulário válido?) then (sim)
-                :Exibir mensagem
-                de sucesso;
-            else (não)
-                :Exibir mensagem
-                de erro;
-            endif
-        else (não)
-            :Exibir mensagem de erro;
-        endif
-    end split
     repeat while (mais ações?) is (sim) not (não)
 end split
 stop
