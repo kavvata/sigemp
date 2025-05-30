@@ -1,0 +1,120 @@
+@startuml classes
+
+package "patrimonio" {
+    class TipoBem {
+        +descricao: str
+        +ativo : bool
+    }
+
+    class GrauFragilidade {
+        +descricao: str
+        +ativo: bool
+    }
+
+    class EstadoConservacao {
+        +descricao: str
+        +ativo: bool
+    }
+
+    class MarcaModelo {
+        +sigla: str
+        +descricao: str
+        +ativo: bool
+    }
+
+    class Bem {
+        +patrimonio: str
+        +descricao: str
+        +ativo: bool
+    }
+
+    Bem -- TipoBem : "tipo"
+    Bem -- GrauFragilidade : "grauFragilidade"
+    Bem -- EstadoConservacao : "estadoConservacao"
+    Bem -- MarcaModelo : "marcaModelo"
+}
+
+package "core" {
+    class User {
+        +id: int
+        +last_login: date
+        +is_superuser: bool
+        +username: str
+        +first_name: str
+        +last_name: str
+        +email: str
+        +is_staff: Boolean
+        +is_active: Boolean
+        +date_joined: date
+        --
+        +check_password(raw_password): bool
+        +set_password(raw_password): void
+        +get_full_name(): str
+        +get_short_name(): str
+        +email_user(subject, message, from_email=None): void
+    }
+
+    class Group {
+        +name: str
+    }
+
+    class Permission {
+        +name: str
+        +codename: str
+    }
+
+    User "0..*" -- "0..*" Group : "groups"
+    User "0..*" -- "0..*" Permission : "user_permissions"
+    Group "0..*" -- "0..*" Permission : "permissions"
+
+}
+
+package "ensino" {
+    class Campus {
+        +sigla: str
+        +nome: str
+    }
+
+    class Curso {
+        +sigla: str
+        +nome: str
+    }
+
+    class Aluno {
+        +nome: str
+        +nome_responsavel: str
+        +cpf: str
+        +email: str
+        +matricula: str
+        +telefone: str
+    }
+
+    Aluno "0..*" -- "1" Campus : "campus"
+    Aluno "0..*" -- "1" Curso : "curso"
+}
+
+package "emprestimo" {
+    class TipoOcorrencia {
+        +descricao: str
+    }
+    class Ocorrencia {
+        +data_ocorrencia: date
+        +emprestimo: Emprestimo
+    }
+    class Emprestimo {
+        +data_emprestimo: date
+        +data_devolucao_prevista: date
+        +data_devolucao: date
+        +bem: Bem
+        +aluno: Aluno
+        +estado: int
+    }
+
+    Emprestimo "0..*" -- "1" Bem : "bem"
+    Emprestimo "0..*" -- "1" Aluno : "aluno"
+
+    Ocorrencia "0..*" -- "1" TipoOcorrencia : "tipo"
+    Ocorrencia "0..*" -- "1" Emprestimo : "emprestimo"
+}
+
+@enduml
