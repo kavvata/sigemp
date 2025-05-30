@@ -1,0 +1,148 @@
+// ==========================
+// 📦 patrimonio
+// ==========================
+
+Table tipo_bem {
+  id int [pk, increment]
+  descricao varchar
+  ativo boolean
+}
+
+Table grau_fragilidade {
+  id int [pk, increment]
+  descricao varchar
+  ativo boolean
+}
+
+Table estado_conservacao {
+  id int [pk, increment]
+  descricao varchar
+  ativo boolean
+}
+
+Table marca_modelo {
+  id int [pk, increment]
+  sigla varchar
+  descricao varchar
+  ativo boolean
+}
+
+Table bem {
+  id int [pk, increment]
+  patrimonio varchar
+  descricao varchar
+  ativo boolean
+  tipo_id int [ref: > tipo_bem.id]
+  grau_fragilidade_id int [ref: > grau_fragilidade.id]
+  estado_conservacao_id int [ref: > estado_conservacao.id]
+  marca_modelo_id int [ref: > marca_modelo.id]
+}
+
+// ==========================
+// 🧠 core (Django auth)
+// ==========================
+
+Table auth_user {
+  id int [pk, increment]
+  password varchar
+  last_login datetime
+  is_superuser boolean
+  username varchar [unique]
+  first_name varchar
+  last_name varchar
+  email varchar
+  is_staff boolean
+  is_active boolean
+  date_joined datetime
+}
+
+Table auth_group {
+  id int [pk, increment]
+  name varchar [unique]
+}
+
+Table auth_permission {
+  id int [pk, increment]
+  name varchar
+  codename varchar
+  content_type_id int [ref: > django_content_type.id]
+}
+
+Table django_content_type {
+  id int [pk, increment]
+  app_label varchar
+  model varchar
+}
+
+// === M2M Join Tables
+
+Table auth_user_groups {
+  id int [pk, increment]
+  user_id int [ref: > auth_user.id]
+  group_id int [ref: > auth_group.id]
+}
+
+Table auth_user_user_permissions {
+  id int [pk, increment]
+  user_id int [ref: > auth_user.id]
+  permission_id int [ref: > auth_permission.id]
+}
+
+Table auth_group_permissions {
+  id int [pk, increment]
+  group_id int [ref: > auth_group.id]
+  permission_id int [ref: > auth_permission.id]
+}
+
+// ==========================
+// 🎓 ensino
+// ==========================
+
+Table campus {
+  id int [pk, increment]
+  sigla varchar
+  nome varchar
+}
+
+Table curso {
+  id int [pk, increment]
+  sigla varchar
+  nome varchar
+}
+
+Table aluno {
+  id int [pk, increment]
+  nome varchar
+  cpf varchar [unique]
+  email varchar
+  matricula varchar [unique]
+  telefone varchar
+  campus_id int [ref: > campus.id]
+  curso_id int [ref: > curso.id]
+}
+
+// ==========================
+// 📦 emprestimo
+// ==========================
+
+Table tipo_ocorrencia {
+  id int [pk, increment]
+  descricao varchar
+}
+
+Table emprestimo {
+  id int [pk, increment]
+  data_emprestimo date
+  data_devolucao_prevista date
+  data_devolucao date
+  estado int
+  bem_id int [ref: > bem.id]
+  aluno_id int [ref: > aluno.id]
+}
+
+Table ocorrencia {
+  id int [pk, increment]
+  data_ocorrencia date
+  tipo_id int [ref: > tipo_ocorrencia.id]
+  emprestimo_id int [ref: > emprestimo.id]
+}
