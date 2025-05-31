@@ -7,7 +7,7 @@
     :Administrador: as admin <<Role>>
 
     /' Usuário '/
-    rectangle "autenticacao e Perfil" {
+    rectangle "Autenticação e Perfil" {
         user -r-> (Fazer login)
         user --> (Fazer log-off)
         user --> (Manter cadastro)
@@ -26,8 +26,8 @@
         empdetail <.. (Registrar ocorrencia) : <<extend>>
     }
 
-    rectangle "Gestao de Ocorrencias" {
-        "Visualizar detalhes da ocorrencia" as (occdetail)
+    rectangle "Gestao de Ocorrências" {
+        "Visualizar detalhes da ocorrência" as (occdetail)
         membro --> (Visualizar lista de ocorrências)
         membro --> occdetail
         membro --> (Receber notificação de ocorrências)
@@ -44,14 +44,14 @@
 
     /' Administrador '/
     rectangle "Administração" {
-        admin -|> membro
-        admin --> (Manter usuários)
-        admin --> (Manter roles)
-        admin --> (Manter tipos de ocorrencia)
-        admin --> (Manter cursos)
-        admin --> (Manter campi)
-        admin --> (Manter graus de fragilidade)
-        admin --> (Manter estados de conservação)
+        admin -d-|> membro
+        admin -u-> (Manter usuários)
+        admin -u-> (Manter roles)
+        admin -u-> (Manter tipos de ocorrencia)
+        admin -u-> (Manter cursos)
+        admin -u-> (Manter campi)
+        admin -u-> (Manter graus de fragilidade)
+        admin -u-> (Manter estados de conservação)
     }
   }
 
