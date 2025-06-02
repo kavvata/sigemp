@@ -8,6 +8,7 @@
     </div>
     <div>
       {{request.user.username}}
+      <a href="{% url 'core:logout' %}" class="text-blue-500">Sair</a>
     </div>
 </nav>
 <hr/>
