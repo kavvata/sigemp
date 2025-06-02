@@ -21,15 +21,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = (
-    getenv("SECRET_KEY")
-    if getenv("SECRET_KEY")
-    else "django-insecure-^ovvy4za0ld&#&s)4eug!(ab))i(iufhv)yb9j0r8neeun=x5#"
+SECRET_KEY = getenv(
+    "SECRET_KEY", "django-insecure-^ovvy4za0ld&#&s)4eug!(ab))i(iufhv)yb9j0r8neeun=x5#"
 )
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = getenv("DEBUG") if getenv("DEBUG") else True
-
+DEBUG = getenv("DEBUG", True)
 ALLOWED_HOSTS = ["host.docker.internal", "localhost"]
 
 
@@ -91,13 +88,25 @@ WSGI_APPLICATION = "sigemp.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+DATABASE_ENGINE = getenv("DATABASE_ENGINE")
+if DATABASE_ENGINE == "postgresql":
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": getenv("DB_NAME", "sigemp_db"),
+            "USER": getenv("DB_USER", "myuser"),
+            "PASSWORD": getenv("DB_PASSWORD", "secret"),
+            "HOST": getenv("DB_HOST", "db"),
+            "PORT": getenv("DB_PORT", "5432"),
+        }
     }
-}
-
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
