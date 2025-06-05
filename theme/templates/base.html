@@ -6,13 +6,14 @@
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 		{% tailwind_css %}
 	</head>
 
 	<body class="bg-gray-50 leading-normal tracking-normal w-screen h-screen">
         {% include "navigation.html" %}
         <div class="pt-6 bg-gray-200 h-screen flex-col items-center justify-center">
-          <div class="pt-6">
+          <div class="pt-6 text-gray-900">
             {% block content %}
             {% endblock %}
           </div>
