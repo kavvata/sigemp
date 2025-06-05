@@ -2,16 +2,25 @@
 
 {% block content %}
 
-  <div class="max-w-7xl mx-auto flex items-center justify-between border border-red-500 mb-16">
+  <section class="max-w-7xl mx-auto flex items-center justify-between border mb-8">
     <div><h1 class="font-bold text-2xl ">Tipos de Bem</h1></div>
     {% if pode_criar %}
-      <div><a href="{% url 'core:home' %}">Novo Tipo de Bem</a></div>
+      <div>
+        <a href="{% url 'core:home' %}">
+          <div class="rounded-md py-2 px-4 bg-blue-500 hover:bg-blue-700 hover:text-gray-50 items-center font-semibold text-sm text-gray-100">
+            <i class="material-icons align-middle">add</i>
+              Novo Tipo de Bem
+          </div>
+        </a>
+      </div>
     {% endif %}
-  </div>
+  </section>
 
-  <section class="bg-gray-50 max-w-7xl mx-auto flex justify-center items-center p-4 shadow-md rounded-md font-serif">
+  <section class="bg-gray-50 text-gray-500 max-w-7xl mx-auto flex justify-center items-center p-4 shadow-md rounded-md">
     {% for tipo_bem in tipo_bens %}
       <p>{{tipo_bem.descricao}}</p>
+    {% empty %}
+      <p class="text-xs">Nenhum tipo de bem cadastrado.</p>
     {% endfor %}
   </section>
 {% endblock %}
