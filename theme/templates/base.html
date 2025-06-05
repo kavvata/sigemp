@@ -13,7 +13,17 @@
 	<body class="bg-gray-50 leading-normal tracking-normal w-screen h-screen">
         {% include "navigation.html" %}
         <div class="pt-6 bg-gray-200 h-screen flex-col items-center justify-center">
-          <div class="pt-6 text-gray-900">
+          <div class="mt-6 text-gray-900">
+
+            <section class="max-w-7xl mx-auto flex items-center justify-between border mb-8">
+              <div>
+                <h1 class="font-bold text-2xl ">{% block title %}{% endblock %}</h1>
+              </div>
+              <div>
+                {% block actions %}{% endblock actions %}
+              </div>
+            </section>
+
             {% block content %}
             {% endblock %}
           </div>
