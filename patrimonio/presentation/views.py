@@ -2,7 +2,6 @@ from typing import Any
 
 from django.core.exceptions import PermissionDenied
 from django.views.generic import CreateView, ListView
-from django.urls import reverse
 
 from patrimonio.models import TipoBem
 from patrimonio.policies.django import DjangoTipoBemPolicy
@@ -47,7 +46,6 @@ class ListarTiposBemView(ListView):
 class CriarTipoBemView(CreateView):
     template_name = "patrimonio/tipo_bem/tipo_bem_form.html"
     form_class = TipoBemForm
-    success_url = reverse("patrimonio:listar_tipos_bem")
 
     def form_valid(self, form):
         repo = DjTipoBemRepository()
