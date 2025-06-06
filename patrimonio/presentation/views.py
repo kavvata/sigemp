@@ -1,10 +1,12 @@
 from typing import Any
 
 from django.core.exceptions import PermissionDenied
-from django.views.generic import ListView
+from django.views.generic import CreateView, ListView
+from django.urls import reverse
 
 from patrimonio.models import TipoBem
 from patrimonio.policies.django import DjangoTipoBemPolicy
+from patrimonio.presentation.forms import TipoBemForm
 from patrimonio.repositories.django import DjTipoBemRepository
 from patrimonio.usecases import CadastrarTipoBemUsecase, ListarTiposBemUsecase
 
@@ -40,3 +42,26 @@ class ListarTiposBemView(ListView):
         context["pode_criar"] = usecase.pode_criar()
 
         return context
+
+
+class CriarTipoBemView(CreateView):
+    template_name = "patrimonio/tipo_bem/tipo_bem_form.html"
+    form_class = TipoBemForm
+    success_url = reverse("patrimonio:listar_tipos_bem")
+
+    def form_valid(self, form):
+        repo = DjTipoBemRepository()
+        policy = DjangoTipoBemPolicy()
+        usecase = CadastrarTipoBemUsecase(repo, policy)
+
+        if not usecase.pode_criar():
+            raise PermissionDenied(
+                "Voce nao tem permissao para visualizar tipos de bem."
+            )
+
+        result = usecase.execute(form.cleaned_data["descricao"])
+
+        if not result:
+            raise PermissionDenied(result.mensagem)
+
+        return super().form_valid(form)
