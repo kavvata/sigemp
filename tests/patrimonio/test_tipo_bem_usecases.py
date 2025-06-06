@@ -81,7 +81,7 @@ def test_editar_tipo_bem_usecase(tipo_bem):
 
     repo.buscar_por_id.assert_called_with(tipo_bem["id"])
     repo.editar_tipo_bem.assert_called_with(tipo_bem["id"], tipo_bem["descricao"])
-    policy.pode_editar.assert_called_with()
+    policy.pode_editar.assert_called_with(tipo_bem)
 
     assert result
     assert isinstance(result, ResultSuccess)
@@ -91,6 +91,7 @@ def test_editar_tipo_bem_usecase(tipo_bem):
 def test_remover_tipo_bem_usecase(tipo_bem):
     repo = mock.Mock()
     policy = mock.Mock()
+    repo.buscar_por_id.return_value = tipo_bem
     repo.remover_tipo_bem.return_value = tipo_bem
     policy.pode_remover.return_value = True
 
@@ -99,7 +100,7 @@ def test_remover_tipo_bem_usecase(tipo_bem):
     result = usecase.execute(tipo_bem["id"])
 
     repo.remover_tipo_bem.assert_called_with(tipo_bem["id"])
-    policy.pode_remover.assert_called_with()
+    policy.pode_remover.assert_called_with(tipo_bem)
 
     assert result
     assert isinstance(result, ResultSuccess)

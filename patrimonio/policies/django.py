@@ -1,4 +1,5 @@
 from typing import override
+from patrimonio.models import TipoBem
 from patrimonio.policies.contracts import TipoBemPolicy
 from django.contrib.auth.models import User
 
@@ -10,20 +11,20 @@ class DjangoTipoBemPolicy(TipoBemPolicy):
 
     @override
     def pode_listar(self) -> bool:
-        return True
+        return self.user.is_authenticated
 
     @override
     def pode_criar(self) -> bool:
-        return True
+        return self.user.is_authenticated
 
     @override
-    def pode_editar(self, tipo_bem) -> bool:
-        return True
+    def pode_editar(self, tipo_bem: TipoBem) -> bool:
+        return self.user.is_authenticated and tipo_bem.ativo
 
     @override
     def pode_remover(self, tipo_bem) -> bool:
-        return True
+        return self.user.is_authenticated and tipo_bem.ativo
 
     @override
     def pode_visualizar(self, tipo_bem) -> bool:
-        return True
+        return self.user.is_authenticated and tipo_bem.ativo

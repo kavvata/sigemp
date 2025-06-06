@@ -9,7 +9,7 @@ class DjTipoBemRepository(TipoBemRepository):
         return TipoBem.objects.filter(ativo=True)
 
     @override
-    def buscar_tipo_bem_por_id(self, id: int):
+    def buscar_por_id(self, id: int):
         tipo_bem = None
 
         try:
@@ -17,6 +17,8 @@ class DjTipoBemRepository(TipoBemRepository):
         except TipoBem.DoesNotExist as e:
             e.add_note(f"Tipo de bem com id {id} não encontrado.")
             raise e
+        else:
+            return tipo_bem
 
     @override
     def cadastrar_tipo_bem(self, descricao: str) -> TipoBem:
