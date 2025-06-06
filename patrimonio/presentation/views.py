@@ -1,7 +1,6 @@
 from typing import Any
 
 from django.core.exceptions import PermissionDenied
-from django.http import HttpRequest, HttpResponse
 from django.views.generic import ListView
 
 from patrimonio.models import TipoBem
