@@ -2,8 +2,8 @@ services:
   web:
     build: .
     command: bash -c "
-      pipenv run python manage.py migrate &&
-      pipenv run python manage.py runserver 0.0.0.0:8000
+      python manage.py migrate &&
+      python manage.py runserver 0.0.0.0:8000
       "
     volumes:
       - .:/app

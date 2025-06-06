@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %} Tipos de Bem {% endblock title %}
+
+{% block actions %}
+  {% if pode_criar %}
+    <div>
+      <a href="{% url 'core:home' %}">
+        <div class="rounded-md py-2 gap-2 flex px-4 bg-blue-600 hover:bg-blue-700 hover:text-gray-50 items-center font-semibold text-sm text-gray-100">
+          <i class="material-icons">add</i>
+            <span>
+              Novo Tipo de Bem
+            </span>
+        </div>
+      </a>
+    </div>
+  {% endif %}
+{% endblock actions %}
+
+{% block content %}
+  <section class="bg-gray-50 text-gray-500 max-w-7xl mx-auto flex justify-center items-center p-4 shadow-md rounded-md">
+    {% for tipo_bem in tipo_bens %}
+      <p>{{tipo_bem.descricao}}</p>
+    {% empty %}
+      <p class="text-xs">Nenhum tipo de bem cadastrado.</p>
+    {% endfor %}
+  </section>
+{% endblock %}

@@ -18,12 +18,13 @@ RUN pip install --upgrade pip && pip install pipenv
 
 COPY Pipfile.lock Pipfile ./
 
-RUN pipenv install --deploy --dev
+RUN pipenv requirements > requirements.txt
+RUN pip install -r requirements.txt
 
 COPY . .
 
-RUN pipenv run python manage.py tailwind install
-RUN pipenv run python manage.py tailwind build
+RUN python manage.py tailwind install
+RUN python manage.py tailwind install
 
 # Expose Django and Tailwind ports
 EXPOSE 8000
