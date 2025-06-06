@@ -4,9 +4,9 @@ from patrimonio.policies.contracts import TipoBemPolicy
 
 
 class ListarTiposBemUsecase:
-    def __init__(self, repo: TipoBemPolicy, policy: TipoBemPolicy) -> None:
-        self.repo = repo
-        self.policy = policy
+    def __init__(self, repo: TipoBemRepository, policy: TipoBemPolicy) -> None:
+        self.repo: TipoBemRepository = repo
+        self.policy: TipoBemPolicy = policy
 
     def pode_listar(self):
         return self.policy.pode_listar()
@@ -23,9 +23,9 @@ class ListarTiposBemUsecase:
 
 
 class CadastrarTipoBemUsecase:
-    def __init__(self, repo: TipoBemPolicy, policy: TipoBemPolicy) -> None:
-        self.repo = repo
-        self.policy = policy
+    def __init__(self, repo: TipoBemRepository, policy: TipoBemPolicy) -> None:
+        self.repo: TipoBemRepository = repo
+        self.policy: TipoBemPolicy = policy
 
     def pode_criar(self):
         return self.policy.pode_criar()
@@ -37,29 +37,34 @@ class CadastrarTipoBemUsecase:
         try:
             resposta = self.repo.cadastrar_tipo_bem(descricao)
             return ResultSuccess(resposta)
-        except:
-            return ResultError("Erro ao cadastrar tipo bem: ??")
+        except Exception as e:
+            return ResultError(f"Erro ao listar tipos de bem bem: {e}")
 
 
 class EditarTipoBemUsecase:
-    def __init__(self, repo: TipoBemPolicy, policy: TipoBemPolicy) -> None:
-        self.repo = repo
-        self.policy = policy
+    def __init__(self, repo: TipoBemRepository, policy: TipoBemPolicy) -> None:
+        self.repo: TipoBemRepository = repo
+        self.policy: TipoBemPolicy = policy
 
     def get_tipo_bem(self, id: int):
-        if not self.policy.pode_editar():
-            return ResultError("Você não tem permissão para realizar esta ação.")
-
         try:
             tipo_bem = self.repo.buscar_por_id(id)
         except Exception as e:
             return ResultError(f"Erro ao editar tipo bem: {e}")
         else:
+            if not self.policy.pode_editar(tipo_bem):
+                return ResultError("Você não tem permissão para realizar esta ação.")
+
             return ResultSuccess(tipo_bem)
 
     def execute(self, id: int, descricao: str):
-        if not self.policy.pode_editar():
+        resposta = self.get_tipo_bem(id)
+        if not resposta:
+            return resposta
+
+        if not self.policy.pode_editar(resposta.value):
             return ResultError("Você não tem permissão para realizar esta ação.")
+
         try:
             resposta = self.repo.editar_tipo_bem(id, descricao)
             return ResultSuccess(resposta)
@@ -68,12 +73,28 @@ class EditarTipoBemUsecase:
 
 
 class RemoverTipoBemUsecase:
-    def __init__(self, repo: TipoBemPolicy, policy: TipoBemPolicy) -> None:
-        self.repo = repo
-        self.policy = policy
+    def __init__(self, repo: TipoBemRepository, policy: TipoBemPolicy) -> None:
+        self.repo: TipoBemRepository = repo
+        self.policy: TipoBemPolicy = policy
+
+    def get_tipo_bem(self, id: int):
+        try:
+            tipo_bem = self.repo.buscar_por_id(id)
+        except Exception as e:
+            return ResultError(f"Erro ao editar tipo bem: {e}")
+        else:
+            if not self.policy.pode_editar(tipo_bem):
+                return ResultError("Você não tem permissão para realizar esta ação.")
+
+            return ResultSuccess(tipo_bem)
 
     def execute(self, id: int):
-        if not self.policy.pode_remover():
+        resposta = self.get_tipo_bem(id)
+
+        if not resposta:
+            return resposta
+
+        if not self.policy.pode_remover(resposta.value):
             return ResultError("Você não tem permissão para realizar esta ação.")
 
         try:
