@@ -12,7 +12,7 @@ from patrimonio.usecases import CadastrarTipoBemUsecase, ListarTiposBemUsecase
 # Create your views here.
 class ListarTiposBemView(ListView):
     model = TipoBem
-    paginate_by = 20
+    paginate_by = 10
     template_name = "patrimonio/tipo_bem/tipo_bem_list.html"
     context_object_name = "tipos_bem"
 
