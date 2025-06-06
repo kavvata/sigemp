@@ -18,11 +18,15 @@
 {% endblock actions %}
 
 {% block content %}
-  <section class="bg-gray-50 text-gray-500 max-w-7xl mx-auto flex justify-center items-center p-4 shadow-md rounded-md">
-    {% for tipo_bem in tipo_bens %}
-      <p>{{tipo_bem.descricao}}</p>
-    {% empty %}
-      <p class="text-xs">Nenhum tipo de bem cadastrado.</p>
-    {% endfor %}
+  <section class="bg-gray-50 text-gray-500 max-w-7xl mx-auto flex items-center p-4 shadow-md rounded-md">
+    <ul class="flex gap-2">
+      {% for tipo_bem in tipos_bem %}
+        <li>
+          <div class="p-8 font-semibold text-gray-800 rounded-md border border-gray-200">{{tipo_bem.descricao}}</div>
+        </li>
+      {% empty %}
+        <p class="text-xs">Nenhum tipo de bem cadastrado.</p>
+      {% endfor %}
+    </ul>
   </section>
 {% endblock %}
