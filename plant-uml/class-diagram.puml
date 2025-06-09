@@ -114,11 +114,13 @@ package "emprestimo" {
         +data_emprestimo: date
         +data_devolucao_prevista: date
         +data_devolucao: date
+        +devolucao_ciente_por: User
         +bem: Bem
         +aluno: Aluno
         +estado: int
     }
 
+    Emprestimo "0..*" -- "1" User : "devolucao_ciente_por"
     Emprestimo "0..*" -- "1" Bem : "bem"
     Emprestimo "0..*" -- "1" Aluno : "aluno"
 
