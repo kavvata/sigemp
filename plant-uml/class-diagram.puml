@@ -80,6 +80,13 @@ package "ensino" {
         +nome: str
     }
 
+    class FormaSelecao {
+        +descricao: str
+        +periodo_inicio: date
+        +periodo_fim: date
+        +ativo: bool
+    }
+
     class Aluno {
         +nome: str
         +nome_responsavel: str
@@ -87,8 +94,10 @@ package "ensino" {
         +email: str
         +matricula: str
         +telefone: str
+        +forma_selecao: FormaSelecao
     }
 
+    Aluno "0..*" -- "1" FormaSelecao : "FormaSelecao"
     Aluno "0..*" -- "1" Campus : "campus"
     Aluno "0..*" -- "1" Curso : "curso"
 }
