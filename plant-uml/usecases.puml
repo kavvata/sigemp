@@ -39,6 +39,7 @@
         membro --> (Manter tipos de bem)
         membro --> (Manter alunos)
         membro --> (Manter marcas/modelo)
+        membro --> (Manter formas de seleção)
     }
 
 
