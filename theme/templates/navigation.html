@@ -1,14 +1,40 @@
-<nav class="flex items-center justify-between h-16 w-dvw px-4">
-    <div class="inline-flex items-center">
-      <h1 class="text-xl font-bold pr-4">sigemp</h1>
-      <ul class="inline-flex gap-2">
-          <li><a href="{% url 'core:home' %}">Home</a></li>
-          <li>Alunos</li>
-      </ul>
-    </div>
-    <div>
-      {{request.user.username}}
-      <a href="{% url 'core:logout' %}" class="text-blue-500">Sair</a>
-    </div>
-</nav>
-<hr/>
+<div class="flex h-screen text-gray-800" x-data="{ openMenu: false }">
+    <aside class="w-64 bg-gray-50 border border-gray-200 flex-col">
+        <div class="px-6 py-4 text-sm text-gray-500 font-semibold">SIGEMP</div>
+        <nav class="flex-1 px-2 py-4">
+            <div class="relative">
+                <a href="{% url 'core:home' %}" class="block px-4 py-2 rounded hover:bg-gray-100"
+                    >Dashboard</a
+                >
+                <a href="#" class="block px-4 py-2 rounded hover:bg-gray-100">Empréstimos</a>
+                <button
+                    @click="openMenu = !openMenu"
+                    class="w-full flex justify-between items-center px-4 py-2 rounded hover:bg-gray-100 transition"
+                >
+                    <span>Cadastros</span>
+                    <svg :class="{ 'rotate-90': openMenu }"
+                        class="w-4 h-4 transform transition-transform"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+
+                <div x-show="openMenu"
+                    @click.away="openMenu = false"
+                    x-transition
+                    class="absolute left-full top-0 ml-2 mt-0 bg-white border shadow-lg rounded w-48 z-50"
+                >
+                    <a href="{% url 'patrimonio:listar_tipos_bem' %}"
+                        class="block px-4 py-2 hover:bg-gray-100"
+                        >Tipos de Bem</a
+                    >
+                    <a href="#" class="block px-4 py-2 hover:bg-gray-100">Setores</a>
+                    <a href="#" class="block px-4 py-2 hover:bg-gray-100">Categorias</a>
+                </div>
+            </div>
+        </nav>
+    </aside>
+</div>
