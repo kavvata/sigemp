@@ -49,7 +49,7 @@ class CriarTipoBemView(CreateView):
 
     def form_valid(self, form):
         repo = DjTipoBemRepository()
-        policy = DjangoTipoBemPolicy()
+        policy = DjangoTipoBemPolicy(self.request.user)
         usecase = CadastrarTipoBemUsecase(repo, policy)
 
         if not usecase.pode_criar():
