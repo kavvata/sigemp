@@ -1,32 +1,57 @@
 {% load static tailwind_tags %}
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-	<head>
-    <title>Sigemp</title>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-		{% tailwind_css %}
-	</head>
+    <head>
+        <title>{% block title %} Sigemp {% endblock %}</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+        <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+        {% tailwind_css %} {% block head %} {% endblock %}
+    </head>
 
-	<body class="bg-gray-50 leading-normal tracking-normal w-screen h-screen">
-        {% include "navigation.html" %}
-        <div class="pt-6 bg-gray-200 h-screen flex-col items-center justify-center">
-          <div class="mt-6 text-gray-900">
-
-            <section class="max-w-7xl mx-auto flex items-center justify-between border mb-8">
-              <div>
-                <h1 class="font-bold text-2xl ">{% block title %}{% endblock %}</h1>
-              </div>
-              <div>
-                {% block actions %}{% endblock actions %}
-              </div>
-            </section>
-
-            {% block content %}
-            {% endblock %}
+    <body class="bg-gray-50 leading-normal tracking-normal w-screen h-screen" x-data="{
+      sidebarOpen: JSON.parse(localStorage.getItem('sidebarOpen') ?? 'true'),
+      toggleSidebar() {
+        this.sidebarOpen = !this.sidebarOpen;
+        localStorage.setItem('sidebarOpen', JSON.stringify(this.sidebarOpen));
+      }
+    }">
+        <div class="flex flex-row">
+        <div x-show="sidebarOpen"
+              x-transition:enter="transition transform duration-300"
+              x-transition:enter-start="-translate-x-full"
+              x-transition:enter-end="translate-x-0"
+              x-transition:leave="transition transform duration-300"
+              x-transition:leave-start="translate-x-0"
+              x-transition:leave-end="-translate-x-full"
+              class="w-64 flex-shrink-0 z-50"
+            >
+            {% include "navigation.html" %}
           </div>
+            <section class="bg-gray-200 h-screen w-full flex-col items-center justify-center">
+              <div class="px-6 w-full bg-white flex flex-row h-16 gap-4">
+                <button @click="toggleSidebar()" class="focus:outline-none">
+                  <i class="material-icons">view_sidebar</i>
+                </button>
+                <p class="flex items-center font-semibold">Sistema de Gerenciamento de Empréstimo de Bens Móveis</p>
+              </div>
+              <main class="p-6 ">
+                <div class="mt-6 text-gray-900">
+                    <section class="max-w-7xl mx-auto flex items-center justify-between border mb-8" >
+                        <div>
+                            <h1 class="font-bold text-2xl">
+                                {% block page_title %}{% endblock %}
+                            </h1>
+                        </div>
+                        <div>{% block actions %}{% endblock actions %}</div>
+                    </section>
+
+                    {% block content %} {% endblock %}
+                </div>
+              </main>
+            </section>
         </div>
-	</body>
+    </body>
 </html>
