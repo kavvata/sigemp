@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %} Tipos de Bem {% endblock title %}
+{% block page_title %} Tipos de Bem {% endblock page_title %}
 
 {% block actions %}
   {% if pode_criar %}
     <div>
-      <a href="{% url 'core:home' %}">
+      <a href="{% url 'patrimonio:criar_tipo_bem' %}">
         <div class="rounded-md py-2 gap-2 flex px-4 bg-blue-600 hover:bg-blue-700 hover:text-gray-50 items-center font-semibold text-sm text-gray-100">
           <i class="material-icons">add</i>
             <span>

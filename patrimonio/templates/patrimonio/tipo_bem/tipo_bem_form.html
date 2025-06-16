@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block title %} Cadastrar Tipo de Bem {% endblock title %}
+
+{% block content %}
+  <section class="bg-gray-50 text-gray-900 max-w-2xl mx-auto p-2 shadow-md rounded-md">
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="flex flex-col max-w-64">
+        <label class="text-gray-800 text-sm font-semibold" for="descricao">{{ form.descricao.label }}</label>
+        {% render_field form.descricao class="rounded-md border-gray-200" %}
+      </div>
+
+      <div class="mt-8">
+        <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Salvar</button>
+      </div>
+    </form>
+  </section>
+{% endblock %}

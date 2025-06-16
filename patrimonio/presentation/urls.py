@@ -10,4 +10,9 @@ urlpatterns = [
         views.ListarTiposBemView.as_view(),
         name="listar_tipos_bem",
     ),
+    path(
+        "tipo_bem/add",
+        views.CriarTipoBemView.as_view(),
+        name="criar_tipo_bem",
+    ),
 ]

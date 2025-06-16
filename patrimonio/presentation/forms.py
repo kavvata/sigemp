@@ -1,5 +1,9 @@
 from django import forms
 
+from patrimonio.models import TipoBem
 
-class TipoBemForm(forms.Form):
-    descricao = forms.CharField(max_length=255)
+
+class TipoBemForm(forms.ModelForm):
+    class Meta:
+        model = TipoBem
+        fields = ["descricao"]
