@@ -1,13 +1,18 @@
 from typing import Any
 
 from django.core.exceptions import PermissionDenied
-from django.views.generic import CreateView, ListView
+from django.urls import reverse_lazy
+from django.views.generic import CreateView, ListView, UpdateView
 
 from patrimonio.models import TipoBem
 from patrimonio.policies.django import DjangoTipoBemPolicy
 from patrimonio.presentation.forms import TipoBemForm
 from patrimonio.repositories.django import DjTipoBemRepository
-from patrimonio.usecases import CadastrarTipoBemUsecase, ListarTiposBemUsecase
+from patrimonio.usecases import (
+    CadastrarTipoBemUsecase,
+    EditarTipoBemUsecase,
+    ListarTiposBemUsecase,
+)
 
 
 # Create your views here.
@@ -58,6 +63,29 @@ class CriarTipoBemView(CreateView):
             )
 
         result = usecase.execute(form.cleaned_data["descricao"])
+
+        if not result:
+            raise PermissionDenied(result.mensagem)
+
+        return super().form_valid(form)
+
+
+class EditarTipoBemView(UpdateView):
+    template_name = "patrimonio/tipo_bem/tipo_bem_form.html"
+    form_class = TipoBemForm
+    queryset = TipoBem.objects.filter(ativo=True)
+    success_url = reverse_lazy("patrimonio:listar_tipos_bem")
+
+    def form_valid(self, form):
+        repo = DjTipoBemRepository()
+        policy = DjangoTipoBemPolicy(self.request.user)
+        usecase = EditarTipoBemUsecase(repo, policy)
+
+        result = usecase.get_tipo_bem(form.instance.id)
+        if not result:
+            raise PermissionDenied(result.mensagem)
+
+        result = usecase.execute(form.instance.id, form.cleaned_data["descricao"])
 
         if not result:
             raise PermissionDenied(result.mensagem)
