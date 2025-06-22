@@ -149,3 +149,12 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Session settings
+
+# Session expire in two days
+SESSION_COOKIE_AGE = 172800
+
+
+# On Browser close, expire
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
