@@ -1,21 +1,30 @@
 {% extends "base.html" %}
 {% load widget_tweaks %}
-
-{% block title %} Cadastrar Tipo de Bem {% endblock title %}
-
+{% block page_title %}Cadastrar Tipo de Bem{% endblock %}
+{% block actions %}
+    {% if form.instance.id %}
+        <a href="#"
+           class="rounded-md py-2 gap-2 flex px-4 border border-red-500 text-red-600 dark:border-red-400 dark:text-red-300 bg-red-50 dark:bg-gray-800 items-center font-semibold text-sm transition-all duration-300 ease-in-out hover:bg-red-100 dark:hover:bg-gray-700 hover:ring-2 hover:ring-red-300 dark:hover:ring-red-500/40 hover:shadow-md cursor-pointer">
+            <i class="material-symbols-outlined align-middle">delete</i>
+            <span>Remover</span>
+        </a>
+    {% endif %}
+{% endblock actions %}
 {% block content %}
-  <section class="bg-gray-50 text-gray-900 max-w-2xl mx-auto p-2 shadow-md rounded-md">
-    <form method="post">
-      {% csrf_token %}
-
-      <div class="flex flex-col max-w-64">
-        <label class="text-gray-800 text-sm font-semibold" for="descricao">{{ form.descricao.label }}</label>
-        {% render_field form.descricao class="rounded-md border-gray-200" %}
-      </div>
-
-      <div class="mt-8">
-        <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Salvar</button>
-      </div>
-    </form>
-  </section>
+    <section class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white max-w-7xl mx-auto p-2 shadow-md rounded-md">
+        <form method="post">
+            {% csrf_token %}
+            <div class="flex flex-col max-w-64">
+                <label class="text-gray-800 dark:text-white text-sm font-semibold"
+                       for="descricao">{{ form.descricao.label }}</label>
+                {% render_field form.descricao class="block w-full min-w-0 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500  dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500" %}
+            </div>
+            <div class="mt-8">
+                <button type="submit"
+                        class="rounded-md py-2 gap-2 flex px-4 border border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-300 bg-blue-50 dark:bg-gray-800 items-center font-semibold text-sm transition-all duration-300 ease-in-out hover:bg-blue-100 dark:hover:bg-gray-700 hover:ring-2 hover:ring-blue-300 dark:hover:ring-blue-500/40 hover:shadow-md cursor-pointer">
+                    Salvar
+                </button>
+            </div>
+        </form>
+    </section>
 {% endblock %}

@@ -1,21 +1,18 @@
 {% load static tailwind_tags %}
-<!DOCTYPE html>
 <html lang="pt-BR">
-	<head>
-    <title>Sigemp</title>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<meta http-equiv="X-UA-Compatible" content="ie=edge">
-		{% tailwind_css %}
-	</head>
-
-	<body class="bg-gray-50 leading-normal tracking-normal w-screen h-screen">
-
-        <div class="pt-6 bg-gray-200 h-screen">
-          <div class="pt-6">
-            {% block content %}
-            {% endblock %}
-          </div>
+    <!DOCTYPE html>
+    <head>
+        <title>Sigemp</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        {% tailwind_css %}
+    </head>
+    <body class="bg-gray-50 dark:bg-gray-900 leading-normal tracking-normal w-screen h-screen">
+        <div class="flex pt-6 bg-gray-200 dark:bg-gray-800 h-screen items-center justify-center">
+            <div class="pt-6">
+                {% block content %}{% endblock %}
+            </div>
         </div>
-	</body>
+    </body>
 </html>
