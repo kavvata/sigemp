@@ -87,7 +87,6 @@ class EditarTipoBemView(UpdateView):
         if not result:
             raise PermissionDenied(result.mensagem)
 
-        # FIXME: nao estou salvando 'alterado_por'
         result = usecase.execute(form.instance.id, form.cleaned_data["descricao"])
 
         if not result:
