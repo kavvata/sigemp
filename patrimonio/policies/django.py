@@ -6,8 +6,7 @@ from django.contrib.auth.models import User
 
 class DjangoTipoBemPolicy(TipoBemPolicy):
     def __init__(self, user: User) -> None:
-        super().__init__()
-        self.user = user
+        super().__init__(user)
 
     @override
     def pode_listar(self) -> bool:
