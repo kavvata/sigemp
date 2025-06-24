@@ -12,15 +12,15 @@ from patrimonio.usecases import (
 
 @pytest.fixture
 def tipo_bem():
-    return {"id": 1, "descricao": "Projetor", "ativo": True}
+    return {"id": 1, "descricao": "Projetor"}
 
 
 @pytest.fixture
 def lista_tipos_bem():
     return [
-        {"id": 1, "descricao": "Projetor", "ativo": True},
-        {"id": 2, "descricao": "Notebook Dell", "ativo": True},
-        {"id": 3, "descricao": "Frasco laboratorio", "ativo": True},
+        {"id": 1, "descricao": "Projetor"},
+        {"id": 2, "descricao": "Notebook Dell"},
+        {"id": 3, "descricao": "Frasco laboratorio"},
     ]
 
 
@@ -47,15 +47,17 @@ def listar_tipos_bem(lista_tipos_bem):
 def test_cadastrar_tipo_bem_usecase(tipo_bem):
     repo = mock.Mock()
     policy = mock.Mock()
+    user = mock.Mock()
     repo.cadastrar_tipo_bem.return_value = tipo_bem
     policy.pode_criar.return_value = True
+    policy.user = user
 
     usecase = CadastrarTipoBemUsecase(repo, policy)
 
     if usecase.pode_criar():
         result = usecase.execute(tipo_bem["descricao"])
 
-    repo.cadastrar_tipo_bem.assert_called_with(tipo_bem["descricao"])
+    repo.cadastrar_tipo_bem.assert_called_with(tipo_bem["descricao"], user)
     policy.pode_criar.assert_called_with()
 
     assert result
@@ -66,9 +68,11 @@ def test_cadastrar_tipo_bem_usecase(tipo_bem):
 def test_editar_tipo_bem_usecase(tipo_bem):
     repo = mock.Mock()
     policy = mock.Mock()
+    user = mock.Mock()
     repo.buscar_por_id.return_value = tipo_bem
     repo.editar_tipo_bem.return_value = tipo_bem
     policy.pode_editar.return_value = True
+    policy.user = user
 
     usecase = EditarTipoBemUsecase(repo, policy)
 
@@ -80,7 +84,7 @@ def test_editar_tipo_bem_usecase(tipo_bem):
     result = usecase.execute(encontrado["id"], encontrado["descricao"])
 
     repo.buscar_por_id.assert_called_with(tipo_bem["id"])
-    repo.editar_tipo_bem.assert_called_with(tipo_bem["id"], tipo_bem["descricao"])
+    repo.editar_tipo_bem.assert_called_with(tipo_bem["id"], tipo_bem["descricao"], user)
     policy.pode_editar.assert_called_with(tipo_bem)
 
     assert result
@@ -91,15 +95,17 @@ def test_editar_tipo_bem_usecase(tipo_bem):
 def test_remover_tipo_bem_usecase(tipo_bem):
     repo = mock.Mock()
     policy = mock.Mock()
+    user = mock.Mock()
     repo.buscar_por_id.return_value = tipo_bem
     repo.remover_tipo_bem.return_value = tipo_bem
     policy.pode_remover.return_value = True
+    policy.user = user
 
     usecase = RemoverTipoBemUsecase(repo, policy)
 
     result = usecase.execute(tipo_bem["id"])
 
-    repo.remover_tipo_bem.assert_called_with(tipo_bem["id"])
+    repo.remover_tipo_bem.assert_called_with(tipo_bem["id"], user)
     policy.pode_remover.assert_called_with(tipo_bem)
 
     assert result
