@@ -98,7 +98,7 @@ class RemoverTipoBemUsecase:
             return ResultError("Você não tem permissão para realizar esta ação.")
 
         try:
-            resposta = self.repo.remover_tipo_bem(id)
+            resposta = self.repo.remover_tipo_bem(id, self.policy.user)
             return ResultSuccess(resposta)
         except Exception as e:
             return ResultError(f"Erro ao remover tipo bem: {e}")

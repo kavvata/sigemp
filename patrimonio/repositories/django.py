@@ -1,4 +1,4 @@
-from datetime import date
+from django.utils import timezone
 from typing import override
 
 from django.contrib.auth.models import User
@@ -42,16 +42,15 @@ class DjTipoBemRepository(TipoBemRepository):
         return tipo_bem
 
     @override
-    def remover_tipo_bem(self, id: int, descricao: str, user: User) -> TipoBem:
-        tipo_bem = None
-
+    def remover_tipo_bem(self, id: int, user: User) -> TipoBem:
         try:
             tipo_bem = TipoBem.objects.get(pk=id, removido_em__isnull=True)
         except TipoBem.DoesNotExist as e:
             e.add_note(f"Tipo de bem com id {id} não encontrado.")
             raise e
 
-        tipo_bem.removido_em = date.today()
+        tipo_bem.removido_em = timezone.now()
+        tipo_bem.alterado_por = user
         tipo_bem.save()
 
         return tipo_bem
