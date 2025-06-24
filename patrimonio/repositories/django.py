@@ -35,7 +35,7 @@ class DjTipoBemRepository(TipoBemRepository):
             raise e
 
         tipo_bem.descricao = descricao
-        tipo_bem.atualizado_por = user
+        tipo_bem.alterado_por = user
         tipo_bem.save()
 
         return tipo_bem
