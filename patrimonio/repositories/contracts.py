@@ -12,13 +12,13 @@ class TipoBemRepository(ABC):
         pass
 
     @abstractmethod
-    def cadastrar_tipo_bem(self, descricao: str) -> Any:
+    def cadastrar_tipo_bem(self, descricao: str, user: Any) -> Any:
         pass
 
     @abstractmethod
-    def editar_tipo_bem(self, id: int, descricao: str) -> Any:
+    def editar_tipo_bem(self, id: int, descricao: str, user: Any) -> Any:
         pass
 
     @abstractmethod
-    def remover_tipo_bem(self, id: int) -> Any:
+    def remover_tipo_bem(self, id: int, user: Any) -> Any:
         pass

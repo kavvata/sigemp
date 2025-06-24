@@ -35,7 +35,7 @@ class CadastrarTipoBemUsecase:
             return ResultError("Você não tem permissão para realizar esta ação.")
 
         try:
-            resposta = self.repo.cadastrar_tipo_bem(descricao)
+            resposta = self.repo.cadastrar_tipo_bem(descricao, self.policy.user)
             return ResultSuccess(resposta)
         except Exception as e:
             return ResultError(f"Erro ao listar tipos de bem bem: {e}")
@@ -66,7 +66,7 @@ class EditarTipoBemUsecase:
             return ResultError("Você não tem permissão para realizar esta ação.")
 
         try:
-            resposta = self.repo.editar_tipo_bem(id, descricao)
+            resposta = self.repo.editar_tipo_bem(id, descricao, self.policy.user)
             return ResultSuccess(resposta)
         except Exception as e:
             return ResultError(f"Erro ao editar tipo bem: {e}")
