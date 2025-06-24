@@ -9,7 +9,7 @@ from patrimonio.repositories.contracts import TipoBemRepository
 class DjTipoBemRepository(TipoBemRepository):
     @override
     def listar_tipos_bem(self):
-        return TipoBem.objects.filter(removido_em__isnull=True)
+        return TipoBem.objects.filter(removido_em__isnull=True).order_by("descricao")
 
     @override
     def buscar_por_id(self, id: int):
