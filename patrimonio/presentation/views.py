@@ -13,6 +13,7 @@ from patrimonio.usecases import (
     CadastrarTipoBemUsecase,
     EditarTipoBemUsecase,
     ListarTiposBemUsecase,
+    RemoverTipoBemUsecase,
 )
 
 
@@ -93,3 +94,12 @@ class EditarTipoBemView(UpdateView):
             raise PermissionDenied(result.mensagem)
 
         return redirect(self.success_url)
+
+
+def remover_tipobem(request, pk):
+    repo = DjTipoBemRepository()
+    policy = DjangoTipoBemPolicy(request.user)
+    usecase = RemoverTipoBemUsecase(repo, policy)
+
+    usecase.execute(pk)
+    return redirect(reverse_lazy("patrimonio:listar_tipos_bem"))

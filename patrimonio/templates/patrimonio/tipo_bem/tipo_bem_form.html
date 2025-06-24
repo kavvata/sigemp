@@ -3,7 +3,7 @@
 {% block page_title %}Cadastrar Tipo de Bem{% endblock %}
 {% block actions %}
     {% if form.instance.id %}
-        <a href="#"
+        <a href="{% url 'patrimonio:remover_tipo_bem' form.instance.id %}"
            class="rounded-md py-2 gap-2 flex px-4 border border-red-500 text-red-600 dark:border-red-400 dark:text-red-300 bg-red-50 dark:bg-gray-800 items-center font-semibold text-sm transition-all duration-300 ease-in-out hover:bg-red-100 dark:hover:bg-gray-700 hover:ring-2 hover:ring-red-300 dark:hover:ring-red-500/40 hover:shadow-md cursor-pointer">
             <i class="material-symbols-outlined align-middle">delete</i>
             <span>Remover</span>
