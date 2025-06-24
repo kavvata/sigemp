@@ -1,3 +1,4 @@
+from datetime import date
 from typing import override
 
 from django.contrib.auth.models import User
@@ -50,7 +51,7 @@ class DjTipoBemRepository(TipoBemRepository):
             e.add_note(f"Tipo de bem com id {id} não encontrado.")
             raise e
 
-        tipo_bem.ativo = False
+        tipo_bem.removido_em = date.today()
         tipo_bem.save()
 
         return tipo_bem
