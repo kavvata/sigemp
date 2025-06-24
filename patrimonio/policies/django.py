@@ -18,12 +18,12 @@ class DjangoTipoBemPolicy(TipoBemPolicy):
 
     @override
     def pode_editar(self, tipo_bem: TipoBem) -> bool:
-        return self.user.is_authenticated and tipo_bem.ativo
+        return self.user.is_authenticated and tipo_bem.removido_em is None
 
     @override
     def pode_remover(self, tipo_bem) -> bool:
-        return self.user.is_authenticated and tipo_bem.ativo
+        return self.user.is_authenticated and tipo_bem.removido_em is None
 
     @override
     def pode_visualizar(self, tipo_bem) -> bool:
-        return self.user.is_authenticated and tipo_bem.ativo
+        return self.user.is_authenticated and tipo_bem.removido_em is None
