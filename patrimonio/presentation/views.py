@@ -1,6 +1,7 @@
 from typing import Any
 
 from django.core.exceptions import PermissionDenied
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, UpdateView
 
@@ -51,6 +52,7 @@ class ListarTiposBemView(ListView):
 class CriarTipoBemView(CreateView):
     template_name = "patrimonio/tipo_bem/tipo_bem_form.html"
     form_class = TipoBemForm
+    success_url = reverse_lazy("patrimonio:listar_tipos_bem")
 
     def form_valid(self, form):
         repo = DjTipoBemRepository()
@@ -67,7 +69,7 @@ class CriarTipoBemView(CreateView):
         if not result:
             raise PermissionDenied(result.mensagem)
 
-        return super().form_valid(form)
+        return redirect(self.success_url)
 
 
 class EditarTipoBemView(UpdateView):
