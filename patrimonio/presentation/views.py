@@ -75,7 +75,7 @@ class CriarTipoBemView(CreateView):
 class EditarTipoBemView(UpdateView):
     template_name = "patrimonio/tipo_bem/tipo_bem_form.html"
     form_class = TipoBemForm
-    queryset = TipoBem.objects.filter(ativo=True)
+    queryset = TipoBem.objects.filter(removido_em__isnull=True)
     success_url = reverse_lazy("patrimonio:listar_tipos_bem")
 
     def form_valid(self, form):
@@ -87,9 +87,10 @@ class EditarTipoBemView(UpdateView):
         if not result:
             raise PermissionDenied(result.mensagem)
 
+        # FIXME: nao estou salvando 'alterado_por'
         result = usecase.execute(form.instance.id, form.cleaned_data["descricao"])
 
         if not result:
             raise PermissionDenied(result.mensagem)
 
-        return super().form_valid(form)
+        return redirect(self.success_url)
