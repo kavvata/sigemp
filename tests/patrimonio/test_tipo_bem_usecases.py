@@ -1,7 +1,7 @@
 from unittest import mock
 import pytest
 
-from core.types import ResultSuccess
+from core.types import ResultError, ResultSuccess
 from patrimonio.usecases import (
     ListarTiposBemUsecase,
     CadastrarTipoBemUsecase,
@@ -24,7 +24,7 @@ def lista_tipos_bem():
     ]
 
 
-def listar_tipos_bem(lista_tipos_bem):
+def test_listar_tipos_bem(lista_tipos_bem):
     repo = mock.Mock()
     policy = mock.Mock()
 
@@ -42,6 +42,24 @@ def listar_tipos_bem(lista_tipos_bem):
     assert result
     assert isinstance(result, ResultSuccess)
     assert result.value == lista_tipos_bem
+
+
+def test_nao_pode_listar_tipos_bem_usecase(lista_tipos_bem):
+    repo = mock.Mock()
+    policy = mock.Mock()
+
+    repo.listar_tipos_bem.return_value = lista_tipos_bem
+    policy.pode_listar.return_value = False
+
+    usecase = ListarTiposBemUsecase(repo, policy)
+
+    result = usecase.execute()
+
+    repo.listar_tipos_bem.assert_not_called()
+    policy.pode_listar.assert_called_with()
+
+    assert not result
+    assert isinstance(result, ResultError)
 
 
 def test_cadastrar_tipo_bem_usecase(tipo_bem):
@@ -63,6 +81,25 @@ def test_cadastrar_tipo_bem_usecase(tipo_bem):
     assert result
     assert isinstance(result, ResultSuccess)
     assert result.value == tipo_bem
+
+
+def test_nao_pode_cadastrar_tipo_bem_usecase(tipo_bem):
+    repo = mock.Mock()
+    policy = mock.Mock()
+    user = mock.Mock()
+    repo.cadastrar_tipo_bem.return_value = tipo_bem
+    policy.pode_criar.return_value = False
+    policy.user = user
+
+    usecase = CadastrarTipoBemUsecase(repo, policy)
+
+    result = usecase.execute(tipo_bem["descricao"])
+
+    repo.cadastrar_tipo_bem.assert_not_called()
+    policy.pode_criar.assert_called_with()
+
+    assert not result
+    assert isinstance(result, ResultError)
 
 
 def test_editar_tipo_bem_usecase(tipo_bem):
@@ -92,6 +129,31 @@ def test_editar_tipo_bem_usecase(tipo_bem):
     assert result.value == tipo_bem
 
 
+def test_nao_pode_editar_tipo_bem_usecase(tipo_bem):
+    repo = mock.Mock()
+    policy = mock.Mock()
+    user = mock.Mock()
+    repo.buscar_por_id.return_value = tipo_bem
+    repo.editar_tipo_bem.return_value = tipo_bem
+    policy.pode_editar.return_value = False
+    policy.user = user
+
+    usecase = EditarTipoBemUsecase(repo, policy)
+
+    result = usecase.get_tipo_bem(tipo_bem["id"])
+    assert not result
+    assert isinstance(result, ResultError)
+
+    result = usecase.execute(tipo_bem["id"], tipo_bem["descricao"])
+
+    repo.buscar_por_id.assert_called_with(tipo_bem["id"])
+    repo.editar_tipo_bem.assert_not_called()
+    policy.pode_editar.assert_called_with(tipo_bem)
+
+    assert not result
+    assert isinstance(result, ResultError)
+
+
 def test_remover_tipo_bem_usecase(tipo_bem):
     repo = mock.Mock()
     policy = mock.Mock()
@@ -111,3 +173,23 @@ def test_remover_tipo_bem_usecase(tipo_bem):
     assert result
     assert isinstance(result, ResultSuccess)
     assert result.value == tipo_bem
+
+
+def test_nao_pode_remover_tipo_bem_usecase(tipo_bem):
+    repo = mock.Mock()
+    policy = mock.Mock()
+    user = mock.Mock()
+    repo.buscar_por_id.return_value = tipo_bem
+    repo.remover_tipo_bem.return_value = tipo_bem
+    policy.pode_remover.return_value = False
+    policy.user = user
+
+    usecase = RemoverTipoBemUsecase(repo, policy)
+
+    result = usecase.execute(tipo_bem["id"])
+
+    repo.remover_tipo_bem.assert_not_called()
+    policy.pode_remover.assert_called_with(tipo_bem)
+
+    assert not result
+    assert isinstance(result, ResultError)
