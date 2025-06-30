@@ -1,6 +1,6 @@
 <div class="flex h-screen text-gray-700 dark:text-gray-200"
      x-data="{ openMenu: false }">
-    <aside class="w-64 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-600 flex-col">
+    <aside class="w-64 bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-600 flex-col">
         <div class="px-6 py-4 text-sm text-gray-500 font-semibold">SIGEMP</div>
         <nav class="flex-1 px-6 py-4 text-sm font-semibold">
             <div class="relative">
@@ -28,7 +28,7 @@
                 <div x-show="openMenu"
                      @click.away="openMenu = false"
                      x-transition
-                     class="absolute left-full top-0 ml-2 mt-0 bg-white dark:bg-gray-900 border dark:border-gray-700 shadow-lg rounded w-48 z-50">
+                     class="absolute left-full top-0 ml-2 mt-0 bg-white border dark:bg-gray-900  dark:border-gray-700 shadow-lg rounded w-48 z-50">
                     <a href="{% url 'patrimonio:listar_tipos_bem' %}"
                        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Tipos de Bem</a>
                     <a href="#"
