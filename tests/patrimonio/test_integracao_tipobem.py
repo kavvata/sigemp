@@ -53,3 +53,37 @@ def test_listar_tipo_bem_sem_permissao(client, test_user):
     assert response.status_code == 403
 
 
+@pytest.mark.django_db
+def test_criar_tipo_bem(admin_client):
+    url = reverse_lazy("patrimonio:criar_tipo_bem")
+    data = {"descricao": "Projetor Novo"}
+
+    response = admin_client.post(url, data, follow=True)
+
+    assert response.status_code == 200
+    assert TipoBem.objects.filter(descricao="Projetor Novo").exists()
+    assertContains(response, "Projetor Novo")
+
+
+@pytest.mark.django_db
+def test_editar_tipo_bem(admin_client):
+    tipo = TipoBem.objects.create(descricao="Monitor Antigo")
+    url = reverse_lazy("patrimonio:editar_tipo_bem", args=[tipo.pk])
+    data = {"descricao": "Monitor LG"}
+
+    response = admin_client.post(url, data, follow=True)
+
+    tipo.refresh_from_db()
+    assert tipo.descricao == "Monitor LG"
+    assertContains(response, "Monitor LG")
+
+
+@pytest.mark.django_db
+def test_remover_tipo_bem(admin_client):
+    tipo = TipoBem.objects.create(descricao="Impressora")
+    url = reverse_lazy("patrimonio:remover_tipo_bem", args=[tipo.pk])
+
+    response = admin_client.post(url, follow=True)
+
+    tipo.refresh_from_db()
+    assert tipo.removido_em is not None
