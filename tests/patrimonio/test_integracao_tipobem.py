@@ -4,6 +4,8 @@ from pytest_django.asserts import assertContains, assertTemplateUsed
 from django.urls import reverse_lazy
 from django.contrib.auth import get_user_model
 
+from core.types import ResultError
+
 from patrimonio.models import TipoBem
 
 
@@ -66,6 +68,17 @@ def test_criar_tipo_bem(admin_client):
 
 
 @pytest.mark.django_db
+def test_criar_tipo_bem_sem_permissao(client, test_user):
+    client.force_login(test_user)
+
+    url = reverse_lazy("patrimonio:criar_tipo_bem")
+    response = client.post(url, {"descricao": "Cadeira"}, follow=True)
+
+    assert response.status_code == 403
+    assert not TipoBem.objects.filter(descricao="Cadeira").exists()
+
+
+@pytest.mark.django_db
 def test_editar_tipo_bem(admin_client):
     tipo = TipoBem.objects.create(descricao="Monitor Antigo")
     url = reverse_lazy("patrimonio:editar_tipo_bem", args=[tipo.pk])
@@ -79,6 +92,20 @@ def test_editar_tipo_bem(admin_client):
 
 
 @pytest.mark.django_db
+def test_editar_tipo_bem_sem_permissao(client, test_user):
+    client.force_login(test_user)
+
+    tipo = TipoBem.objects.create(descricao="Switch")
+
+    url = reverse_lazy("patrimonio:editar_tipo_bem", args=[tipo.pk])
+    response = client.post(url, {"descricao": "Switch Novo"}, follow=True)
+
+    tipo.refresh_from_db()
+    assert tipo.descricao == "Switch"  # Não mudou
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
 def test_remover_tipo_bem(admin_client):
     tipo = TipoBem.objects.create(descricao="Impressora")
     url = reverse_lazy("patrimonio:remover_tipo_bem", args=[tipo.pk])
@@ -87,3 +114,17 @@ def test_remover_tipo_bem(admin_client):
 
     tipo.refresh_from_db()
     assert tipo.removido_em is not None
+
+
+@pytest.mark.django_db
+def test_remover_tipo_bem_sem_permissao(client, test_user):
+    client.force_login(test_user)
+
+    tipo = TipoBem.objects.create(descricao="Projetor Epson")
+
+    url = reverse_lazy("patrimonio:remover_tipo_bem", args=[tipo.pk])
+    response = client.post(url, follow=True)
+
+    tipo.refresh_from_db()
+    assert tipo.removido_em is None
+    assert response.status_code == 403
