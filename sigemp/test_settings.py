@@ -39,7 +39,6 @@ INTERNAL_IPS = [
 TAILWIND_APP_NAME = "theme"
 
 INSTALLED_APPS = [
-    "ativos.apps.AtivosConfig",
     "patrimonio.apps.PatrimonioConfig",
     "core.apps.CoreConfig",
     "django.contrib.admin",
