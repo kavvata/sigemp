@@ -2,8 +2,16 @@ from unittest import mock
 import pytest
 from pytest_django.asserts import assertContains, assertTemplateUsed
 from django.urls import reverse_lazy
+from django.contrib.auth import get_user_model
 
 from patrimonio.models import TipoBem
+
+
+@pytest.fixture
+def test_user(db):
+    User = get_user_model()
+    user = User.objects.create_user(username="testuser", password="testpassword")
+    return user
 
 
 @pytest.fixture()
@@ -17,6 +25,7 @@ def tipos_de_bem(db):
         TipoBem.objects.get_or_create(descricao=tp["descricao"])[0]
         for tp in tipos_de_bem
     ]
+
     yield tipos_de_bem_models
 
     TipoBem.objects.filter(
@@ -24,7 +33,7 @@ def tipos_de_bem(db):
     ).delete()
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_listar_tipos_bem(tipos_de_bem, admin_client):
     response = admin_client.get(reverse_lazy("patrimonio:listar_tipos_bem"))
 
@@ -32,3 +41,15 @@ def test_listar_tipos_bem(tipos_de_bem, admin_client):
         assertContains(response, tipo)
 
     assertTemplateUsed("patrimonio/tipo_bem_list.html")
+
+
+@pytest.mark.django_db
+def test_listar_tipo_bem_sem_permissao(client, test_user):
+    client.force_login(test_user)
+
+    url = reverse_lazy("patrimonio:listar_tipos_bem")
+    response = client.get(url)
+
+    assert response.status_code == 403
+
+
