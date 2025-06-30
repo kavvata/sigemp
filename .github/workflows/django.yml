@@ -29,4 +29,3 @@ jobs:
     - name: Run Tests
       run: |
         DJANGO_SETTINGS_MODULE=sigemp.test_settings pipenv run pytest
-        pipenv run python ./manage.py test
