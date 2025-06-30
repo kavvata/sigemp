@@ -1,4 +1,7 @@
+from django.utils import timezone
 from typing import override
+
+from django.contrib.auth.models import User
 from patrimonio.models import TipoBem
 from patrimonio.repositories.contracts import TipoBemRepository
 
@@ -6,55 +9,48 @@ from patrimonio.repositories.contracts import TipoBemRepository
 class DjTipoBemRepository(TipoBemRepository):
     @override
     def listar_tipos_bem(self):
-        return TipoBem.objects.filter(ativo=True)
+        return TipoBem.objects.filter(removido_em__isnull=True).order_by("descricao")
 
     @override
-    def buscar_tipo_bem_por_id(self, id: int):
+    def buscar_por_id(self, id: int):
         tipo_bem = None
 
         try:
-            tipo_bem = TipoBem.objects.get(pk=id, ativo=True)
+            tipo_bem = TipoBem.objects.get(pk=id, removido_em__isnull=True)
         except TipoBem.DoesNotExist as e:
             e.add_note(f"Tipo de bem com id {id} não encontrado.")
             raise e
+        else:
+            return tipo_bem
 
     @override
-    def cadastrar_tipo_bem(self, descricao: str) -> TipoBem:
-        return TipoBem.objects.create(descricao=descricao)
+    def cadastrar_tipo_bem(self, descricao: str, user: User) -> TipoBem:
+        return TipoBem.objects.create(descricao=descricao, criado_por=user)
 
     @override
-    def editar_tipo_bem(self, id: int, descricao: str) -> TipoBem:
-        tipo_bem = None
-
+    def editar_tipo_bem(self, id: int, descricao: str, user: User) -> TipoBem:
         try:
-            tipo_bem = TipoBem.objects.get(pk=id, ativo=True)
+            tipo_bem = TipoBem.objects.get(pk=id, removido_em__isnull=True)
         except TipoBem.DoesNotExist as e:
             e.add_note(f"Tipo de bem com id {id} não encontrado.")
             raise e
-
-        try:
-            TipoBem.objects.get(descricao=descricao, ativo=True)
-            raise Exception(f"Descrição de tipo de bem '{descricao}' ja cadastrado.")
-        except TipoBem.DoesNotExist:
-            # ok
-            pass
 
         tipo_bem.descricao = descricao
+        tipo_bem.alterado_por = user
         tipo_bem.save()
 
         return tipo_bem
 
     @override
-    def remover_tipo_bem(self, id: int, descricao: str) -> TipoBem:
-        tipo_bem = None
-
+    def remover_tipo_bem(self, id: int, user: User) -> TipoBem:
         try:
-            tipo_bem = TipoBem.objects.get(pk=id, ativo=True)
+            tipo_bem = TipoBem.objects.get(pk=id, removido_em__isnull=True)
         except TipoBem.DoesNotExist as e:
             e.add_note(f"Tipo de bem com id {id} não encontrado.")
             raise e
 
-        tipo_bem.ativo = False
+        tipo_bem.removido_em = timezone.now()
+        tipo_bem.alterado_por = user
         tipo_bem.save()
 
         return tipo_bem

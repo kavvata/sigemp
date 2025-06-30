@@ -2,6 +2,10 @@ from abc import ABC, abstractmethod
 
 
 class TipoBemPolicy(ABC):
+    def __init__(self, user) -> None:
+        super().__init__()
+        self.user = user
+
     @abstractmethod
     def pode_listar(self) -> bool:
         pass

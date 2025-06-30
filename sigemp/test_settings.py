@@ -88,7 +88,7 @@ WSGI_APPLICATION = "sigemp.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASE_ENGINE = getenv("DATABASE_ENGINE")
+DATABASE_ENGINE = "sqlite3"
 if DATABASE_ENGINE == "postgresql":
     DATABASES = {
         "default": {

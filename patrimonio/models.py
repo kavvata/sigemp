@@ -1,7 +1,12 @@
+from django.contrib.auth.models import User
 from django.db import models
+
+from core.models import Timestampable
 
 
 # Create your models here.
-class TipoBem(models.Model):
+class TipoBem(Timestampable, models.Model):
     descricao = models.CharField(null=False, blank=False, max_length=255)
-    ativo = models.BooleanField(default=True)
+
+    def __str__(self) -> str:
+        return self.descricao
