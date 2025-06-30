@@ -1,10 +1,7 @@
-from unittest import mock
 import pytest
-from pytest_django.asserts import assertContains, assertTemplateUsed
-from django.urls import reverse_lazy
 from django.contrib.auth import get_user_model
-
-from core.types import ResultError
+from django.urls import reverse_lazy
+from pytest_django.asserts import assertContains, assertTemplateUsed
 
 from patrimonio.models import TipoBem
 
