@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load widget_tweaks %}
-{% block page_title %}Cadastrar Tipo de Bem{% endblock %}
+  {% block page_title %} {% if form.instance.id %} Editar {{ form.instance.descricao }} {% else %} Cadastrar Tipo de Bem {% endif %} {% endblock %}
 {% block actions %}
     {% if form.instance.id %}
         <a href="{% url 'patrimonio:remover_tipo_bem' form.instance.id %}"
