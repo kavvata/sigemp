@@ -22,3 +22,25 @@ class TipoBemRepository(ABC):
     @abstractmethod
     def remover_tipo_bem(self, id: int, user: Any) -> Any:
         pass
+
+
+class EstadoConservacaoRepository(ABC):
+    @abstractmethod
+    def listar_estados_conservacao(self) -> Any:
+        pass
+
+    @abstractmethod
+    def buscar_por_id(self, id: int) -> Any:
+        pass
+
+    @abstractmethod
+    def cadastrar_estado_conservacao(self, descricao: str, user: Any) -> Any:
+        pass
+
+    @abstractmethod
+    def editar_estado_conservacao(self, id: int, descricao: str, user: Any) -> Any:
+        pass
+
+    @abstractmethod
+    def remover_estado_conservacao(self, id: int, user: Any) -> Any:
+        pass
