@@ -2,6 +2,8 @@ build:
 	docker compose build
 up:
 	docker compose up
+down:
+	docker-compose down
 
 tailwind:
 	docker-compose exec web python manage.py tailwind start
@@ -9,5 +11,5 @@ tailwind:
 migrate:
 	docker-compose exec web python manage.py migrate
 
-down:
-	docker-compose down
+shell:
+	docker-compose exec web python manage.py shell
