@@ -10,3 +10,10 @@ class TipoBem(Timestampable, models.Model):
 
     def __str__(self) -> str:
         return self.descricao
+
+
+class EstadoConservacao(Timestampable, models.Model):
+    descricao = models.CharField(null=False, blank=False, max_length=255)
+
+    def __str__(self) -> str:
+        return self.descricao
