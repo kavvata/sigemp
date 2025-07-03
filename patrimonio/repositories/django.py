@@ -2,8 +2,11 @@ from django.utils import timezone
 from typing import override
 
 from django.contrib.auth.models import User
-from patrimonio.models import TipoBem
-from patrimonio.repositories.contracts import TipoBemRepository
+from patrimonio.models import EstadoConservacao, TipoBem
+from patrimonio.repositories.contracts import (
+    EstadoConservacaoRepository,
+    TipoBemRepository,
+)
 
 
 class DjTipoBemRepository(TipoBemRepository):
@@ -54,3 +57,53 @@ class DjTipoBemRepository(TipoBemRepository):
         tipo_bem.save()
 
         return tipo_bem
+
+
+class DjangoEstadoConservacaoRepository(EstadoConservacaoRepository):
+    @override
+    def listar_estados_conservacao(self):
+        return EstadoConservacao.objects.filter(removido_em__isnull=True).order_by(
+            "nivel"
+        )
+
+    @override
+    def buscar_por_id(self, id: int):
+        try:
+            estado_conservacao = EstadoConservacao.objects.get(
+                pk=id, removido_em__isnull=True
+            )
+        except EstadoConservacao.DoesNotExist as e:
+            e.add_note(f"Estado de conservacao com id {id} não encontrado.")
+            raise e
+        else:
+            return estado_conservacao
+
+    @override
+    def cadastrar_estado_conservacao(self, descricao: str, nivel: int, user: User):
+        return EstadoConservacao.objects.create(
+            descricao=descricao, nivel=nivel, criado_por=user
+        )
+
+    def editar_estado_conservacao(
+        self, id: int, descricao: str, nivel: int, user: User
+    ):
+        try:
+            estado = EstadoConservacao.objects.get(pk=id)
+        except EstadoConservacao.DoesNotExist as e:
+            e.add_note(f"Estado de conservacao com id {id} não encontrado.")
+
+        estado.alterado_por = user
+        estado.descricao = descricao
+        estado.nivel = nivel
+        estado.save()
+        return estado
+
+    def remover_estado_conservacao(self, id: int, user: User):
+        try:
+            estado = EstadoConservacao.objects.get(pk=id)
+        except EstadoConservacao.DoesNotExist as e:
+            e.add_note(f"Estado de conservacao com id {id} não encontrado.")
+
+        estado.removido_em = timezone.now()
+        estado.alterado_por = user
+        estado.save()
