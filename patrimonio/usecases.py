@@ -138,13 +138,13 @@ class CadastrarEstadoConservacaoUsecase:
     def pode_criar(self):
         return self.policy.pode_criar()
 
-    def execute(self, descricao: str):
+    def execute(self, descricao: str, nivel: int):
         if not self.policy.pode_criar():
             return ResultError("Você não tem permissão para realizar esta ação.")
 
         try:
             resposta = self.repo.cadastrar_estado_conservacao(
-                descricao, self.policy.user
+                descricao, nivel, self.policy.user
             )
             return ResultSuccess(resposta)
         except Exception as e:
@@ -169,7 +169,7 @@ class EditarEstadoConservacaoUsecase:
 
             return ResultSuccess(estado_conservacao)
 
-    def execute(self, id: int, descricao: str):
+    def execute(self, id: int, descricao: str, nivel: int):
         resposta = self.get_estado_conservacao(id)
         if not resposta:
             return resposta
@@ -179,7 +179,7 @@ class EditarEstadoConservacaoUsecase:
 
         try:
             resposta = self.repo.editar_estado_conservacao(
-                id, descricao, self.policy.user
+                id, descricao, nivel, self.policy.user
             )
             return ResultSuccess(resposta)
         except Exception as e:

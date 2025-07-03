@@ -34,11 +34,15 @@ class EstadoConservacaoRepository(ABC):
         pass
 
     @abstractmethod
-    def cadastrar_estado_conservacao(self, descricao: str, user: Any) -> Any:
+    def cadastrar_estado_conservacao(
+        self, descricao: str, nivel: int, user: Any
+    ) -> Any:
         pass
 
     @abstractmethod
-    def editar_estado_conservacao(self, id: int, descricao: str, user: Any) -> Any:
+    def editar_estado_conservacao(
+        self, id: int, descricao: str, nivel: int, user: Any
+    ) -> Any:
         pass
 
     @abstractmethod
