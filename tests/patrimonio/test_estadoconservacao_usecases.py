@@ -12,17 +12,17 @@ from patrimonio.usecases import (
 
 @pytest.fixture
 def estado_conservacao():
-    return {"id": 3, "descricao": "Médio"}
+    return {"id": 3, "descricao": "Médio", "nivel": 3}
 
 
 @pytest.fixture
 def lista_estados_conservacao():
     return [
-        {"id": 1, "descricao": "Péssimo"},
-        {"id": 2, "descricao": "Mau"},
-        {"id": 3, "descricao": "Médio"},
-        {"id": 4, "descricao": "Bom"},
-        {"id": 5, "descricao": "Excelente"},
+        {"id": 1, "descricao": "Péssimo", "nivel": 1},
+        {"id": 2, "descricao": "Mau", "nivel": 2},
+        {"id": 3, "descricao": "Médio", "nivel": 3},
+        {"id": 4, "descricao": "Bom", "nivel": 4},
+        {"id": 5, "descricao": "Excelente", "nivel": 5},
     ]
 
 
@@ -75,10 +75,12 @@ def test_cadastrar_estado_conservacao_usecase(estado_conservacao):
     usecase = CadastrarEstadoConservacaoUsecase(repo, policy)
 
     if usecase.pode_criar():
-        result = usecase.execute(estado_conservacao["descricao"])
+        result = usecase.execute(
+            estado_conservacao["descricao"], estado_conservacao["nivel"]
+        )
 
     repo.cadastrar_estado_conservacao.assert_called_with(
-        estado_conservacao["descricao"], user
+        estado_conservacao["descricao"], estado_conservacao["nivel"], user
     )
     policy.pode_criar.assert_called_with()
 
@@ -97,7 +99,9 @@ def test_nao_pode_cadastrar_estado_conservacao_usecase(estado_conservacao):
 
     usecase = CadastrarEstadoConservacaoUsecase(repo, policy)
 
-    result = usecase.execute(estado_conservacao["descricao"])
+    result = usecase.execute(
+        estado_conservacao["descricao"], estado_conservacao["nivel"]
+    )
 
     repo.cadastrar_estado_conservacao.assert_not_called()
     policy.pode_criar.assert_called_with()
@@ -122,11 +126,16 @@ def test_editar_estado_conservacao_usecase(estado_conservacao):
 
     assert encontrado
 
-    result = usecase.execute(encontrado["id"], encontrado["descricao"])
+    result = usecase.execute(
+        encontrado["id"], encontrado["descricao"], encontrado["nivel"]
+    )
 
     repo.buscar_por_id.assert_called_with(estado_conservacao["id"])
     repo.editar_estado_conservacao.assert_called_with(
-        estado_conservacao["id"], estado_conservacao["descricao"], user
+        estado_conservacao["id"],
+        estado_conservacao["descricao"],
+        estado_conservacao["nivel"],
+        user,
     )
     policy.pode_editar.assert_called_with(estado_conservacao)
 
@@ -150,7 +159,11 @@ def test_nao_pode_editar_estado_conservacao_usecase(estado_conservacao):
     assert not result
     assert isinstance(result, ResultError)
 
-    result = usecase.execute(estado_conservacao["id"], estado_conservacao["descricao"])
+    result = usecase.execute(
+        estado_conservacao["id"],
+        estado_conservacao["descricao"],
+        estado_conservacao["nivel"],
+    )
 
     repo.buscar_por_id.assert_called_with(estado_conservacao["id"])
     repo.editar_estado_conservacao.assert_not_called()
