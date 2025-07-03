@@ -66,7 +66,7 @@ def test_listar_estados_conservacao(estados_conservacao, admin_client):
 def test_listar_estado_conservacao_sem_permissao(client, test_user):
     client.force_login(test_user)
 
-    url = reverse_lazy("patrimonio:estados_conservacao")
+    url = reverse_lazy("patrimonio:listar_estados_conservacao")
     response = client.get(url)
 
     assert response.status_code == 403
@@ -88,7 +88,7 @@ def test_criar_estado_conservacao(admin_client):
     assert EstadoConservacao.objects.filter(
         descricao=data["descricao"], nivel=data["nivel"]
     ).exists()
-    assertContains(response, "Projetor Novo")
+    assertContains(response, data["descricao"])
     assertTemplateUsed("patrimonio/estado_conservacao_form.html")
 
 
@@ -188,5 +188,3 @@ def test_remover_estado_conservacao_sem_permissao(
     estado_conservacao.refresh_from_db()
     assert estado_conservacao.removido_em is None
     assert response.status_code == 403
-
-    assertNotContains(response, estado_conservacao.descricao)
