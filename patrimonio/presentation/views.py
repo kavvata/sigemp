@@ -258,4 +258,4 @@ def remover_estado_conservacao(request, pk):
     if not result:
         raise PermissionDenied(result.mensagem)
 
-    return redirect(reverse_lazy("patrimonio:listar_tipos_bem"))
+    return redirect(reverse_lazy("patrimonio:listar_estados_conservacao"))
