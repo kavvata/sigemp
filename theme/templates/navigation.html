@@ -16,7 +16,7 @@
                 </a>
                 <button @click="openMenu = !openMenu"
                         class="w-full flex justify-between items-center py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition">
-                    <span>Cadastros</span>
+                    <span>Patrimônio</span>
                     <svg :class="{ 'rotate-90': openMenu }"
                          class="w-4 h-4 transform transition-transform"
                          fill="none"
@@ -33,8 +33,6 @@
                        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Tipos de Bem</a>
                     <a href="{% url 'patrimonio:listar_estados_conservacao' %}"
                        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Estados de Conservação</a>
-                    <a href="#"
-                       class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Categorias</a>
                 </div>
                 <a href="{% url 'core:logout' %}"
                    class="block py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800">
