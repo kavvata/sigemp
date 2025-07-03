@@ -1,6 +1,7 @@
 from typing import Any
 
 from django.core.exceptions import PermissionDenied
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, UpdateView
@@ -55,15 +56,23 @@ class CriarTipoBemView(CreateView):
     form_class = TipoBemForm
     success_url = reverse_lazy("patrimonio:listar_tipos_bem")
 
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        repo = DjTipoBemRepository()
+        policy = DjangoTipoBemPolicy(self.request.user)
+        usecase = CadastrarTipoBemUsecase(repo, policy)
+
+        if not usecase.pode_criar():
+            raise PermissionDenied("Voce nao tem permissao para criar tipo de bem.")
+
+        return super().get(request, *args, **kwargs)
+
     def form_valid(self, form):
         repo = DjTipoBemRepository()
         policy = DjangoTipoBemPolicy(self.request.user)
         usecase = CadastrarTipoBemUsecase(repo, policy)
 
         if not usecase.pode_criar():
-            raise PermissionDenied(
-                "Voce nao tem permissao para visualizar tipos de bem."
-            )
+            raise PermissionDenied("Voce nao tem permissao para criar tipo de bem.")
 
         result = usecase.execute(form.cleaned_data["descricao"])
 
@@ -78,6 +87,18 @@ class EditarTipoBemView(UpdateView):
     form_class = TipoBemForm
     queryset = TipoBem.objects.filter(removido_em__isnull=True)
     success_url = reverse_lazy("patrimonio:listar_tipos_bem")
+
+    def get(
+        self, request: HttpRequest, pk: int, *args: Any, **kwargs: Any
+    ) -> HttpResponse:
+        repo = DjTipoBemRepository()
+        policy = DjangoTipoBemPolicy(self.request.user)
+        usecase = EditarTipoBemUsecase(repo, policy)
+
+        if not usecase.pode_editar(usecase.get_tipo_bem(pk)):
+            raise PermissionDenied("Voce nao tem permissao para criar tipo de bem.")
+
+        return super().get(request, *args, **kwargs)
 
     def form_valid(self, form):
         repo = DjTipoBemRepository()

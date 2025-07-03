@@ -49,6 +49,9 @@ class EditarTipoBemUsecase:
         self.repo: TipoBemRepository = repo
         self.policy: TipoBemPolicy = policy
 
+    def pode_editar(self, tipo_bem):
+        return self.policy.pode_editar(tipo_bem)
+
     def get_tipo_bem(self, id: int):
         try:
             tipo_bem = self.repo.buscar_por_id(id)
