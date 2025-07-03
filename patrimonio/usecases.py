@@ -203,9 +203,9 @@ class RemoverEstadoConservacaoUsecase:
         try:
             estado_conservacao = self.repo.buscar_por_id(id)
         except Exception as e:
-            return ResultError(f"Erro ao editar tipo bem: {e}")
+            return ResultError(f"Erro ao remover estado de conservacao: {e}")
         else:
-            if not self.policy.pode_editar(estado_conservacao):
+            if not self.policy.pode_remover(estado_conservacao):
                 return ResultError("Você não tem permissão para realizar esta ação.")
 
             return ResultSuccess(estado_conservacao)
@@ -223,4 +223,4 @@ class RemoverEstadoConservacaoUsecase:
             resposta = self.repo.remover_estado_conservacao(id, self.policy.user)
             return ResultSuccess(resposta)
         except Exception as e:
-            return ResultError(f"Erro ao remover tipo bem: {e}")
+            return ResultError(f"Erro ao remover estado de conservacao: {e}")
