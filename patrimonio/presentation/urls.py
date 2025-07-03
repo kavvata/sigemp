@@ -42,7 +42,7 @@ urlpatterns = [
     ),
     path(
         "estado_conservacao/delete/<int:pk>/",
-        views.remover_tipobem,
+        views.remover_estado_conservacao,
         name="remover_estado_conservacao",
     ),
 ]
