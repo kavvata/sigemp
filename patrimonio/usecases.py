@@ -161,6 +161,9 @@ class EditarEstadoConservacaoUsecase:
         self.repo: EstadoConservacaoRepository = repo
         self.policy: EstadoConservacaoPolicy = policy
 
+    def pode_editar(self, estado_conservacao):
+        return self.policy.pode_editar(estado_conservacao)
+
     def get_estado_conservacao(self, id: int):
         try:
             estado_conservacao = self.repo.buscar_por_id(id)
