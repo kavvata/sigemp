@@ -25,4 +25,24 @@ urlpatterns = [
         views.remover_tipobem,
         name="remover_tipo_bem",
     ),
+    path(
+        "estado_conservacao/",
+        views.ListarEstadosConservacaoView.as_view(),
+        name="listar_estados_conservacao",
+    ),
+    path(
+        "estado_conservacao/add",
+        views.CriarEstadoConservacaoView.as_view(),
+        name="criar_estado_conservacao",
+    ),
+    path(
+        "estado_conservacao/change/<int:pk>/",
+        views.EditarEstadoConservacaoView.as_view(),
+        name="editar_estado_conservacao",
+    ),
+    path(
+        "estado_conservacao/delete/<int:pk>/",
+        views.remover_estado_conservacao,
+        name="remover_estado_conservacao",
+    ),
 ]

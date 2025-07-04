@@ -16,7 +16,7 @@
                 </a>
                 <button @click="openMenu = !openMenu"
                         class="w-full flex justify-between items-center py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition">
-                    <span>Cadastros</span>
+                    <span>Patrimônio</span>
                     <svg :class="{ 'rotate-90': openMenu }"
                          class="w-4 h-4 transform transition-transform"
                          fill="none"
@@ -31,10 +31,8 @@
                      class="absolute left-full top-0 ml-2 mt-0 bg-white border dark:bg-gray-900  dark:border-gray-700 shadow-lg rounded w-48 z-50">
                     <a href="{% url 'patrimonio:listar_tipos_bem' %}"
                        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Tipos de Bem</a>
-                    <a href="#"
-                       class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Setores</a>
-                    <a href="#"
-                       class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Categorias</a>
+                    <a href="{% url 'patrimonio:listar_estados_conservacao' %}"
+                       class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Estados de Conservação</a>
                 </div>
                 <a href="{% url 'core:logout' %}"
                    class="block py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800">
