@@ -2,8 +2,13 @@ from core.types import ResultError, ResultSuccess
 from patrimonio.repositories.contracts import (
     TipoBemRepository,
     EstadoConservacaoRepository,
+    GrauFragilidadeRepository,
 )
-from patrimonio.policies.contracts import TipoBemPolicy, EstadoConservacaoPolicy
+from patrimonio.policies.contracts import (
+    TipoBemPolicy,
+    EstadoConservacaoPolicy,
+    GrauFragilidadePolicy,
+)
 
 
 class ListarTiposBemUsecase:
@@ -224,3 +229,119 @@ class RemoverEstadoConservacaoUsecase:
             return ResultSuccess(resposta)
         except Exception as e:
             return ResultError(f"Erro ao remover estado de conservacao: {e}")
+
+
+class ListarGrauFragilidadeUsecase:
+    def __init__(
+        self, repo: GrauFragilidadeRepository, policy: GrauFragilidadePolicy
+    ) -> None:
+        self.repo: GrauFragilidadeRepository = repo
+        self.policy: GrauFragilidadePolicy = policy
+
+    def pode_listar(self):
+        return self.policy.pode_listar()
+
+    def execute(self):
+        if not self.policy.pode_listar():
+            return ResultError("Você não tem permissão para realizar esta ação.")
+
+        try:
+            resposta = self.repo.listar_grau_fragilidade()
+            return ResultSuccess(resposta)
+        except Exception as e:
+            return ResultError(f"Erro ao listar grais de fragilidade: {e}")
+
+
+class CadastrarGrauFragilidadeUsecase:
+    def __init__(
+        self, repo: GrauFragilidadeRepository, policy: GrauFragilidadePolicy
+    ) -> None:
+        self.repo: GrauFragilidadeRepository = repo
+        self.policy: GrauFragilidadePolicy = policy
+
+    def pode_criar(self):
+        return self.policy.pode_criar()
+
+    def execute(self, descricao: str, nivel: int):
+        if not self.policy.pode_criar():
+            return ResultError("Você não tem permissão para realizar esta ação.")
+
+        try:
+            resposta = self.repo.cadastrar_grau_fragilidade(
+                descricao, nivel, self.policy.user
+            )
+            return ResultSuccess(resposta)
+        except Exception as e:
+            return ResultError(f"Erro ao cadastrar grau de fragilidade: {e}")
+
+
+class EditarGrauFragilidadeUsecase:
+    def __init__(
+        self, repo: GrauFragilidadeRepository, policy: GrauFragilidadePolicy
+    ) -> None:
+        self.repo: GrauFragilidadeRepository = repo
+        self.policy: GrauFragilidadePolicy = policy
+
+    def pode_editar(self, grau_fragilidade):
+        return self.policy.pode_editar(grau_fragilidade)
+
+    def get_grau_fragilidade(self, id: int):
+        try:
+            grau_fragilidade = self.repo.buscar_por_id(id)
+        except Exception as e:
+            return ResultError(f"Erro ao editar grau de fragilidade: {e}")
+        else:
+            if not self.policy.pode_editar(grau_fragilidade):
+                return ResultError("Você não tem permissão para realizar esta ação.")
+
+            return ResultSuccess(grau_fragilidade)
+
+    def execute(self, id: int, descricao: str, nivel: int):
+        resposta = self.get_grau_fragilidade(id)
+        if not resposta:
+            return resposta
+
+        if not self.policy.pode_editar(resposta.value):
+            return ResultError("Você não tem permissão para realizar esta ação.")
+
+        try:
+            resposta = self.repo.editar_grau_fragilidade(
+                id, descricao, nivel, self.policy.user
+            )
+            return ResultSuccess(resposta)
+        except Exception as e:
+            return ResultError(f"Erro ao editar grau de fragilidade: {e}")
+
+
+class RemoverGrauFragilidadeUsecase:
+    def __init__(
+        self, repo: GrauFragilidadeRepository, policy: GrauFragilidadePolicy
+    ) -> None:
+        self.repo: GrauFragilidadeRepository = repo
+        self.policy: GrauFragilidadePolicy = policy
+
+    def get_grau_fragilidade(self, id: int):
+        try:
+            grau_fragilidade = self.repo.buscar_por_id(id)
+        except Exception as e:
+            return ResultError(f"Erro ao remover grau de fragilidade: {e}")
+        else:
+            if not self.policy.pode_remover(grau_fragilidade):
+                return ResultError("Você não tem permissão para realizar esta ação.")
+
+            return ResultSuccess(grau_fragilidade)
+
+    def execute(self, id: int):
+        resposta = self.get_grau_fragilidade(id)
+
+        if not resposta:
+            return resposta
+
+        if not self.policy.pode_remover(resposta.value):
+            return ResultError("Você não tem permissão para realizar esta ação.")
+
+        try:
+            resposta = self.repo.remover_grau_fragilidade(id, self.policy.user)
+            return ResultSuccess(resposta)
+        except Exception as e:
+            return ResultError(f"Erro ao remover grau de fragilidade: {e}")
