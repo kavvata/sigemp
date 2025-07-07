@@ -19,7 +19,7 @@ def test_user(db):
 
 
 @pytest.fixture()
-def grau_fragilidade(db):
+def lista_grau_fragilidade(db):
     grau_fragilidade_dict = [
         {"descricao": "Péssimo", "nivel": 1},
         {"descricao": "Mau", "nivel": 2},
@@ -42,7 +42,7 @@ def grau_fragilidade(db):
 
 
 @pytest.fixture()
-def lista_grau_fragilidade(db):
+def grau_fragilidade(db):
     data = {"descricao": "Médio", "nivel": 3}
     model, _criado = GrauFragilidade.objects.get_or_create(
         descricao=data["descricao"], nivel=data["nivel"]
