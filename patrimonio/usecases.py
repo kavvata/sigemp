@@ -1,13 +1,15 @@
 from core.types import ResultError, ResultSuccess
-from patrimonio.repositories.contracts import (
-    TipoBemRepository,
-    EstadoConservacaoRepository,
-    GrauFragilidadeRepository,
-)
 from patrimonio.policies.contracts import (
-    TipoBemPolicy,
     EstadoConservacaoPolicy,
     GrauFragilidadePolicy,
+    MarcaModeloPolicy,
+    TipoBemPolicy,
+)
+from patrimonio.repositories.contracts import (
+    EstadoConservacaoRepository,
+    GrauFragilidadeRepository,
+    MarcaModeloRepository,
+    TipoBemRepository,
 )
 
 
@@ -249,7 +251,7 @@ class ListarGrauFragilidadeUsecase:
             resposta = self.repo.listar_grau_fragilidade()
             return ResultSuccess(resposta)
         except Exception as e:
-            return ResultError(f"Erro ao listar grais de fragilidade: {e}")
+            return ResultError(f"Erro ao listar graus de fragilidade: {e}")
 
 
 class CadastrarGrauFragilidadeUsecase:
@@ -345,3 +347,109 @@ class RemoverGrauFragilidadeUsecase:
             return ResultSuccess(resposta)
         except Exception as e:
             return ResultError(f"Erro ao remover grau de fragilidade: {e}")
+
+
+class ListarMarcaModeloUsecase:
+    def __init__(self, repo: MarcaModeloRepository, policy: MarcaModeloPolicy) -> None:
+        self.repo: MarcaModeloRepository = repo
+        self.policy: MarcaModeloPolicy = policy
+
+    def pode_listar(self):
+        return self.policy.pode_listar()
+
+    def execute(self):
+        if not self.policy.pode_listar():
+            return ResultError("Você não tem permissão para realizar esta ação.")
+
+        try:
+            resposta = self.repo.listar_marca_modelo()
+            return ResultSuccess(resposta)
+        except Exception as e:
+            return ResultError(f"Erro ao listar marca/modelos: {e}")
+
+
+class CadastrarMarcaModeloUsecase:
+    def __init__(self, repo: MarcaModeloRepository, policy: MarcaModeloPolicy) -> None:
+        self.repo: MarcaModeloRepository = repo
+        self.policy: MarcaModeloPolicy = policy
+
+    def pode_criar(self):
+        return self.policy.pode_criar()
+
+    def execute(self, marca: str, modelo: str):
+        if not self.policy.pode_criar():
+            return ResultError("Você não tem permissão para realizar esta ação.")
+
+        try:
+            resposta = self.repo.cadastrar_marca_modelo(marca, modelo, self.policy.user)
+            return ResultSuccess(resposta)
+        except Exception as e:
+            return ResultError(f"Erro ao cadastrar marca/modelo: {e}")
+
+
+class EditarMarcaModeloUsecase:
+    def __init__(self, repo: MarcaModeloRepository, policy: MarcaModeloPolicy) -> None:
+        self.repo: MarcaModeloRepository = repo
+        self.policy: MarcaModeloPolicy = policy
+
+    def pode_editar(self, marca_modelo):
+        return self.policy.pode_editar(marca_modelo)
+
+    def get_marca_modelo(self, id: int):
+        try:
+            marca_modelo = self.repo.buscar_por_id(id)
+        except Exception as e:
+            return ResultError(f"Erro ao editar marca/modelo: {e}")
+        else:
+            if not self.policy.pode_editar(marca_modelo):
+                return ResultError("Você não tem permissão para realizar esta ação.")
+
+            return ResultSuccess(marca_modelo)
+
+    def execute(self, id: int, marca: str, modelo: int):
+        resposta = self.get_marca_modelo(id)
+        if not resposta:
+            return resposta
+
+        if not self.policy.pode_editar(resposta.value):
+            return ResultError("Você não tem permissão para realizar esta ação.")
+
+        try:
+            resposta = self.repo.editar_marca_modelo(
+                id, marca, modelo, self.policy.user
+            )
+            return ResultSuccess(resposta)
+        except Exception as e:
+            return ResultError(f"Erro ao editar marca/modelo: {e}")
+
+
+class RemoverMarcaModeloUsecase:
+    def __init__(self, repo: MarcaModeloRepository, policy: MarcaModeloPolicy) -> None:
+        self.repo: MarcaModeloRepository = repo
+        self.policy: MarcaModeloPolicy = policy
+
+    def get_marca_modelo(self, id: int):
+        try:
+            marca_modelo = self.repo.buscar_por_id(id)
+        except Exception as e:
+            return ResultError(f"Erro ao remover marca/modelo: {e}")
+        else:
+            if not self.policy.pode_remover(marca_modelo):
+                return ResultError("Você não tem permissão para realizar esta ação.")
+
+            return ResultSuccess(marca_modelo)
+
+    def execute(self, id: int):
+        resposta = self.get_marca_modelo(id)
+
+        if not resposta:
+            return resposta
+
+        if not self.policy.pode_remover(resposta.value):
+            return ResultError("Você não tem permissão para realizar esta ação.")
+
+        try:
+            resposta = self.repo.remover_marca_modelo(id, self.policy.user)
+            return ResultSuccess(resposta)
+        except Exception as e:
+            return ResultError(f"Erro ao remover marca/modelo: {e}")
