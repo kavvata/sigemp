@@ -29,7 +29,7 @@ class ListarTiposBemUsecase:
             resposta = self.repo.listar_tipos_bem()
             return ResultSuccess(resposta)
         except Exception as e:
-            return ResultError(f"Erro ao listar tipos de bem bem: {e}")
+            return ResultError(f"Erro ao listar tipos de bem: {e}")
 
 
 class CadastrarTipoBemUsecase:
@@ -48,7 +48,7 @@ class CadastrarTipoBemUsecase:
             resposta = self.repo.cadastrar_tipo_bem(descricao, self.policy.user)
             return ResultSuccess(resposta)
         except Exception as e:
-            return ResultError(f"Erro ao listar tipos de bem bem: {e}")
+            return ResultError(f"Erro ao cadastrar tipo de bem : {e}")
 
 
 class EditarTipoBemUsecase:
@@ -135,7 +135,7 @@ class ListarEstadosConservacaoUsecase:
             resposta = self.repo.listar_estados_conservacao()
             return ResultSuccess(resposta)
         except Exception as e:
-            return ResultError(f"Erro ao listar tipos de bem bem: {e}")
+            return ResultError(f"Erro ao listar estados de conservação: {e}")
 
 
 class CadastrarEstadoConservacaoUsecase:
@@ -158,7 +158,7 @@ class CadastrarEstadoConservacaoUsecase:
             )
             return ResultSuccess(resposta)
         except Exception as e:
-            return ResultError(f"Erro ao listar tipos de bem bem: {e}")
+            return ResultError(f"Erro ao cadastrar estado de conservação: {e}")
 
 
 class EditarEstadoConservacaoUsecase:
