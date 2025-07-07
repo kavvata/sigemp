@@ -65,4 +65,24 @@ urlpatterns = [
         views.remover_grau_fragilidade,
         name="remover_grau_fragilidade",
     ),
+    path(
+        "marca_modelo/",
+        views.ListarMarcaModeloView.as_view(),
+        name="listar_marca_modelo",
+    ),
+    path(
+        "marca_modelo/add",
+        views.CriarMarcaModeloView.as_view(),
+        name="criar_marca_modelo",
+    ),
+    path(
+        "marca_modelo/change/<int:pk>/",
+        views.EditarMarcaModeloView.as_view(),
+        name="editar_marca_modelo",
+    ),
+    path(
+        "marca_modelo/delete/<int:pk>/",
+        views.remover_marca_modelo,
+        name="remover_marca_modelo",
+    ),
 ]
