@@ -17,3 +17,11 @@ class EstadoConservacao(Timestampable, models.Model):
 
     def __str__(self) -> str:
         return self.descricao
+
+
+class GrauFragilidade(Timestampable, models.Model):
+    descricao = models.CharField(null=False, blank=False, max_length=255)
+    nivel = models.IntegerField("Nível", null=False, blank=False)
+
+    def __str__(self) -> str:
+        return self.descricao

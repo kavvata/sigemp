@@ -6,24 +6,34 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, UpdateView
 
-from patrimonio.models import EstadoConservacao, TipoBem
+from patrimonio.models import EstadoConservacao, GrauFragilidade, TipoBem
 from patrimonio.policies.django import (
     DjangoEstadoConservacaoPolicy,
+    DjangoGrauFragilidadePolicy,
     DjangoTipoBemPolicy,
 )
-from patrimonio.presentation.forms import TipoBemForm, EstadoConservacaoForm
+from patrimonio.presentation.forms import (
+    EstadoConservacaoForm,
+    GrauFragilidadeForm,
+    TipoBemForm,
+)
 from patrimonio.repositories.django import (
-    DjTipoBemRepository,
     DjangoEstadoConservacaoRepository,
+    DjangoGrauFragilidadeRepository,
+    DjTipoBemRepository,
 )
 from patrimonio.usecases import (
     CadastrarEstadoConservacaoUsecase,
+    CadastrarGrauFragilidadeUsecase,
     CadastrarTipoBemUsecase,
     EditarEstadoConservacaoUsecase,
+    EditarGrauFragilidadeUsecase,
     EditarTipoBemUsecase,
     ListarEstadosConservacaoUsecase,
+    ListarGrauFragilidadeUsecase,
     ListarTiposBemUsecase,
     RemoverEstadoConservacaoUsecase,
+    RemoverGrauFragilidadeUsecase,
     RemoverTipoBemUsecase,
 )
 
@@ -259,3 +269,125 @@ def remover_estado_conservacao(request, pk):
         raise PermissionDenied(result.mensagem)
 
     return redirect(reverse_lazy("patrimonio:listar_estados_conservacao"))
+
+
+class ListarGrauFragilidadeView(ListView):
+    model = GrauFragilidade
+    paginate_by = 10
+    template_name = "patrimonio/grau_fragilidade/grau_fragilidade_list.html"
+    context_object_name = "lista_grau_fragilidade"
+
+    def get_queryset(self):
+        policy = DjangoGrauFragilidadePolicy(self.request.user)
+        repo = DjangoGrauFragilidadeRepository()
+        usecase = ListarGrauFragilidadeUsecase(repo, policy)
+
+        if not usecase.pode_listar():
+            raise PermissionDenied(
+                "Voce nao tem permissao para visualizar estados de conservacao"
+            )
+
+        result = usecase.execute()
+
+        if not result:
+            raise PermissionDenied(result.mensagem)
+
+        return result.value
+
+    def get_context_data(self, **kwargs: Any):
+        context = super().get_context_data(**kwargs)
+        policy = DjangoGrauFragilidadePolicy(self.request.user)
+        repo = DjangoGrauFragilidadeRepository()
+
+        usecase = CadastrarGrauFragilidadeUsecase(repo, policy)
+
+        context["pode_criar"] = usecase.pode_criar()
+
+        return context
+
+
+class CriarGrauFragilidadeView(CreateView):
+    template_name = "patrimonio/grau_fragilidade/grau_fragilidade_form.html"
+    form_class = GrauFragilidadeForm
+    success_url = reverse_lazy("patrimonio:listar_grau_fragilidade")
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        repo = DjangoGrauFragilidadeRepository()
+        policy = DjangoGrauFragilidadePolicy(self.request.user)
+        usecase = CadastrarGrauFragilidadeUsecase(repo, policy)
+
+        if not usecase.pode_criar():
+            raise PermissionDenied(
+                "Voce nao tem permissao para criar estado de conservacao."
+            )
+
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        repo = DjangoGrauFragilidadeRepository()
+        policy = DjangoGrauFragilidadePolicy(self.request.user)
+        usecase = CadastrarGrauFragilidadeUsecase(repo, policy)
+
+        if not usecase.pode_criar():
+            raise PermissionDenied(
+                "Voce nao tem permissao para criar estado de conservacao."
+            )
+        result = usecase.execute(
+            form.cleaned_data["descricao"], form.cleaned_data["nivel"]
+        )
+
+        if not result:
+            raise PermissionDenied(result.mensagem)
+
+        return redirect(self.success_url)
+
+
+class EditarGrauFragilidadeView(UpdateView):
+    template_name = "patrimonio/grau_fragilidade/grau_fragilidade_form.html"
+    queryset = GrauFragilidade.objects.filter(removido_em__isnull=True)
+    form_class = GrauFragilidadeForm
+    success_url = reverse_lazy("patrimonio:listar_grau_fragilidade")
+
+    def get(
+        self, request: HttpRequest, pk: int, *args: Any, **kwargs: Any
+    ) -> HttpResponse:
+        repo = DjangoGrauFragilidadeRepository()
+        policy = DjangoGrauFragilidadePolicy(self.request.user)
+        usecase = EditarGrauFragilidadeUsecase(repo, policy)
+
+        if not usecase.pode_editar(usecase.get_grau_fragilidade(pk)):
+            raise PermissionDenied(
+                "Voce nao tem permissao para criar estado de conservação."
+            )
+
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        repo = DjangoGrauFragilidadeRepository()
+        policy = DjangoGrauFragilidadePolicy(self.request.user)
+        usecase = EditarGrauFragilidadeUsecase(repo, policy)
+
+        result = usecase.get_grau_fragilidade(form.instance.id)
+        if not result:
+            raise PermissionDenied(result.mensagem)
+
+        result = usecase.execute(
+            form.instance.id, form.cleaned_data["descricao"], form.cleaned_data["nivel"]
+        )
+
+        if not result:
+            raise PermissionDenied(result.mensagem)
+
+        return redirect(self.success_url)
+
+
+def remover_grau_fragilidade(request, pk):
+    repo = DjangoGrauFragilidadeRepository()
+    policy = DjangoGrauFragilidadePolicy(request.user)
+    usecase = RemoverGrauFragilidadeUsecase(repo, policy)
+
+    result = usecase.execute(pk)
+    if not result:
+        raise PermissionDenied(result.mensagem)
+
+    return redirect(reverse_lazy("patrimonio:listar_grau_fragilidade"))

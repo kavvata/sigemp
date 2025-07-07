@@ -1,10 +1,12 @@
-from django.utils import timezone
 from typing import override
 
 from django.contrib.auth.models import User
-from patrimonio.models import EstadoConservacao, TipoBem
+from django.utils import timezone
+
+from patrimonio.models import EstadoConservacao, GrauFragilidade, TipoBem
 from patrimonio.repositories.contracts import (
     EstadoConservacaoRepository,
+    GrauFragilidadeRepository,
     TipoBemRepository,
 )
 
@@ -107,3 +109,51 @@ class DjangoEstadoConservacaoRepository(EstadoConservacaoRepository):
         estado.removido_em = timezone.now()
         estado.alterado_por = user
         estado.save()
+
+
+class DjangoGrauFragilidadeRepository(GrauFragilidadeRepository):
+    @override
+    def listar_grau_fragilidade(self):
+        return GrauFragilidade.objects.filter(removido_em__isnull=True).order_by(
+            "nivel"
+        )
+
+    @override
+    def buscar_por_id(self, id: int):
+        try:
+            grau_fragilidade = GrauFragilidade.objects.get(
+                pk=id, removido_em__isnull=True
+            )
+        except GrauFragilidade.DoesNotExist as e:
+            e.add_note(f"Grau de fragilidade com id {id} não encontrado.")
+            raise e
+        else:
+            return grau_fragilidade
+
+    @override
+    def cadastrar_grau_fragilidade(self, descricao: str, nivel: int, user: User):
+        return GrauFragilidade.objects.create(
+            descricao=descricao, nivel=nivel, criado_por=user
+        )
+
+    def editar_grau_fragilidade(self, id: int, descricao: str, nivel: int, user: User):
+        try:
+            grau = GrauFragilidade.objects.get(pk=id)
+        except GrauFragilidade.DoesNotExist as e:
+            e.add_note(f"Grau de fragilidade com id {id} não encontrado.")
+
+        grau.alterado_por = user
+        grau.descricao = descricao
+        grau.nivel = nivel
+        grau.save()
+        return grau
+
+    def remover_grau_fragilidade(self, id: int, user: User):
+        try:
+            grau = GrauFragilidade.objects.get(pk=id)
+        except GrauFragilidade.DoesNotExist as e:
+            e.add_note(f"Grau de fragilidade com id {id} não encontrado.")
+
+        grau.removido_em = timezone.now()
+        grau.alterado_por = user
+        grau.save()
