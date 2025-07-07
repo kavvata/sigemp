@@ -100,8 +100,9 @@ class DjangoGrauFragilidadePolicy(GrauFragilidadePolicy):
 
     @override
     def pode_criar(self) -> bool:
-        "patrimonio:add_graufragilidade"
-        return self.user.is_superuser or self.user.has_perm()
+        return self.user.is_superuser or self.user.has_perm(
+            "patrimonio:add_graufragilidade"
+        )
 
     @override
     def pode_editar(self, grau_fragilidade) -> bool:
