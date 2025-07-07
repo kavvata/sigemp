@@ -25,3 +25,11 @@ class GrauFragilidade(Timestampable, models.Model):
 
     def __str__(self) -> str:
         return self.descricao
+
+
+class MarcaModelo(Timestampable, models.Model):
+    marca = models.CharField(null=False, blank=False, max_length=255)
+    modelo = models.CharField(null=False, blank=False, max_length=255)
+
+    def __str__(self) -> str:
+        return f"{self.marca} - {self.modelo}"
