@@ -6,6 +6,7 @@ from patrimonio.models import TipoBem
 from patrimonio.policies.contracts import (
     EstadoConservacaoPolicy,
     GrauFragilidadePolicy,
+    MarcaModeloPolicy,
     TipoBemPolicy,
 )
 
@@ -126,4 +127,45 @@ class DjangoGrauFragilidadePolicy(GrauFragilidadePolicy):
             self.user.is_superuser
             or self.user.has_perm("patrimonio:view_graufragilidade")
             and grau_fragilidade.removido_em is None
+        )
+
+
+class DjangoMarcaModeloPolicy(MarcaModeloPolicy):
+    def __init__(self, user: User) -> None:
+        super().__init__(user)
+
+    @override
+    def pode_listar(self) -> bool:
+        return self.user.is_superuser or self.user.has_perm(
+            "patrimonio:view_marcamodelo"
+        )
+
+    @override
+    def pode_criar(self) -> bool:
+        return self.user.is_superuser or self.user.has_perm(
+            "patrimonio:add_marcamodelo"
+        )
+
+    @override
+    def pode_editar(self, marca_modelo) -> bool:
+        return (
+            self.user.is_superuser
+            or self.user.has_perm("patrimonio:change_marcamodelo")
+            and marca_modelo.removido_em is None
+        )
+
+    @override
+    def pode_remover(self, marca_modelo) -> bool:
+        return (
+            self.user.is_superuser
+            or self.user.has_perm("patrimonio:delete_marcamodelo")
+            and marca_modelo.removido_em is None
+        )
+
+    @override
+    def pode_visualizar(self, marca_modelo) -> bool:
+        return (
+            self.user.is_superuser
+            or self.user.has_perm("patrimonio:view_marcamodelo")
+            and marca_modelo.removido_em is None
         )

@@ -72,3 +72,25 @@ class GrauFragilidadeRepository(ABC):
     @abstractmethod
     def remover_grau_fragilidade(self, id: int, user: Any) -> Any:
         pass
+
+
+class MarcaModeloRepository(ABC):
+    @abstractmethod
+    def listar_marca_modelo(self) -> Any:
+        pass
+
+    @abstractmethod
+    def buscar_por_id(self, id: int) -> Any:
+        pass
+
+    @abstractmethod
+    def cadastrar_marca_modelo(self, marca: str, modelo: str, user: Any) -> Any:
+        pass
+
+    @abstractmethod
+    def editar_marca_modelo(self, id: int, marca: str, modelo: str, user: Any) -> Any:
+        pass
+
+    @abstractmethod
+    def remover_marca_modelo(self, id: int, user: Any) -> Any:
+        pass

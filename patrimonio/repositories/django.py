@@ -3,10 +3,11 @@ from typing import override
 from django.contrib.auth.models import User
 from django.utils import timezone
 
-from patrimonio.models import EstadoConservacao, GrauFragilidade, TipoBem
+from patrimonio.models import EstadoConservacao, GrauFragilidade, TipoBem, MarcaModelo
 from patrimonio.repositories.contracts import (
     EstadoConservacaoRepository,
     GrauFragilidadeRepository,
+    MarcaModeloRepository,
     TipoBemRepository,
 )
 
@@ -157,3 +158,47 @@ class DjangoGrauFragilidadeRepository(GrauFragilidadeRepository):
         grau.removido_em = timezone.now()
         grau.alterado_por = user
         grau.save()
+
+
+class DjangoMarcaModeloRepository(MarcaModeloRepository):
+    @override
+    def listar_marca_modelo(self):
+        return MarcaModelo.objects.filter(removido_em__isnull=True).order_by(
+            "marca", "modelo"
+        )
+
+    @override
+    def buscar_por_id(self, id: int):
+        try:
+            marca_modelo = MarcaModelo.objects.get(pk=id, removido_em__isnull=True)
+        except MarcaModelo.DoesNotExist as e:
+            e.add_note(f"MarcaModelo com id {id} não encontrado.")
+            raise e
+        else:
+            return marca_modelo
+
+    @override
+    def cadastrar_marca_modelo(self, marca: str, modelo: str, user: User):
+        return MarcaModelo.objects.create(marca=marca, modelo=modelo, criado_por=user)
+
+    def editar_marca_modelo(self, id: int, marca: str, modelo: str, user: User):
+        try:
+            marca_modelo = MarcaModelo.objects.get(pk=id)
+        except MarcaModelo.DoesNotExist as e:
+            e.add_note(f"MarcaModelo com id {id} não encontrado.")
+
+        marca_modelo.alterado_por = user
+        marca_modelo.marca = marca
+        marca_modelo.modelo = modelo
+        marca_modelo.save()
+        return marca_modelo
+
+    def remover_marca_modelo(self, id: int, user: User):
+        try:
+            marca_modelo = MarcaModelo.objects.get(pk=id)
+        except MarcaModelo.DoesNotExist as e:
+            e.add_note(f"MarcaModelo com id {id} não encontrado.")
+
+        marca_modelo.removido_em = timezone.now()
+        marca_modelo.alterado_por = user
+        marca_modelo.save()

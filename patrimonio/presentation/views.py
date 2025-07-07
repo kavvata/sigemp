@@ -6,34 +6,41 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, UpdateView
 
-from patrimonio.models import EstadoConservacao, GrauFragilidade, TipoBem
+from patrimonio.models import EstadoConservacao, GrauFragilidade, MarcaModelo, TipoBem
 from patrimonio.policies.django import (
     DjangoEstadoConservacaoPolicy,
     DjangoGrauFragilidadePolicy,
+    DjangoMarcaModeloPolicy,
     DjangoTipoBemPolicy,
 )
 from patrimonio.presentation.forms import (
     EstadoConservacaoForm,
     GrauFragilidadeForm,
+    MarcaModeloForm,
     TipoBemForm,
 )
 from patrimonio.repositories.django import (
     DjangoEstadoConservacaoRepository,
     DjangoGrauFragilidadeRepository,
+    DjangoMarcaModeloRepository,
     DjTipoBemRepository,
 )
 from patrimonio.usecases import (
     CadastrarEstadoConservacaoUsecase,
     CadastrarGrauFragilidadeUsecase,
+    CadastrarMarcaModeloUsecase,
     CadastrarTipoBemUsecase,
     EditarEstadoConservacaoUsecase,
     EditarGrauFragilidadeUsecase,
+    EditarMarcaModeloUsecase,
     EditarTipoBemUsecase,
     ListarEstadosConservacaoUsecase,
     ListarGrauFragilidadeUsecase,
+    ListarMarcaModeloUsecase,
     ListarTiposBemUsecase,
     RemoverEstadoConservacaoUsecase,
     RemoverGrauFragilidadeUsecase,
+    RemoverMarcaModeloUsecase,
     RemoverTipoBemUsecase,
 )
 
@@ -391,3 +398,119 @@ def remover_grau_fragilidade(request, pk):
         raise PermissionDenied(result.mensagem)
 
     return redirect(reverse_lazy("patrimonio:listar_grau_fragilidade"))
+
+
+class ListarMarcaModeloView(ListView):
+    model = MarcaModelo
+    paginate_by = 10
+    template_name = "patrimonio/marca_modelo/marca_modelo_list.html"
+    context_object_name = "lista_marca_modelo"
+
+    def get_queryset(self):
+        policy = DjangoMarcaModeloPolicy(self.request.user)
+        repo = DjangoMarcaModeloRepository()
+        usecase = ListarMarcaModeloUsecase(repo, policy)
+
+        if not usecase.pode_listar():
+            raise PermissionDenied(
+                "Voce nao tem permissao para visualizar marcas/modelos"
+            )
+
+        result = usecase.execute()
+
+        if not result:
+            raise PermissionDenied(result.mensagem)
+
+        return result.value
+
+    def get_context_data(self, **kwargs: Any):
+        context = super().get_context_data(**kwargs)
+        policy = DjangoMarcaModeloPolicy(self.request.user)
+        repo = DjangoMarcaModeloRepository()
+
+        usecase = CadastrarMarcaModeloUsecase(repo, policy)
+
+        context["pode_criar"] = usecase.pode_criar()
+
+        return context
+
+
+class CriarMarcaModeloView(CreateView):
+    template_name = "patrimonio/marca_modelo/marca_modelo_form.html"
+    form_class = MarcaModeloForm
+    success_url = reverse_lazy("patrimonio:listar_marca_modelo")
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        repo = DjangoMarcaModeloRepository()
+        policy = DjangoMarcaModeloPolicy(self.request.user)
+        usecase = CadastrarMarcaModeloUsecase(repo, policy)
+
+        if not usecase.pode_criar():
+            raise PermissionDenied("Voce nao tem permissao para criar marcas/modelos.")
+
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        repo = DjangoMarcaModeloRepository()
+        policy = DjangoMarcaModeloPolicy(self.request.user)
+        usecase = CadastrarMarcaModeloUsecase(repo, policy)
+
+        if not usecase.pode_criar():
+            raise PermissionDenied("Voce nao tem permissao para criar marcas/modelos.")
+        result = usecase.execute(
+            form.cleaned_data["marca"], form.cleaned_data["modelo"]
+        )
+
+        if not result:
+            raise PermissionDenied(result.mensagem)
+
+        return redirect(self.success_url)
+
+
+class EditarMarcaModeloView(UpdateView):
+    template_name = "patrimonio/marca_modelo/marca_modelo_form.html"
+    queryset = MarcaModelo.objects.filter(removido_em__isnull=True)
+    form_class = MarcaModeloForm
+    success_url = reverse_lazy("patrimonio:listar_marca_modelo")
+
+    def get(
+        self, request: HttpRequest, pk: int, *args: Any, **kwargs: Any
+    ) -> HttpResponse:
+        repo = DjangoMarcaModeloRepository()
+        policy = DjangoMarcaModeloPolicy(self.request.user)
+        usecase = EditarMarcaModeloUsecase(repo, policy)
+
+        if not usecase.pode_editar(usecase.get_marca_modelo(pk)):
+            raise PermissionDenied("Voce nao tem permissao para editar marca/modelo.")
+
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        repo = DjangoMarcaModeloRepository()
+        policy = DjangoMarcaModeloPolicy(self.request.user)
+        usecase = EditarMarcaModeloUsecase(repo, policy)
+
+        result = usecase.get_marca_modelo(form.instance.id)
+        if not result:
+            raise PermissionDenied(result.mensagem)
+
+        result = usecase.execute(
+            form.instance.id, form.cleaned_data["marca"], form.cleaned_data["modelo"]
+        )
+
+        if not result:
+            raise PermissionDenied(result.mensagem)
+
+        return redirect(self.success_url)
+
+
+def remover_marca_modelo(request, pk):
+    repo = DjangoMarcaModeloRepository()
+    policy = DjangoMarcaModeloPolicy(request.user)
+
+    usecase = RemoverMarcaModeloUsecase(repo, policy)
+    result = usecase.execute(pk)
+    if not result:
+        raise PermissionDenied(result.mensagem)
+
+    return redirect(reverse_lazy("patrimonio:listar_marca_modelo"))
