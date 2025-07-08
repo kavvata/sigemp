@@ -94,6 +94,7 @@ class DjangoEstadoConservacaoRepository(EstadoConservacaoRepository):
             estado = EstadoConservacao.objects.get(pk=id)
         except EstadoConservacao.DoesNotExist as e:
             e.add_note(f"Estado de conservacao com id {id} não encontrado.")
+            raise e
 
         estado.alterado_por = user
         estado.descricao = descricao
@@ -106,6 +107,7 @@ class DjangoEstadoConservacaoRepository(EstadoConservacaoRepository):
             estado = EstadoConservacao.objects.get(pk=id)
         except EstadoConservacao.DoesNotExist as e:
             e.add_note(f"Estado de conservacao com id {id} não encontrado.")
+            raise e
 
         estado.removido_em = timezone.now()
         estado.alterado_por = user
@@ -142,6 +144,7 @@ class DjangoGrauFragilidadeRepository(GrauFragilidadeRepository):
             grau = GrauFragilidade.objects.get(pk=id)
         except GrauFragilidade.DoesNotExist as e:
             e.add_note(f"Grau de fragilidade com id {id} não encontrado.")
+            raise e
 
         grau.alterado_por = user
         grau.descricao = descricao
@@ -154,6 +157,7 @@ class DjangoGrauFragilidadeRepository(GrauFragilidadeRepository):
             grau = GrauFragilidade.objects.get(pk=id)
         except GrauFragilidade.DoesNotExist as e:
             e.add_note(f"Grau de fragilidade com id {id} não encontrado.")
+            raise e
 
         grau.removido_em = timezone.now()
         grau.alterado_por = user
@@ -186,6 +190,7 @@ class DjangoMarcaModeloRepository(MarcaModeloRepository):
             marca_modelo = MarcaModelo.objects.get(pk=id)
         except MarcaModelo.DoesNotExist as e:
             e.add_note(f"MarcaModelo com id {id} não encontrado.")
+            raise e
 
         marca_modelo.alterado_por = user
         marca_modelo.marca = marca
@@ -198,6 +203,7 @@ class DjangoMarcaModeloRepository(MarcaModeloRepository):
             marca_modelo = MarcaModelo.objects.get(pk=id)
         except MarcaModelo.DoesNotExist as e:
             e.add_note(f"MarcaModelo com id {id} não encontrado.")
+            raise e
 
         marca_modelo.removido_em = timezone.now()
         marca_modelo.alterado_por = user
