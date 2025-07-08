@@ -1,11 +1,13 @@
 from core.types import ResultError, ResultSuccess
 from patrimonio.policies.contracts import (
+    BemPolicy,
     EstadoConservacaoPolicy,
     GrauFragilidadePolicy,
     MarcaModeloPolicy,
     TipoBemPolicy,
 )
 from patrimonio.repositories.contracts import (
+    BemRepository,
     EstadoConservacaoRepository,
     GrauFragilidadeRepository,
     MarcaModeloRepository,
@@ -453,3 +455,149 @@ class RemoverMarcaModeloUsecase:
             return ResultSuccess(resposta)
         except Exception as e:
             return ResultError(f"Erro ao remover marca/modelo: {e}")
+
+
+class ListarBensUsecase:
+    def __init__(self, repo: BemRepository, policy: BemPolicy) -> None:
+        self.repo = repo
+        self.policy = policy
+
+    def pode_listar(self):
+        return self.policy.pode_listar()
+
+    def execute(self):
+        if not self.policy.pode_listar():
+            return ResultError("Você não tem permissão para realizar esta ação.")
+
+        try:
+            resposta = self.repo.listar_bens()
+            return ResultSuccess(resposta)
+        except Exception as e:
+            return ResultError(f"Erro ao listar bens: {e}")
+
+
+class CadastrarBemUsecase:
+    def __init__(self, repo: BemRepository, policy: BemPolicy) -> None:
+        self.repo = repo
+        self.policy = policy
+
+    def pode_criar(self):
+        return self.policy.pode_criar()
+
+    def execute(
+        self,
+        patrimonio,
+        descricao,
+        tipo,
+        grau_fragilidade,
+        estado_conservacao,
+        marca_modelo,
+    ):
+        if not self.policy.pode_criar():
+            return ResultError("Você não tem permissão para realizar esta ação.")
+
+        try:
+            bem_existente = self.repo.buscar_por_patrimonio(patrimonio)
+            if bem_existente:
+                return ResultError("Já existe um bem com esse número de patrimônio.")
+        except Exception:
+            pass
+
+        try:
+            resposta = self.repo.cadastrar_bem(
+                patrimonio,
+                descricao,
+                tipo,
+                grau_fragilidade,
+                estado_conservacao,
+                marca_modelo,
+                self.policy.user,
+            )
+            return ResultSuccess(resposta)
+        except Exception as e:
+            return ResultError(f"Erro ao cadastrar bem: {e}")
+
+
+class EditarBemUsecase:
+    def __init__(self, repo: BemRepository, policy: BemPolicy) -> None:
+        self.repo = repo
+        self.policy = policy
+
+    def pode_editar(self, bem):
+        return self.policy.pode_editar(bem)
+
+    def get_bem(self, id):
+        try:
+            bem = self.repo.buscar_por_id(id)
+        except Exception as e:
+            return ResultError(f"Erro ao buscar bem: {e}")
+
+        if not self.policy.pode_editar(bem):
+            return ResultError("Você não tem permissão para realizar esta ação.")
+
+        return ResultSuccess(bem)
+
+    def execute(
+        self,
+        id,
+        patrimonio,
+        descricao,
+        tipo,
+        grau_fragilidade,
+        estado_conservacao,
+        marca_modelo,
+    ):
+        resultado = self.get_bem(id)
+        if not resultado:
+            return resultado
+
+        try:
+            bem_com_mesmo_patrimonio = self.repo.buscar_por_patrimonio(patrimonio)
+            # FIXME: nao acessar via dicionario. comecar implementação de dataclasses ASAP
+            if bem_com_mesmo_patrimonio and bem_com_mesmo_patrimonio["id"] != id:
+                return ResultError("Já existe outro bem com esse patrimônio.")
+        except Exception:
+            pass
+
+        try:
+            resposta = self.repo.editar_bem(
+                id,
+                patrimonio,
+                descricao,
+                tipo,
+                grau_fragilidade,
+                estado_conservacao,
+                marca_modelo,
+                self.policy.user,
+            )
+            return ResultSuccess(resposta)
+        except Exception as e:
+            return ResultError(f"Erro ao editar bem: {e}")
+
+
+class RemoverBemUsecase:
+    def __init__(self, repo: BemRepository, policy: BemPolicy) -> None:
+        self.repo = repo
+        self.policy = policy
+
+    def get_bem(self, id):
+        try:
+            bem = self.repo.buscar_por_id(id)
+        except Exception as e:
+            return ResultError(f"Erro ao buscar bem: {e}")
+
+        if not self.policy.pode_remover(bem):
+            return ResultError("Você não tem permissão para realizar esta ação.")
+
+        return ResultSuccess(bem)
+
+    def execute(self, id):
+        resultado = self.get_bem(id)
+        if not resultado:
+            return resultado
+
+        try:
+            resposta = self.repo.remover_bem(id, self.policy.user)
+            return ResultSuccess(resposta)
+        except Exception as e:
+            return ResultError(f"Erro ao remover bem: {e}")

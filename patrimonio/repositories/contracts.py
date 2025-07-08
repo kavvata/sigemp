@@ -94,3 +94,48 @@ class MarcaModeloRepository(ABC):
     @abstractmethod
     def remover_marca_modelo(self, id: int, user: Any) -> Any:
         pass
+
+
+class BemRepository(ABC):
+    @abstractmethod
+    def listar_bens(self) -> Any:
+        pass
+
+    @abstractmethod
+    def buscar_por_id(self, id: int) -> Any:
+        pass
+
+    @abstractmethod
+    def buscar_por_patirmonio(self, patrimonio: str) -> Any:
+        pass
+
+    @abstractmethod
+    def cadastrar_bem(
+        self,
+        patrimonio: str,
+        descricao: str,
+        tipo: str,
+        grau_fragilidade: Any,
+        estado_conservacao: Any,
+        marca_modelo: Any,
+        user: Any,
+    ) -> Any:
+        pass
+
+    @abstractmethod
+    def editar_bem(
+        self,
+        id: int,
+        patrimonio: str,
+        descricao: str,
+        tipo: str,
+        grau_fragilidade: Any,
+        estado_conservacao: Any,
+        marca_modelo: Any,
+        user: Any,
+    ) -> Any:
+        pass
+
+    @abstractmethod
+    def remover_bem(self, id: int, user: Any) -> Any:
+        pass
