@@ -2,6 +2,12 @@ from unittest import mock
 import pytest
 
 from core.types import ResultError, ResultSuccess
+from patrimonio.usecases import (
+    ListarBensUsecase,
+    CadastrarBemUsecase,
+    EditarBemUsecase,
+    RemoverBemUsecase,
+)
 
 
 @pytest.fixture
@@ -60,8 +66,8 @@ def test_listar_bens_usecase(lista_bem):
     usecase = ListarBensUsecase(repo, policy)
     result = usecase.execute()
 
-    repo.listar_bens.assert_not_called()
-    policy.pode_listar.assert_called_with()
+    repo.listar_bens.assert_called()
+    policy.pode_listar.assert_called()
 
     assert result
     assert isinstance(result, ResultSuccess)
@@ -217,7 +223,7 @@ def test_nao_pode_editar_para_patrimonio_existente_usecase(bem, lista_bem):
     policy.user = user
     policy.pode_editar.return_value = True
     repo.buscar_por_id.return_value = bem
-    repo.buscar_por_patrimonio.return_value = lista_bem[1]  # Já existe outro
+    repo.buscar_por_patrimonio.return_value = lista_bem[1]
 
     usecase = EditarBemUsecase(repo, policy)
     result = usecase.execute(
