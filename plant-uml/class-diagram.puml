@@ -108,6 +108,7 @@ package "emprestimo" {
     }
     class Ocorrencia {
         +data_ocorrencia: date
+        +estado: int
         +emprestimo: Emprestimo
     }
     class Emprestimo {
