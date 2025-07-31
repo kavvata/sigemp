@@ -3,7 +3,7 @@ from typing import override
 from django.contrib.auth.models import User
 from django.utils import timezone
 
-from patrimonio.infrastructure.mappers import TipoBemMapper
+from patrimonio.infrastructure.mappers import EstadoConservacaoMapper, TipoBemMapper
 from patrimonio.models import EstadoConservacao, GrauFragilidade, TipoBem, MarcaModelo
 from patrimonio.repositories.contracts import (
     EstadoConservacaoRepository,
@@ -73,26 +73,29 @@ class DjangoTipoBemRepository(TipoBemRepository):
 class DjangoEstadoConservacaoRepository(EstadoConservacaoRepository):
     @override
     def listar_estados_conservacao(self):
-        return EstadoConservacao.objects.filter(removido_em__isnull=True).order_by(
-            "nivel"
-        )
+        return [
+            EstadoConservacaoMapper.from_model(estado_conservacao)
+            for estado_conservacao in EstadoConservacao.objects.filter(
+                removido_em__isnull=True
+            ).order_by("nivel")
+        ]
 
     @override
     def buscar_por_id(self, id: int):
         try:
-            estado_conservacao = EstadoConservacao.objects.get(
-                pk=id, removido_em__isnull=True
-            )
+            estado = EstadoConservacao.objects.get(pk=id, removido_em__isnull=True)
         except EstadoConservacao.DoesNotExist as e:
             e.add_note(f"Estado de conservacao com id {id} não encontrado.")
             raise e
         else:
-            return estado_conservacao
+            return EstadoConservacaoMapper.from_model(estado)
 
     @override
     def cadastrar_estado_conservacao(self, descricao: str, nivel: int, user: User):
-        return EstadoConservacao.objects.create(
-            descricao=descricao, nivel=nivel, criado_por=user
+        return EstadoConservacaoMapper.from_model(
+            EstadoConservacao.objects.create(
+                descricao=descricao, nivel=nivel, criado_por=user
+            )
         )
 
     def editar_estado_conservacao(
@@ -108,7 +111,7 @@ class DjangoEstadoConservacaoRepository(EstadoConservacaoRepository):
         estado.descricao = descricao
         estado.nivel = nivel
         estado.save()
-        return estado
+        return EstadoConservacaoMapper.from_model(estado)
 
     def remover_estado_conservacao(self, id: int, user: User):
         try:
@@ -120,6 +123,7 @@ class DjangoEstadoConservacaoRepository(EstadoConservacaoRepository):
         estado.removido_em = timezone.now()
         estado.alterado_por = user
         estado.save()
+        return EstadoConservacaoMapper.from_model(estado)
 
 
 class DjangoGrauFragilidadeRepository(GrauFragilidadeRepository):

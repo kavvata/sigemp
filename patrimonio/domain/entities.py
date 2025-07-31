@@ -1,35 +1,37 @@
 from dataclasses import dataclass
 
+from core.domain.entities import TimeStampableEntity
 
-@dataclass
-class TipoBemEntity:
+
+@dataclass(kw_only=True)
+class TipoBemEntity(TimeStampableEntity):
     descricao: str
     id: int = None
 
 
-@dataclass
-class EstadoConservacaoEntity:
-    descricao: str
-    nivel: int
-    id: int = None
-
-
-@dataclass
-class GrauFragilidadeEntity:
+@dataclass(kw_only=True)
+class EstadoConservacaoEntity(TimeStampableEntity):
     descricao: str
     nivel: int
     id: int = None
 
 
-@dataclass
-class MarcaModeloEntity:
+@dataclass(kw_only=True)
+class GrauFragilidadeEntity(TimeStampableEntity):
+    descricao: str
+    nivel: int
+    id: int = None
+
+
+@dataclass(kw_only=True)
+class MarcaModeloEntity(TimeStampableEntity):
     marca: str
     modelo: str
     id: int = None
 
 
-@dataclass
-class BemEntity:
+@dataclass(kw_only=True)
+class BemEntity(TimeStampableEntity):
     descricao: str
     patrimonio: str
     tipo_id: TipoBemEntity
