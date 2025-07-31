@@ -106,7 +106,7 @@ class BemRepository(ABC):
         pass
 
     @abstractmethod
-    def buscar_por_patirmonio(self, patrimonio: str) -> Any:
+    def buscar_por_patrimonio(self, patrimonio: str) -> Any:
         pass
 
     @abstractmethod
