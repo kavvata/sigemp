@@ -6,6 +6,7 @@ from django.utils import timezone
 from patrimonio.infrastructure.mappers import (
     EstadoConservacaoMapper,
     GrauFragilidadeMapper,
+    MarcaModeloMapper,
     TipoBemMapper,
 )
 from patrimonio.models import EstadoConservacao, GrauFragilidade, TipoBem, MarcaModelo
@@ -187,9 +188,12 @@ class DjangoGrauFragilidadeRepository(GrauFragilidadeRepository):
 class DjangoMarcaModeloRepository(MarcaModeloRepository):
     @override
     def listar_marca_modelo(self):
-        return MarcaModelo.objects.filter(removido_em__isnull=True).order_by(
-            "marca", "modelo"
-        )
+        return [
+            MarcaModeloMapper.from_model(model)
+            for model in MarcaModelo.objects.filter(removido_em__isnull=True).order_by(
+                "marca", "modelo"
+            )
+        ]
 
     @override
     def buscar_por_id(self, id: int):
@@ -199,7 +203,7 @@ class DjangoMarcaModeloRepository(MarcaModeloRepository):
             e.add_note(f"MarcaModelo com id {id} não encontrado.")
             raise e
         else:
-            return marca_modelo
+            return MarcaModeloMapper.from_model(marca_modelo)
 
     @override
     def cadastrar_marca_modelo(self, marca: str, modelo: str, user: User):
@@ -216,7 +220,7 @@ class DjangoMarcaModeloRepository(MarcaModeloRepository):
         marca_modelo.marca = marca
         marca_modelo.modelo = modelo
         marca_modelo.save()
-        return marca_modelo
+        return MarcaModeloMapper.from_model(marca_modelo)
 
     def remover_marca_modelo(self, id: int, user: User):
         try:
@@ -228,3 +232,4 @@ class DjangoMarcaModeloRepository(MarcaModeloRepository):
         marca_modelo.removido_em = timezone.now()
         marca_modelo.alterado_por = user
         marca_modelo.save()
+        return MarcaModeloMapper.from_model(marca_modelo)

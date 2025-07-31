@@ -3,8 +3,14 @@ from patrimonio.domain.entities import (
     EstadoConservacaoEntity,
     GrauFragilidadeEntity,
     TipoBemEntity,
+    MarcaModeloEntity,
 )
-from patrimonio.models import EstadoConservacao, GrauFragilidade, TipoBem
+from patrimonio.models import (
+    EstadoConservacao,
+    GrauFragilidade,
+    TipoBem,
+    MarcaModelo,
+)
 
 
 class TipoBemMapper:
@@ -35,3 +41,13 @@ class GrauFragilidadeMapper:
     @staticmethod
     def from_dict(data: dict):
         return GrauFragilidadeEntity(**data)
+
+
+class MarcaModeloMapper:
+    @staticmethod
+    def from_model(model: MarcaModelo):
+        return MarcaModeloEntity(**model_to_dict(model))
+
+    @staticmethod
+    def from_dict(data: dict):
+        return MarcaModeloEntity(**data)
