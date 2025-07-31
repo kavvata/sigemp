@@ -34,7 +34,7 @@ class MarcaModeloEntity(TimeStampableEntity):
 class BemEntity(TimeStampableEntity):
     descricao: str
     patrimonio: str
-    tipo_id: TipoBemEntity
+    tipo_id: int
     grau_fragilidade_id: int
     estado_conservacao_id: int
     marca_modelo_id: int

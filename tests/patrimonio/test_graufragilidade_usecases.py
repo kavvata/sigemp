@@ -9,20 +9,22 @@ from patrimonio.usecases import (
     RemoverGrauFragilidadeUsecase,
 )
 
+from patrimonio.domain.entities import GrauFragilidadeEntity
+
 
 @pytest.fixture
 def grau_fragilidade():
-    return {"id": 3, "descricao": "Médio", "nivel": 3}
+    return GrauFragilidadeEntity(id=3, descricao="Médio", nivel=3)
 
 
 @pytest.fixture
 def lista_grau_fragilidade():
     return [
-        {"id": 1, "descricao": "Péssimo", "nivel": 1},
-        {"id": 2, "descricao": "Mau", "nivel": 2},
-        {"id": 3, "descricao": "Médio", "nivel": 3},
-        {"id": 4, "descricao": "Bom", "nivel": 4},
-        {"id": 5, "descricao": "Excelente", "nivel": 5},
+        GrauFragilidadeEntity(id=1, descricao="Péssimo", nivel=1),
+        GrauFragilidadeEntity(id=2, descricao="Mau", nivel=2),
+        GrauFragilidadeEntity(id=3, descricao="Médio", nivel=3),
+        GrauFragilidadeEntity(id=4, descricao="Bom", nivel=4),
+        GrauFragilidadeEntity(id=5, descricao="Excelente", nivel=5),
     ]
 
 
@@ -75,12 +77,10 @@ def test_cadastrar_grau_fragilidade_usecase(grau_fragilidade):
     usecase = CadastrarGrauFragilidadeUsecase(repo, policy)
 
     if usecase.pode_criar():
-        result = usecase.execute(
-            grau_fragilidade["descricao"], grau_fragilidade["nivel"]
-        )
+        result = usecase.execute(grau_fragilidade.descricao, grau_fragilidade.nivel)
 
     repo.cadastrar_grau_fragilidade.assert_called_with(
-        grau_fragilidade["descricao"], grau_fragilidade["nivel"], user
+        grau_fragilidade.descricao, grau_fragilidade.nivel, user
     )
     policy.pode_criar.assert_called_with()
 
@@ -99,7 +99,7 @@ def test_nao_pode_cadastrar_grau_fragilidade_usecase(grau_fragilidade):
 
     usecase = CadastrarGrauFragilidadeUsecase(repo, policy)
 
-    result = usecase.execute(grau_fragilidade["descricao"], grau_fragilidade["nivel"])
+    result = usecase.execute(grau_fragilidade.descricao, grau_fragilidade.nivel)
 
     repo.cadastrar_grau_fragilidade.assert_not_called()
     policy.pode_criar.assert_called_with()
@@ -119,20 +119,18 @@ def test_editar_grau_fragilidade_usecase(grau_fragilidade):
 
     usecase = EditarGrauFragilidadeUsecase(repo, policy)
 
-    result = usecase.get_grau_fragilidade(grau_fragilidade["id"])
+    result = usecase.get_grau_fragilidade(grau_fragilidade.id)
     encontrado = result.value
 
     assert encontrado
 
-    result = usecase.execute(
-        encontrado["id"], encontrado["descricao"], encontrado["nivel"]
-    )
+    result = usecase.execute(encontrado.id, encontrado.descricao, encontrado.nivel)
 
-    repo.buscar_por_id.assert_called_with(grau_fragilidade["id"])
+    repo.buscar_por_id.assert_called_with(grau_fragilidade.id)
     repo.editar_grau_fragilidade.assert_called_with(
-        grau_fragilidade["id"],
-        grau_fragilidade["descricao"],
-        grau_fragilidade["nivel"],
+        grau_fragilidade.id,
+        grau_fragilidade.descricao,
+        grau_fragilidade.nivel,
         user,
     )
     policy.pode_editar.assert_called_with(grau_fragilidade)
@@ -153,17 +151,17 @@ def test_nao_pode_editar_grau_fragilidade_usecase(grau_fragilidade):
 
     usecase = EditarGrauFragilidadeUsecase(repo, policy)
 
-    result = usecase.get_grau_fragilidade(grau_fragilidade["id"])
+    result = usecase.get_grau_fragilidade(grau_fragilidade.id)
     assert not result
     assert isinstance(result, ResultError)
 
     result = usecase.execute(
-        grau_fragilidade["id"],
-        grau_fragilidade["descricao"],
-        grau_fragilidade["nivel"],
+        grau_fragilidade.id,
+        grau_fragilidade.descricao,
+        grau_fragilidade.nivel,
     )
 
-    repo.buscar_por_id.assert_called_with(grau_fragilidade["id"])
+    repo.buscar_por_id.assert_called_with(grau_fragilidade.id)
     repo.editar_grau_fragilidade.assert_not_called()
     policy.pode_editar.assert_called_with(grau_fragilidade)
 
@@ -182,9 +180,9 @@ def test_remover_grau_fragilidade_usecase(grau_fragilidade):
 
     usecase = RemoverGrauFragilidadeUsecase(repo, policy)
 
-    result = usecase.execute(grau_fragilidade["id"])
+    result = usecase.execute(grau_fragilidade.id)
 
-    repo.remover_grau_fragilidade.assert_called_with(grau_fragilidade["id"], user)
+    repo.remover_grau_fragilidade.assert_called_with(grau_fragilidade.id, user)
     policy.pode_remover.assert_called_with(grau_fragilidade)
 
     assert result
@@ -203,7 +201,7 @@ def test_nao_pode_remover_grau_fragilidade_usecase(grau_fragilidade):
 
     usecase = RemoverGrauFragilidadeUsecase(repo, policy)
 
-    result = usecase.execute(grau_fragilidade["id"])
+    result = usecase.execute(grau_fragilidade.id)
 
     repo.remover_grau_fragilidade.assert_not_called()
     policy.pode_remover.assert_called_with(grau_fragilidade)

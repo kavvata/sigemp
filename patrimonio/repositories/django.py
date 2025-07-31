@@ -3,7 +3,11 @@ from typing import override
 from django.contrib.auth.models import User
 from django.utils import timezone
 
-from patrimonio.infrastructure.mappers import EstadoConservacaoMapper, TipoBemMapper
+from patrimonio.infrastructure.mappers import (
+    EstadoConservacaoMapper,
+    GrauFragilidadeMapper,
+    TipoBemMapper,
+)
 from patrimonio.models import EstadoConservacao, GrauFragilidade, TipoBem, MarcaModelo
 from patrimonio.repositories.contracts import (
     EstadoConservacaoRepository,
@@ -129,9 +133,12 @@ class DjangoEstadoConservacaoRepository(EstadoConservacaoRepository):
 class DjangoGrauFragilidadeRepository(GrauFragilidadeRepository):
     @override
     def listar_grau_fragilidade(self):
-        return GrauFragilidade.objects.filter(removido_em__isnull=True).order_by(
-            "nivel"
-        )
+        return [
+            GrauFragilidadeMapper.from_model(grau)
+            for grau in GrauFragilidade.objects.filter(
+                removido_em__isnull=True
+            ).order_by("nivel")
+        ]
 
     @override
     def buscar_por_id(self, id: int):
@@ -143,7 +150,7 @@ class DjangoGrauFragilidadeRepository(GrauFragilidadeRepository):
             e.add_note(f"Grau de fragilidade com id {id} não encontrado.")
             raise e
         else:
-            return grau_fragilidade
+            return GrauFragilidadeMapper.from_model(grau_fragilidade)
 
     @override
     def cadastrar_grau_fragilidade(self, descricao: str, nivel: int, user: User):
@@ -162,7 +169,7 @@ class DjangoGrauFragilidadeRepository(GrauFragilidadeRepository):
         grau.descricao = descricao
         grau.nivel = nivel
         grau.save()
-        return grau
+        return GrauFragilidadeMapper.from_model(grau)
 
     def remover_grau_fragilidade(self, id: int, user: User):
         try:
@@ -174,6 +181,7 @@ class DjangoGrauFragilidadeRepository(GrauFragilidadeRepository):
         grau.removido_em = timezone.now()
         grau.alterado_por = user
         grau.save()
+        return GrauFragilidadeMapper.from_model(grau)
 
 
 class DjangoMarcaModeloRepository(MarcaModeloRepository):
