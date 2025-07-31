@@ -3,6 +3,7 @@ from typing import override
 from django.contrib.auth.models import User
 from django.utils import timezone
 
+from patrimonio.infrastructure.mappers import TipoBemMapper
 from patrimonio.models import EstadoConservacao, GrauFragilidade, TipoBem, MarcaModelo
 from patrimonio.repositories.contracts import (
     EstadoConservacaoRepository,
@@ -15,7 +16,12 @@ from patrimonio.repositories.contracts import (
 class DjTipoBemRepository(TipoBemRepository):
     @override
     def listar_tipos_bem(self):
-        return TipoBem.objects.filter(removido_em__isnull=True).order_by("descricao")
+        return [
+            TipoBemMapper.from_model(tipo_bem)
+            for tipo_bem in TipoBem.objects.filter(removido_em__isnull=True).order_by(
+                "descricao"
+            )
+        ]
 
     @override
     def buscar_por_id(self, id: int):
@@ -27,11 +33,13 @@ class DjTipoBemRepository(TipoBemRepository):
             e.add_note(f"Tipo de bem com id {id} não encontrado.")
             raise e
         else:
-            return tipo_bem
+            return TipoBemMapper.from_model(tipo_bem)
 
     @override
     def cadastrar_tipo_bem(self, descricao: str, user: User) -> TipoBem:
-        return TipoBem.objects.create(descricao=descricao, criado_por=user)
+        return TipoBemMapper.from_model(
+            TipoBem.objects.create(descricao=descricao, criado_por=user)
+        )
 
     @override
     def editar_tipo_bem(self, id: int, descricao: str, user: User) -> TipoBem:
@@ -45,7 +53,7 @@ class DjTipoBemRepository(TipoBemRepository):
         tipo_bem.alterado_por = user
         tipo_bem.save()
 
-        return tipo_bem
+        return TipoBemMapper.from_model(tipo_bem)
 
     @override
     def remover_tipo_bem(self, id: int, user: User) -> TipoBem:
@@ -59,7 +67,7 @@ class DjTipoBemRepository(TipoBemRepository):
         tipo_bem.alterado_por = user
         tipo_bem.save()
 
-        return tipo_bem
+        return TipoBemMapper.from_model(tipo_bem)
 
 
 class DjangoEstadoConservacaoRepository(EstadoConservacaoRepository):
