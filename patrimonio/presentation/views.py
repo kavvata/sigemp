@@ -23,7 +23,7 @@ from patrimonio.repositories.django import (
     DjangoEstadoConservacaoRepository,
     DjangoGrauFragilidadeRepository,
     DjangoMarcaModeloRepository,
-    DjTipoBemRepository,
+    DjangoTipoBemRepository,
 )
 from patrimonio.usecases import (
     CadastrarEstadoConservacaoUsecase,
@@ -54,7 +54,7 @@ class ListarTiposBemView(ListView):
 
     def get_queryset(self):
         policy = DjangoTipoBemPolicy(self.request.user)
-        repo = DjTipoBemRepository()
+        repo = DjangoTipoBemRepository()
         usecase = ListarTiposBemUsecase(repo, policy)
         if not usecase.pode_listar():
             raise PermissionDenied(
@@ -69,7 +69,7 @@ class ListarTiposBemView(ListView):
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         policy = DjangoTipoBemPolicy(self.request.user)
-        repo = DjTipoBemRepository()
+        repo = DjangoTipoBemRepository()
 
         usecase = CadastrarTipoBemUsecase(repo, policy)
 
@@ -84,7 +84,7 @@ class CriarTipoBemView(CreateView):
     success_url = reverse_lazy("patrimonio:listar_tipos_bem")
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        repo = DjTipoBemRepository()
+        repo = DjangoTipoBemRepository()
         policy = DjangoTipoBemPolicy(self.request.user)
         usecase = CadastrarTipoBemUsecase(repo, policy)
 
@@ -94,7 +94,7 @@ class CriarTipoBemView(CreateView):
         return super().get(request, *args, **kwargs)
 
     def form_valid(self, form):
-        repo = DjTipoBemRepository()
+        repo = DjangoTipoBemRepository()
         policy = DjangoTipoBemPolicy(self.request.user)
         usecase = CadastrarTipoBemUsecase(repo, policy)
 
@@ -118,7 +118,7 @@ class EditarTipoBemView(UpdateView):
     def get(
         self, request: HttpRequest, pk: int, *args: Any, **kwargs: Any
     ) -> HttpResponse:
-        repo = DjTipoBemRepository()
+        repo = DjangoTipoBemRepository()
         policy = DjangoTipoBemPolicy(self.request.user)
         usecase = EditarTipoBemUsecase(repo, policy)
 
@@ -128,7 +128,7 @@ class EditarTipoBemView(UpdateView):
         return super().get(request, *args, **kwargs)
 
     def form_valid(self, form):
-        repo = DjTipoBemRepository()
+        repo = DjangoTipoBemRepository()
         policy = DjangoTipoBemPolicy(self.request.user)
         usecase = EditarTipoBemUsecase(repo, policy)
 
@@ -145,7 +145,7 @@ class EditarTipoBemView(UpdateView):
 
 
 def remover_tipobem(request, pk):
-    repo = DjTipoBemRepository()
+    repo = DjangoTipoBemRepository()
     policy = DjangoTipoBemPolicy(request.user)
     usecase = RemoverTipoBemUsecase(repo, policy)
 

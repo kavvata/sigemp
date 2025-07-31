@@ -13,7 +13,7 @@ from patrimonio.repositories.contracts import (
 )
 
 
-class DjTipoBemRepository(TipoBemRepository):
+class DjangoTipoBemRepository(TipoBemRepository):
     @override
     def listar_tipos_bem(self):
         return [
