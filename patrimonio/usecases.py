@@ -553,7 +553,6 @@ class EditarBemUsecase:
 
         try:
             bem_com_mesmo_patrimonio = self.repo.buscar_por_patrimonio(patrimonio)
-            print(bem_com_mesmo_patrimonio)
             if bem_com_mesmo_patrimonio and bem_com_mesmo_patrimonio.id != id:
                 return ResultError("Já existe outro bem com esse patrimônio.")
         except Exception:
