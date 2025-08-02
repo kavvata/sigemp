@@ -33,3 +33,12 @@ class MarcaModelo(Timestampable, models.Model):
 
     def __str__(self) -> str:
         return f"{self.marca} - {self.modelo}"
+
+
+class Bem(Timestampable, models.Model):
+    descricao = models.CharField(null=False, blank=False, max_length=255)
+    patrimonio = models.CharField(null=False, blank=False, max_length=30)
+    tipo = models.ForeignKey(TipoBem, on_delete=models.CASCADE)
+    grau_fragilidade = models.ForeignKey(GrauFragilidade, on_delete=models.CASCADE)
+    estado_conservacao = models.ForeignKey(EstadoConservacao, on_delete=models.CASCADE)
+    marca_modelo = models.ForeignKey(MarcaModelo, on_delete=models.CASCADE)

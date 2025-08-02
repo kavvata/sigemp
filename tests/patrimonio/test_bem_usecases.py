@@ -9,50 +9,52 @@ from patrimonio.usecases import (
     RemoverBemUsecase,
 )
 
+from patrimonio.domain.entities import BemEntity
+
 
 @pytest.fixture
 def bem():
-    return {
-        "id": 1,
-        "patrimonio": "000.000.000.000",
-        "descricao": "Projetor Epson X1000",
-        "tipo": 1,
-        "grau_fragilidade": 2,
-        "estado_conservacao": 1,
-        "marca_modelo": 1,
-    }
+    return BemEntity(
+        id=1,
+        patrimonio="000.000.000.000",
+        descricao="Projetor Epson X1000",
+        tipo_id=1,
+        grau_fragilidade_id=2,
+        estado_conservacao_id=1,
+        marca_modelo_id=1,
+    )
 
 
 @pytest.fixture
 def lista_bem():
     return [
-        {
-            "id": 1,
-            "patrimonio": "000.000.000.000",
-            "descricao": "Projetor Epson X1000",
-            "tipo": 1,
-            "grau_fragilidade": 2,
-            "estado_conservacao": 1,
-            "marca_modelo": 1,
-        },
-        {
-            "id": 2,
-            "patrimonio": "000.000.000.001",
-            "descricao": "Notebook Dell Latitude",
-            "tipo": 2,
-            "grau_fragilidade": 1,
-            "estado_conservacao": 2,
-            "marca_modelo": 2,
-        },
-        {
-            "id": 3,
-            "patrimonio": "000.000.000.002",
-            "descricao": "Centrífuga de bancada",
-            "tipo": 3,
-            "grau_fragilidade": 3,
-            "estado_conservacao": 3,
-            "marca_modelo": 3,
-        },
+        BemEntity(
+            id=1,
+            patrimonio="000.000.000.000",
+            descricao="Projetor Epson X1000",
+            tipo_id=1,
+            grau_fragilidade_id=2,
+            estado_conservacao_id=1,
+            marca_modelo_id=1,
+        ),
+        BemEntity(
+            id=2,
+            patrimonio="000.000.000.001",
+            descricao="Notebook Dell Latitude",
+            tipo_id=2,
+            grau_fragilidade_id=1,
+            estado_conservacao_id=2,
+            marca_modelo_id=2,
+        ),
+        BemEntity(
+            id=3,
+            patrimonio="000.000.000.002",
+            descricao="Centrífuga de bancada",
+            tipo_id=3,
+            grau_fragilidade_id=3,
+            estado_conservacao_id=3,
+            marca_modelo_id=3,
+        ),
     ]
 
 
@@ -104,22 +106,22 @@ def test_cadastrar_bem_usecase(bem):
     usecase = CadastrarBemUsecase(repo, policy)
 
     result = usecase.execute(
-        bem["patrimonio"],
-        bem["descricao"],
-        bem["tipo"],
-        bem["grau_fragilidade"],
-        bem["estado_conservacao"],
-        bem["marca_modelo"],
+        bem.patrimonio,
+        bem.descricao,
+        bem.tipo_id,
+        bem.grau_fragilidade_id,
+        bem.estado_conservacao_id,
+        bem.marca_modelo_id,
     )
 
-    repo.buscar_por_patrimonio.assert_called_with(bem["patrimonio"])
+    repo.buscar_por_patrimonio.assert_called_with(bem.patrimonio)
     repo.cadastrar_bem.assert_called_with(
-        bem["patrimonio"],
-        bem["descricao"],
-        bem["tipo"],
-        bem["grau_fragilidade"],
-        bem["estado_conservacao"],
-        bem["marca_modelo"],
+        bem.patrimonio,
+        bem.descricao,
+        bem.tipo_id,
+        bem.grau_fragilidade_id,
+        bem.estado_conservacao_id,
+        bem.marca_modelo_id,
         user,
     )
     assert isinstance(result, ResultSuccess)
@@ -134,12 +136,12 @@ def test_nao_pode_cadastrar_bem_sem_permissao_usecase(bem):
 
     usecase = CadastrarBemUsecase(repo, policy)
     result = usecase.execute(
-        bem["patrimonio"],
-        bem["descricao"],
-        bem["tipo"],
-        bem["grau_fragilidade"],
-        bem["estado_conservacao"],
-        bem["marca_modelo"],
+        bem.patrimonio,
+        bem.descricao,
+        bem.tipo_id,
+        bem.grau_fragilidade_id,
+        bem.estado_conservacao_id,
+        bem.marca_modelo_id,
     )
 
     repo.cadastrar_bem.assert_not_called()
@@ -156,12 +158,12 @@ def test_nao_pode_cadastrar_bem_com_patrimonio_existente_usecase(bem):
 
     usecase = CadastrarBemUsecase(repo, policy)
     result = usecase.execute(
-        bem["patrimonio"],
-        bem["descricao"],
-        bem["tipo"],
-        bem["grau_fragilidade"],
-        bem["estado_conservacao"],
-        bem["marca_modelo"],
+        bem.patrimonio,
+        bem.descricao,
+        bem.tipo_id,
+        bem.grau_fragilidade_id,
+        bem.estado_conservacao_id,
+        bem.marca_modelo_id,
     )
 
     repo.cadastrar_bem.assert_not_called()
@@ -180,13 +182,13 @@ def test_editar_bem_usecase(bem):
 
     usecase = EditarBemUsecase(repo, policy)
     result = usecase.execute(
-        bem["id"],
-        bem["patrimonio"],
-        bem["descricao"],
-        bem["tipo"],
-        bem["grau_fragilidade"],
-        bem["estado_conservacao"],
-        bem["marca_modelo"],
+        bem.id,
+        bem.patrimonio,
+        bem.descricao,
+        bem.tipo_id,
+        bem.grau_fragilidade_id,
+        bem.estado_conservacao_id,
+        bem.marca_modelo_id,
     )
 
     assert isinstance(result, ResultSuccess)
@@ -203,13 +205,13 @@ def test_nao_pode_editar_bem_sem_permissao_usecase(bem):
 
     usecase = EditarBemUsecase(repo, policy)
     result = usecase.execute(
-        bem["id"],
-        bem["patrimonio"],
-        bem["descricao"],
-        bem["tipo"],
-        bem["grau_fragilidade"],
-        bem["estado_conservacao"],
-        bem["marca_modelo"],
+        bem.id,
+        bem.patrimonio,
+        bem.descricao,
+        bem.tipo_id,
+        bem.grau_fragilidade_id,
+        bem.estado_conservacao_id,
+        bem.marca_modelo_id,
     )
 
     repo.editar_bem.assert_not_called()
@@ -227,13 +229,13 @@ def test_nao_pode_editar_para_patrimonio_existente_usecase(bem, lista_bem):
 
     usecase = EditarBemUsecase(repo, policy)
     result = usecase.execute(
-        bem["id"],
-        lista_bem[1]["patrimonio"],
-        bem["descricao"],
-        bem["tipo"],
-        bem["grau_fragilidade"],
-        bem["estado_conservacao"],
-        bem["marca_modelo"],
+        bem.id,
+        lista_bem[1].patrimonio,
+        bem.descricao,
+        bem.tipo_id,
+        bem.grau_fragilidade_id,
+        bem.estado_conservacao_id,
+        bem.marca_modelo_id,
     )
 
     repo.editar_bem.assert_not_called()
@@ -250,9 +252,9 @@ def test_remover_bem_usecase(bem):
     repo.remover_bem.return_value = bem
 
     usecase = RemoverBemUsecase(repo, policy)
-    result = usecase.execute(bem["id"])
+    result = usecase.execute(bem.id)
 
-    repo.remover_bem.assert_called_with(bem["id"], user)
+    repo.remover_bem.assert_called_with(bem.id, user)
     assert isinstance(result, ResultSuccess)
     assert result.value == bem
 
@@ -266,7 +268,7 @@ def test_nao_pode_remover_bem_sem_permissao_usecase(bem):
     repo.buscar_por_id.return_value = bem
 
     usecase = RemoverBemUsecase(repo, policy)
-    result = usecase.execute(bem["id"])
+    result = usecase.execute(bem.id)
 
     repo.remover_bem.assert_not_called()
     assert isinstance(result, ResultError)
