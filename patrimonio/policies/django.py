@@ -8,6 +8,7 @@ from patrimonio.policies.contracts import (
     GrauFragilidadePolicy,
     MarcaModeloPolicy,
     TipoBemPolicy,
+    BemPolicy,
 )
 
 
@@ -168,4 +169,41 @@ class DjangoMarcaModeloPolicy(MarcaModeloPolicy):
             self.user.is_superuser
             or self.user.has_perm("patrimonio:view_marcamodelo")
             and marca_modelo.removido_em is None
+        )
+
+
+class DjangoBemPolicy(BemPolicy):
+    def __init__(self, user: User) -> None:
+        super().__init__(user)
+
+    @override
+    def pode_listar(self) -> bool:
+        return self.user.is_superuser or self.user.has_perm("patrimonio:view_bem")
+
+    @override
+    def pode_criar(self) -> bool:
+        return self.user.is_superuser or self.user.has_perm("patrimonio:add_bem")
+
+    @override
+    def pode_editar(self, bem) -> bool:
+        return (
+            self.user.is_superuser
+            or self.user.has_perm("patrimonio:change_bem")
+            and bem.removido_em is None
+        )
+
+    @override
+    def pode_remover(self, bem) -> bool:
+        return (
+            self.user.is_superuser
+            or self.user.has_perm("patrimonio:delete_bem")
+            and bem.removido_em is None
+        )
+
+    @override
+    def pode_visualizar(self, bem) -> bool:
+        return (
+            self.user.is_superuser
+            or self.user.has_perm("patrimonio:view_bem")
+            and bem.removido_em is None
         )
