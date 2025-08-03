@@ -1,11 +1,13 @@
 from django.forms import model_to_dict
 from patrimonio.domain.entities import (
+    BemEntity,
     EstadoConservacaoEntity,
     GrauFragilidadeEntity,
     TipoBemEntity,
     MarcaModeloEntity,
 )
 from patrimonio.models import (
+    Bem,
     EstadoConservacao,
     GrauFragilidade,
     TipoBem,
@@ -51,3 +53,13 @@ class MarcaModeloMapper:
     @staticmethod
     def from_dict(data: dict):
         return MarcaModeloEntity(**data)
+
+
+class BemMapper:
+    @staticmethod
+    def from_model(model: Bem):
+        return BemEntity(**model_to_dict(model))
+
+    @staticmethod
+    def from_dict(data: dict):
+        return BemEntity(**data)
