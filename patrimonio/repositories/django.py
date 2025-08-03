@@ -3,14 +3,23 @@ from typing import override
 from django.contrib.auth.models import User
 from django.utils import timezone
 
+from patrimonio.domain.entities import BemEntity
 from patrimonio.infrastructure.mappers import (
+    BemMapper,
     EstadoConservacaoMapper,
     GrauFragilidadeMapper,
     MarcaModeloMapper,
     TipoBemMapper,
 )
-from patrimonio.models import EstadoConservacao, GrauFragilidade, TipoBem, MarcaModelo
+from patrimonio.models import (
+    Bem,
+    EstadoConservacao,
+    GrauFragilidade,
+    MarcaModelo,
+    TipoBem,
+)
 from patrimonio.repositories.contracts import (
+    BemRepository,
     EstadoConservacaoRepository,
     GrauFragilidadeRepository,
     MarcaModeloRepository,
@@ -233,3 +242,64 @@ class DjangoMarcaModeloRepository(MarcaModeloRepository):
         marca_modelo.alterado_por = user
         marca_modelo.save()
         return MarcaModeloMapper.from_model(marca_modelo)
+
+
+class DjangoBemRepository(BemRepository):
+    @override
+    def listar_bens(self):
+        return [
+            BemMapper.from_model(model)
+            for model in Bem.objects.filter(removido_em__isnull=True).order_by(
+                "patrimonio"
+            )
+        ]
+
+    @override
+    def buscar_por_id(self, id: int):
+        try:
+            bem = Bem.objects.get(pk=id, removido_em__isnull=True)
+        except Bem.DoesNotExist as e:
+            e.add_note(f"Bem com id {id} não encontrado.")
+            raise e
+        else:
+            return BemMapper.from_model(bem)
+
+    @override
+    def buscar_por_patrimonio(self, patrimonio: str):
+        try:
+            bem = Bem.objects.get(patrimonio=patrimonio, removido_em__isnull=True)
+        except Bem.DoesNotExist as e:
+            e.add_note(f"Bem com patrimonio {patrimonio} não encontrado.")
+            raise e
+        else:
+            return BemMapper.from_model(bem)
+
+    @override
+    def cadastrar_bem(self, bem: BemEntity, user: User):
+        novo = Bem.objects.create(criado_por=user, **bem.to_dict())
+        return novo
+
+    def editar_bem(self, id: int, marca: str, modelo: str, user: User):
+        try:
+            bem = Bem.objects.get(pk=id)
+        except Bem.DoesNotExist as e:
+            e.add_note(f"Bem com id {id} não encontrado.")
+            raise e
+
+        bem.alterado_por = user
+        bem.marca = marca
+        bem.modelo = modelo
+        bem.save()
+        return BemMapper.from_model(bem)
+
+    def remover_bem(self, id: int, user: User):
+        try:
+            bem = Bem.objects.get(pk=id)
+        except Bem.DoesNotExist as e:
+            e.add_note(f"Bem com id {id} não encontrado.")
+            raise e
+
+        bem.removido_em = timezone.now()
+        bem.alterado_por = user
+        bem.save()
+        return BemMapper.from_model(bem)
