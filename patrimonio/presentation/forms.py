@@ -1,6 +1,12 @@
 from django import forms
 
-from patrimonio.models import EstadoConservacao, GrauFragilidade, MarcaModelo, TipoBem
+from patrimonio.models import (
+    Bem,
+    EstadoConservacao,
+    GrauFragilidade,
+    MarcaModelo,
+    TipoBem,
+)
 
 
 class TipoBemForm(forms.ModelForm):
@@ -25,3 +31,16 @@ class MarcaModeloForm(forms.ModelForm):
     class Meta:
         model = MarcaModelo
         fields = ["marca", "modelo"]
+
+
+class BemForm(forms.ModelForm):
+    class Meta:
+        model = Bem
+        fields = [
+            "patrimonio",
+            "descricao",
+            "tipo",
+            "grau_fragilidade",
+            "estado_conservacao",
+            "marca_modelo",
+        ]
