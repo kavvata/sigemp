@@ -105,16 +105,10 @@ def test_cadastrar_bem_usecase(bem):
 
     usecase = CadastrarBemUsecase(repo, policy)
 
-    result = usecase.execute(
-        bem.patrimonio,
-        bem.descricao,
-        bem.tipo_id,
-        bem.grau_fragilidade_id,
-        bem.estado_conservacao_id,
-        bem.marca_modelo_id,
-    )
+    result = usecase.execute(bem)
 
     repo.buscar_por_patrimonio.assert_called_with(bem.patrimonio)
+    print(result.mensagem)
     repo.cadastrar_bem.assert_called_with(
         bem.patrimonio,
         bem.descricao,
@@ -135,14 +129,7 @@ def test_nao_pode_cadastrar_bem_sem_permissao_usecase(bem):
     policy.user = mock.Mock()
 
     usecase = CadastrarBemUsecase(repo, policy)
-    result = usecase.execute(
-        bem.patrimonio,
-        bem.descricao,
-        bem.tipo_id,
-        bem.grau_fragilidade_id,
-        bem.estado_conservacao_id,
-        bem.marca_modelo_id,
-    )
+    result = usecase.execute(bem)
 
     repo.cadastrar_bem.assert_not_called()
     assert isinstance(result, ResultError)
@@ -157,14 +144,7 @@ def test_nao_pode_cadastrar_bem_com_patrimonio_existente_usecase(bem):
     repo.buscar_por_patrimonio.return_value = bem  # já existe
 
     usecase = CadastrarBemUsecase(repo, policy)
-    result = usecase.execute(
-        bem.patrimonio,
-        bem.descricao,
-        bem.tipo_id,
-        bem.grau_fragilidade_id,
-        bem.estado_conservacao_id,
-        bem.marca_modelo_id,
-    )
+    result = usecase.execute(bem)
 
     repo.cadastrar_bem.assert_not_called()
     assert isinstance(result, ResultError)
@@ -181,15 +161,7 @@ def test_editar_bem_usecase(bem):
     repo.editar_bem.return_value = bem
 
     usecase = EditarBemUsecase(repo, policy)
-    result = usecase.execute(
-        bem.id,
-        bem.patrimonio,
-        bem.descricao,
-        bem.tipo_id,
-        bem.grau_fragilidade_id,
-        bem.estado_conservacao_id,
-        bem.marca_modelo_id,
-    )
+    result = usecase.execute(bem)
 
     assert isinstance(result, ResultSuccess)
     assert result.value == bem
@@ -204,15 +176,7 @@ def test_nao_pode_editar_bem_sem_permissao_usecase(bem):
     repo.buscar_por_id.return_value = bem
 
     usecase = EditarBemUsecase(repo, policy)
-    result = usecase.execute(
-        bem.id,
-        bem.patrimonio,
-        bem.descricao,
-        bem.tipo_id,
-        bem.grau_fragilidade_id,
-        bem.estado_conservacao_id,
-        bem.marca_modelo_id,
-    )
+    result = usecase.execute(bem)
 
     repo.editar_bem.assert_not_called()
     assert isinstance(result, ResultError)
@@ -228,15 +192,8 @@ def test_nao_pode_editar_para_patrimonio_existente_usecase(bem, lista_bem):
     repo.buscar_por_patrimonio.return_value = lista_bem[1]
 
     usecase = EditarBemUsecase(repo, policy)
-    result = usecase.execute(
-        bem.id,
-        lista_bem[1].patrimonio,
-        bem.descricao,
-        bem.tipo_id,
-        bem.grau_fragilidade_id,
-        bem.estado_conservacao_id,
-        bem.marca_modelo_id,
-    )
+    bem.patirmonio = lista_bem[1].patrimonio
+    result = usecase.execute(bem)
 
     repo.editar_bem.assert_not_called()
     assert isinstance(result, ResultError)

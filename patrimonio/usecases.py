@@ -1,4 +1,5 @@
 from core.types import ResultError, ResultSuccess
+from patrimonio.domain.entities import BemEntity
 from patrimonio.policies.contracts import (
     BemPolicy,
     EstadoConservacaoPolicy,
@@ -484,20 +485,12 @@ class CadastrarBemUsecase:
     def pode_criar(self):
         return self.policy.pode_criar()
 
-    def execute(
-        self,
-        patrimonio,
-        descricao,
-        tipo,
-        grau_fragilidade,
-        estado_conservacao,
-        marca_modelo,
-    ):
+    def execute(self, novo_bem: BemEntity):
         if not self.policy.pode_criar():
             return ResultError("Você não tem permissão para realizar esta ação.")
 
         try:
-            bem_existente = self.repo.buscar_por_patrimonio(patrimonio)
+            bem_existente = self.repo.buscar_por_patrimonio(novo_bem.patrimonio)
             if bem_existente:
                 return ResultError("Já existe um bem com esse número de patrimônio.")
         except Exception:
@@ -505,12 +498,12 @@ class CadastrarBemUsecase:
 
         try:
             resposta = self.repo.cadastrar_bem(
-                patrimonio,
-                descricao,
-                tipo,
-                grau_fragilidade,
-                estado_conservacao,
-                marca_modelo,
+                novo_bem.patrimonio,
+                novo_bem.descricao,
+                novo_bem.tipo_id,
+                novo_bem.grau_fragilidade_id,
+                novo_bem.estado_conservacao_id,
+                novo_bem.marca_modelo_id,
                 self.policy.user,
             )
             return ResultSuccess(resposta)
@@ -537,22 +530,13 @@ class EditarBemUsecase:
 
         return ResultSuccess(bem)
 
-    def execute(
-        self,
-        id,
-        patrimonio,
-        descricao,
-        tipo,
-        grau_fragilidade,
-        estado_conservacao,
-        marca_modelo,
-    ):
+    def execute(self, bem: BemEntity):
         resultado = self.get_bem(id)
         if not resultado:
             return resultado
 
         try:
-            bem_com_mesmo_patrimonio = self.repo.buscar_por_patrimonio(patrimonio)
+            bem_com_mesmo_patrimonio = self.repo.buscar_por_patrimonio(bem.patrimonio)
             if bem_com_mesmo_patrimonio and bem_com_mesmo_patrimonio.id != id:
                 return ResultError("Já existe outro bem com esse patrimônio.")
         except Exception:
@@ -561,12 +545,12 @@ class EditarBemUsecase:
         try:
             resposta = self.repo.editar_bem(
                 id,
-                patrimonio,
-                descricao,
-                tipo,
-                grau_fragilidade,
-                estado_conservacao,
-                marca_modelo,
+                bem.patrimonio,
+                bem.descricao,
+                bem.tipo_id,
+                bem.grau_fragilidade_id,
+                bem.estado_conservacao_id,
+                bem.marca_modelo_id,
                 self.policy.user,
             )
             return ResultSuccess(resposta)
