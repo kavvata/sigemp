@@ -85,4 +85,24 @@ urlpatterns = [
         views.remover_marca_modelo,
         name="remover_marca_modelo",
     ),
+    path(
+        "bem/",
+        views.ListarBemView.as_view(),
+        name="listar_bens",
+    ),
+    path(
+        "bem/add",
+        views.CriarBemView.as_view(),
+        name="criar_bem",
+    ),
+    path(
+        "bem/change/<int:pk>/",
+        views.EditarBemView.as_view(),
+        name="editar_bem",
+    ),
+    path(
+        "bem/delete/<int:pk>/",
+        views.remover_bem,
+        name="remover_bem",
+    ),
 ]
