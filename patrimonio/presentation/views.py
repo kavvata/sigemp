@@ -565,7 +565,7 @@ class ListarBemView(ListView):
 class CriarBemView(CreateView):
     template_name = "patrimonio/bem/bem_form.html"
     form_class = BemForm
-    success_url = reverse_lazy("patrimonio:listar_bem")
+    success_url = reverse_lazy("patrimonio:listar_bens")
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         repo = DjangoBemRepository()
@@ -598,7 +598,7 @@ class EditarBemView(UpdateView):
     template_name = "patrimonio/bem/bem_form.html"
     queryset = Bem.objects.filter(removido_em__isnull=True)
     form_class = BemForm
-    success_url = reverse_lazy("patrimonio:listar_bem")
+    success_url = reverse_lazy("patrimonio:listar_bens")
 
     def get(
         self, request: HttpRequest, pk: int, *args: Any, **kwargs: Any
@@ -640,4 +640,4 @@ def remover_bem(request, pk):
     if not result:
         raise PermissionDenied(result.mensagem)
 
-    return redirect(reverse_lazy("patrimonio:listar_bem"))
+    return redirect(reverse_lazy("patrimonio:listar_bens"))
