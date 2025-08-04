@@ -6,6 +6,7 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, UpdateView
 
+from patrimonio.domain.entities import BemEntity
 from patrimonio.models import (
     EstadoConservacao,
     GrauFragilidade,
@@ -584,9 +585,16 @@ class CriarBemView(CreateView):
 
         if not usecase.pode_criar():
             raise PermissionDenied("Voce nao tem permissao para criar bens móveis.")
-        result = usecase.execute(
-            form.cleaned_data["marca"], form.cleaned_data["modelo"]
+
+        novo_bem = BemEntity(
+            patrimonio=form.cleaned_data["patrimonio"],
+            descricao=form.cleaned_data["descricao"],
+            grau_fragilidade_id=form.cleaned_data["grau_fragilidade"],
+            tipo_id=form.cleaned_data["tipo"],
+            estado_conservacao_id=form.cleaned_data["estado_conservacao"],
+            marca_modelo_id=form.cleaned_data["marca_modelo"],
         )
+        result = usecase.execute(novo_bem)
 
         if not result:
             raise PermissionDenied(result.mensagem)
@@ -621,9 +629,16 @@ class EditarBemView(UpdateView):
         if not result:
             raise PermissionDenied(result.mensagem)
 
-        result = usecase.execute(
-            form.instance.id, form.cleaned_data["marca"], form.cleaned_data["modelo"]
+        bem = BemEntity(
+            id=form.instance.id,
+            patrimonio=form.cleaned_data["patrimonio"],
+            descricao=form.cleaned_data["descricao"],
+            tipo_id=form.cleaned_data["tipo"],
+            grau_fragilidade_id=form.cleaned_data["grau_fragilidade"],
+            estado_conservacao_id=form.cleaned_data["estado_conservacao"],
+            marca_modelo_id=form.cleaned_data["marca_modelo"],
         )
+        result = usecase.execute(bem)
 
         if not result:
             raise PermissionDenied(result.mensagem)
