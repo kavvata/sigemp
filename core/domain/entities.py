@@ -28,14 +28,15 @@ class TimeStampableEntity(BaseEntity):
 
     def to_dict(self, exclude=None):
         entity_dict = super().to_dict(exclude)
-        if "timestamps" in exclude:
-            try:
-                del entity_dict["criado_em"]
-                del entity_dict["criado_por"]
-                del entity_dict["alterado_em"]
-                del entity_dict["alterado_por"]
-                del entity_dict["removido_em"]
-            except KeyError:
-                pass  # in case one of the fields were excluded individually
+        if exclude:
+            if "timestamps" in exclude:
+                try:
+                    del entity_dict["criado_em"]
+                    del entity_dict["criado_por"]
+                    del entity_dict["alterado_em"]
+                    del entity_dict["alterado_por"]
+                    del entity_dict["removido_em"]
+                except KeyError:
+                    pass  # in case one of the fields were excluded individually
 
         return entity_dict
