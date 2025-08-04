@@ -58,7 +58,27 @@ class MarcaModeloMapper:
 class BemMapper:
     @staticmethod
     def from_model(model: Bem):
-        return BemEntity(**model_to_dict(model))
+        model_dict = model_to_dict(
+            model,
+        )
+
+        # FIXME: hacky solution, please refactor me later.
+
+        model_dict["tipo_id"] = model_dict["tipo"]
+        del model_dict["tipo"]
+
+        model_dict["estado_conservacao_id"] = model_dict["estado_conservacao"]
+        del model_dict["estado_conservacao"]
+
+        model_dict["grau_fragilidade_id"] = model_dict["grau_fragilidade"]
+        del model_dict["grau_fragilidade"]
+
+        model_dict["marca_modelo_id"] = model_dict["marca_modelo"]
+        del model_dict["marca_modelo"]
+
+        entity = BemMapper.from_dict(model_dict)
+
+        return entity
 
     @staticmethod
     def from_dict(data: dict):
