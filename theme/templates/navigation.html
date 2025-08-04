@@ -14,6 +14,11 @@
                     <i class="material-symbols-outlined align-middle">contract</i>
                     <span class="align-middle">Empréstimos</span>
                 </a>
+                <a href="{% url 'patrimonio:listar_bens' %}"
+                   class="block py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800">
+                    <i class="material-symbols-outlined align-middle">package_2</i>
+                    <span class="align-middle">Bens Móveis</span>
+                </a>
                 <button @click="openMenu = !openMenu"
                         class="w-full flex justify-between items-center py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition">
                     <span>Patrimônio</span>
