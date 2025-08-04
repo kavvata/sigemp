@@ -276,20 +276,26 @@ class DjangoBemRepository(BemRepository):
 
     @override
     def cadastrar_bem(self, bem: BemEntity, user: User):
-        novo = Bem.objects.create(criado_por=user, **bem.to_dict())
+        entity_dict = bem.to_dict(exclude=["id", "timestamps"])
+        novo = Bem.objects.create(
+            **entity_dict,
+            criado_por=user,
+        )
         return novo
 
-    def editar_bem(self, id: int, marca: str, modelo: str, user: User):
+    def editar_bem(self, entity: BemEntity, user: User):
         try:
-            bem = Bem.objects.get(pk=id)
+            Bem.objects.filter(pk=entity.id).update(
+                **entity.to_dict(["timestamps", "id"]), alterado_por=user
+            )
+
         except Bem.DoesNotExist as e:
-            e.add_note(f"Bem com id {id} não encontrado.")
+            e.add_note(f"Bem com id {entity.id} não encontrado.")
             raise e
 
-        bem.alterado_por = user
-        bem.marca = marca
-        bem.modelo = modelo
-        bem.save()
+        # bem.alterado_por = user
+        # bem.save()
+        bem = Bem.objects.get(pk=entity.id)
         return BemMapper.from_model(bem)
 
     def remover_bem(self, id: int, user: User):
