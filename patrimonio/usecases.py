@@ -498,12 +498,7 @@ class CadastrarBemUsecase:
 
         try:
             resposta = self.repo.cadastrar_bem(
-                novo_bem.patrimonio,
-                novo_bem.descricao,
-                novo_bem.tipo_id,
-                novo_bem.grau_fragilidade_id,
-                novo_bem.estado_conservacao_id,
-                novo_bem.marca_modelo_id,
+                novo_bem,
                 self.policy.user,
             )
             return ResultSuccess(resposta)
@@ -531,26 +526,20 @@ class EditarBemUsecase:
         return ResultSuccess(bem)
 
     def execute(self, bem: BemEntity):
-        resultado = self.get_bem(id)
+        resultado = self.get_bem(bem.id)
         if not resultado:
             return resultado
 
         try:
             bem_com_mesmo_patrimonio = self.repo.buscar_por_patrimonio(bem.patrimonio)
-            if bem_com_mesmo_patrimonio and bem_com_mesmo_patrimonio.id != id:
+            if bem_com_mesmo_patrimonio and bem_com_mesmo_patrimonio.id != bem.id:
                 return ResultError("Já existe outro bem com esse patrimônio.")
         except Exception:
             pass
 
         try:
             resposta = self.repo.editar_bem(
-                id,
-                bem.patrimonio,
-                bem.descricao,
-                bem.tipo_id,
-                bem.grau_fragilidade_id,
-                bem.estado_conservacao_id,
-                bem.marca_modelo_id,
+                bem,
                 self.policy.user,
             )
             return ResultSuccess(resposta)
