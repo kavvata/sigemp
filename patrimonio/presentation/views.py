@@ -533,7 +533,7 @@ class ListarBemView(ListView):
     model = Bem
     paginate_by = 10
     template_name = "patrimonio/bem/bem_list.html"
-    context_object_name = "lista_bem"
+    context_object_name = "lista_bens"
 
     def get_queryset(self):
         policy = DjangoBemPolicy(self.request.user)
