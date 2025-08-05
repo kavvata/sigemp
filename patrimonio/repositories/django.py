@@ -276,9 +276,8 @@ class DjangoBemRepository(BemRepository):
 
     @override
     def cadastrar_bem(self, bem: BemEntity, user: User):
-        entity_dict = bem.to_dict(exclude=["id", "timestamps"])
         novo = Bem.objects.create(
-            **entity_dict,
+            **bem.to_dict(exclude=["id", "timestamps"]),
             criado_por=user,
         )
         return novo
