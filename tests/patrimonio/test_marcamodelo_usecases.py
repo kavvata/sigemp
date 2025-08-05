@@ -9,20 +9,22 @@ from patrimonio.usecases import (
     RemoverMarcaModeloUsecase,
 )
 
+from patrimonio.domain.entities import MarcaModeloEntity
+
 
 @pytest.fixture
 def marca_modelo():
-    return {"id": 1, "marca": "Epson", "modelo": "PowerLite X49"}
+    return MarcaModeloEntity(id=1, marca="Epson", modelo="PowerLite X49")
 
 
 @pytest.fixture
 def lista_marca_modelo():
     return [
-        {"id": 1, "marca": "Epson", "modelo": "PowerLite X49"},
-        {"id": 2, "marca": "Dell", "modelo": "Latitude 5420"},
-        {"id": 3, "marca": "Optika", "modelo": "B-150R"},
-        {"id": 4, "marca": "Minipa", "modelo": "ET-1002"},
-        {"id": 5, "marca": "Canon", "modelo": "EOS Rebel T7"},
+        MarcaModeloEntity(id=1, marca="Epson", modelo="PowerLite X49"),
+        MarcaModeloEntity(id=2, marca="Dell", modelo="Latitude 5420"),
+        MarcaModeloEntity(id=3, marca="Optika", modelo="B-150R"),
+        MarcaModeloEntity(id=4, marca="Minipa", modelo="ET-1002"),
+        MarcaModeloEntity(id=5, marca="Canon", modelo="EOS Rebel T7"),
     ]
 
 
@@ -75,10 +77,10 @@ def test_cadastrar_marca_modelo_usecase(marca_modelo):
     usecase = CadastrarMarcaModeloUsecase(repo, policy)
 
     if usecase.pode_criar():
-        result = usecase.execute(marca_modelo["marca"], marca_modelo["modelo"])
+        result = usecase.execute(marca_modelo.marca, marca_modelo.modelo)
 
     repo.cadastrar_marca_modelo.assert_called_with(
-        marca_modelo["marca"], marca_modelo["modelo"], user
+        marca_modelo.marca, marca_modelo.modelo, user
     )
     policy.pode_criar.assert_called_with()
 
@@ -97,7 +99,7 @@ def test_nao_pode_cadastrar_marca_modelo_usecase(marca_modelo):
 
     usecase = CadastrarMarcaModeloUsecase(repo, policy)
 
-    result = usecase.execute(marca_modelo["marca"], marca_modelo["modelo"])
+    result = usecase.execute(marca_modelo.marca, marca_modelo.modelo)
 
     repo.cadastrar_marca_modelo.assert_not_called()
     policy.pode_criar.assert_called_with()
@@ -117,20 +119,18 @@ def test_editar_marca_modelo_usecase(marca_modelo):
 
     usecase = EditarMarcaModeloUsecase(repo, policy)
 
-    result = usecase.get_marca_modelo(marca_modelo["id"])
+    result = usecase.get_marca_modelo(marca_modelo.id)
     encontrado = result.value
 
     assert encontrado
 
-    result = usecase.execute(
-        encontrado["id"], encontrado["marca"], encontrado["modelo"]
-    )
+    result = usecase.execute(encontrado.id, encontrado.marca, encontrado.modelo)
 
-    repo.buscar_por_id.assert_called_with(marca_modelo["id"])
+    repo.buscar_por_id.assert_called_with(marca_modelo.id)
     repo.editar_marca_modelo.assert_called_with(
-        marca_modelo["id"],
-        marca_modelo["marca"],
-        marca_modelo["modelo"],
+        marca_modelo.id,
+        marca_modelo.marca,
+        marca_modelo.modelo,
         user,
     )
     policy.pode_editar.assert_called_with(marca_modelo)
@@ -151,17 +151,17 @@ def test_nao_pode_editar_marca_modelo_usecase(marca_modelo):
 
     usecase = EditarMarcaModeloUsecase(repo, policy)
 
-    result = usecase.get_marca_modelo(marca_modelo["id"])
+    result = usecase.get_marca_modelo(marca_modelo.id)
     assert not result
     assert isinstance(result, ResultError)
 
     result = usecase.execute(
-        marca_modelo["id"],
-        marca_modelo["marca"],
-        marca_modelo["modelo"],
+        marca_modelo.id,
+        marca_modelo.marca,
+        marca_modelo.modelo,
     )
 
-    repo.buscar_por_id.assert_called_with(marca_modelo["id"])
+    repo.buscar_por_id.assert_called_with(marca_modelo.id)
     repo.editar_marca_modelo.assert_not_called()
     policy.pode_editar.assert_called_with(marca_modelo)
 
@@ -180,9 +180,9 @@ def test_remover_marca_modelo_usecase(marca_modelo):
 
     usecase = RemoverMarcaModeloUsecase(repo, policy)
 
-    result = usecase.execute(marca_modelo["id"])
+    result = usecase.execute(marca_modelo.id)
 
-    repo.remover_marca_modelo.assert_called_with(marca_modelo["id"], user)
+    repo.remover_marca_modelo.assert_called_with(marca_modelo.id, user)
     policy.pode_remover.assert_called_with(marca_modelo)
 
     assert result
@@ -201,7 +201,7 @@ def test_nao_pode_remover_marca_modelo_usecase(marca_modelo):
 
     usecase = RemoverMarcaModeloUsecase(repo, policy)
 
-    result = usecase.execute(marca_modelo["id"])
+    result = usecase.execute(marca_modelo.id)
 
     repo.remover_marca_modelo.assert_not_called()
     policy.pode_remover.assert_called_with(marca_modelo)

@@ -6,42 +6,56 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, UpdateView
 
-from patrimonio.models import EstadoConservacao, GrauFragilidade, MarcaModelo, TipoBem
+from patrimonio.domain.entities import BemEntity
+from patrimonio.models import (
+    EstadoConservacao,
+    GrauFragilidade,
+    MarcaModelo,
+    TipoBem,
+    Bem,
+)
 from patrimonio.policies.django import (
     DjangoEstadoConservacaoPolicy,
     DjangoGrauFragilidadePolicy,
     DjangoMarcaModeloPolicy,
     DjangoTipoBemPolicy,
+    DjangoBemPolicy,
 )
 from patrimonio.presentation.forms import (
     EstadoConservacaoForm,
     GrauFragilidadeForm,
     MarcaModeloForm,
     TipoBemForm,
+    BemForm,
 )
 from patrimonio.repositories.django import (
     DjangoEstadoConservacaoRepository,
     DjangoGrauFragilidadeRepository,
     DjangoMarcaModeloRepository,
-    DjTipoBemRepository,
+    DjangoTipoBemRepository,
+    DjangoBemRepository,
 )
 from patrimonio.usecases import (
     CadastrarEstadoConservacaoUsecase,
     CadastrarGrauFragilidadeUsecase,
     CadastrarMarcaModeloUsecase,
     CadastrarTipoBemUsecase,
+    CadastrarBemUsecase,
     EditarEstadoConservacaoUsecase,
     EditarGrauFragilidadeUsecase,
     EditarMarcaModeloUsecase,
     EditarTipoBemUsecase,
+    EditarBemUsecase,
     ListarEstadosConservacaoUsecase,
     ListarGrauFragilidadeUsecase,
     ListarMarcaModeloUsecase,
     ListarTiposBemUsecase,
+    ListarBensUsecase,
     RemoverEstadoConservacaoUsecase,
     RemoverGrauFragilidadeUsecase,
     RemoverMarcaModeloUsecase,
     RemoverTipoBemUsecase,
+    RemoverBemUsecase,
 )
 
 
@@ -54,7 +68,7 @@ class ListarTiposBemView(ListView):
 
     def get_queryset(self):
         policy = DjangoTipoBemPolicy(self.request.user)
-        repo = DjTipoBemRepository()
+        repo = DjangoTipoBemRepository()
         usecase = ListarTiposBemUsecase(repo, policy)
         if not usecase.pode_listar():
             raise PermissionDenied(
@@ -69,7 +83,7 @@ class ListarTiposBemView(ListView):
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         policy = DjangoTipoBemPolicy(self.request.user)
-        repo = DjTipoBemRepository()
+        repo = DjangoTipoBemRepository()
 
         usecase = CadastrarTipoBemUsecase(repo, policy)
 
@@ -84,7 +98,7 @@ class CriarTipoBemView(CreateView):
     success_url = reverse_lazy("patrimonio:listar_tipos_bem")
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        repo = DjTipoBemRepository()
+        repo = DjangoTipoBemRepository()
         policy = DjangoTipoBemPolicy(self.request.user)
         usecase = CadastrarTipoBemUsecase(repo, policy)
 
@@ -94,7 +108,7 @@ class CriarTipoBemView(CreateView):
         return super().get(request, *args, **kwargs)
 
     def form_valid(self, form):
-        repo = DjTipoBemRepository()
+        repo = DjangoTipoBemRepository()
         policy = DjangoTipoBemPolicy(self.request.user)
         usecase = CadastrarTipoBemUsecase(repo, policy)
 
@@ -118,7 +132,7 @@ class EditarTipoBemView(UpdateView):
     def get(
         self, request: HttpRequest, pk: int, *args: Any, **kwargs: Any
     ) -> HttpResponse:
-        repo = DjTipoBemRepository()
+        repo = DjangoTipoBemRepository()
         policy = DjangoTipoBemPolicy(self.request.user)
         usecase = EditarTipoBemUsecase(repo, policy)
 
@@ -128,7 +142,7 @@ class EditarTipoBemView(UpdateView):
         return super().get(request, *args, **kwargs)
 
     def form_valid(self, form):
-        repo = DjTipoBemRepository()
+        repo = DjangoTipoBemRepository()
         policy = DjangoTipoBemPolicy(self.request.user)
         usecase = EditarTipoBemUsecase(repo, policy)
 
@@ -145,7 +159,7 @@ class EditarTipoBemView(UpdateView):
 
 
 def remover_tipobem(request, pk):
-    repo = DjTipoBemRepository()
+    repo = DjangoTipoBemRepository()
     policy = DjangoTipoBemPolicy(request.user)
     usecase = RemoverTipoBemUsecase(repo, policy)
 
@@ -514,3 +528,131 @@ def remover_marca_modelo(request, pk):
         raise PermissionDenied(result.mensagem)
 
     return redirect(reverse_lazy("patrimonio:listar_marca_modelo"))
+
+
+class ListarBemView(ListView):
+    model = Bem
+    paginate_by = 10
+    template_name = "patrimonio/bem/bem_list.html"
+    context_object_name = "lista_bens"
+
+    def get_queryset(self):
+        policy = DjangoBemPolicy(self.request.user)
+        repo = DjangoBemRepository()
+        usecase = ListarBensUsecase(repo, policy)
+
+        if not usecase.pode_listar():
+            raise PermissionDenied("Voce nao tem permissao para visualizar bens móveis")
+
+        result = usecase.execute()
+
+        if not result:
+            raise PermissionDenied(result.mensagem)
+
+        return result.value
+
+    def get_context_data(self, **kwargs: Any):
+        context = super().get_context_data(**kwargs)
+        policy = DjangoBemPolicy(self.request.user)
+        repo = DjangoBemRepository()
+
+        usecase = CadastrarBemUsecase(repo, policy)
+
+        context["pode_criar"] = usecase.pode_criar()
+
+        return context
+
+
+class CriarBemView(CreateView):
+    template_name = "patrimonio/bem/bem_form.html"
+    form_class = BemForm
+    success_url = reverse_lazy("patrimonio:listar_bens")
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        repo = DjangoBemRepository()
+        policy = DjangoBemPolicy(self.request.user)
+        usecase = CadastrarBemUsecase(repo, policy)
+
+        if not usecase.pode_criar():
+            raise PermissionDenied("Voce nao tem permissao para criar bens móveis.")
+
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        repo = DjangoBemRepository()
+        policy = DjangoBemPolicy(self.request.user)
+        usecase = CadastrarBemUsecase(repo, policy)
+
+        if not usecase.pode_criar():
+            raise PermissionDenied("Voce nao tem permissao para criar bens móveis.")
+
+        novo_bem = BemEntity(
+            patrimonio=form.cleaned_data["patrimonio"],
+            descricao=form.cleaned_data["descricao"],
+            grau_fragilidade_id=form.cleaned_data["grau_fragilidade"].id,
+            tipo_id=form.cleaned_data["tipo"].id,
+            estado_conservacao_id=form.cleaned_data["estado_conservacao"].id,
+            marca_modelo_id=form.cleaned_data["marca_modelo"].id,
+        )
+        result = usecase.execute(novo_bem)
+
+        if not result:
+            raise PermissionDenied(result.mensagem)
+
+        return redirect(self.success_url)
+
+
+class EditarBemView(UpdateView):
+    template_name = "patrimonio/bem/bem_form.html"
+    queryset = Bem.objects.filter(removido_em__isnull=True)
+    form_class = BemForm
+    success_url = reverse_lazy("patrimonio:listar_bens")
+
+    def get(
+        self, request: HttpRequest, pk: int, *args: Any, **kwargs: Any
+    ) -> HttpResponse:
+        repo = DjangoBemRepository()
+        policy = DjangoBemPolicy(self.request.user)
+        usecase = EditarBemUsecase(repo, policy)
+
+        if not usecase.pode_editar(usecase.get_bem(pk)):
+            raise PermissionDenied("Voce nao tem permissao para editar bens móveis.")
+
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        repo = DjangoBemRepository()
+        policy = DjangoBemPolicy(self.request.user)
+        usecase = EditarBemUsecase(repo, policy)
+
+        result = usecase.get_bem(form.instance.id)
+        if not result:
+            raise PermissionDenied(result.mensagem)
+
+        bem = BemEntity(
+            id=form.instance.id,
+            patrimonio=form.cleaned_data["patrimonio"],
+            descricao=form.cleaned_data["descricao"],
+            tipo_id=form.cleaned_data["tipo"],
+            grau_fragilidade_id=form.cleaned_data["grau_fragilidade"],
+            estado_conservacao_id=form.cleaned_data["estado_conservacao"],
+            marca_modelo_id=form.cleaned_data["marca_modelo"],
+        )
+        result = usecase.execute(bem)
+
+        if not result:
+            raise PermissionDenied(result.mensagem)
+
+        return redirect(self.success_url)
+
+
+def remover_bem(request, pk):
+    repo = DjangoBemRepository()
+    policy = DjangoBemPolicy(request.user)
+
+    usecase = RemoverBemUsecase(repo, policy)
+    result = usecase.execute(pk)
+    if not result:
+        raise PermissionDenied(result.mensagem)
+
+    return redirect(reverse_lazy("patrimonio:listar_bens"))

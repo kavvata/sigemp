@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
+from patrimonio.domain.entities import BemEntity
+
 
 class TipoBemRepository(ABC):
     @abstractmethod
@@ -93,4 +95,30 @@ class MarcaModeloRepository(ABC):
 
     @abstractmethod
     def remover_marca_modelo(self, id: int, user: Any) -> Any:
+        pass
+
+
+class BemRepository(ABC):
+    @abstractmethod
+    def listar_bens(self) -> Any:
+        pass
+
+    @abstractmethod
+    def buscar_por_id(self, id: int) -> Any:
+        pass
+
+    @abstractmethod
+    def buscar_por_patrimonio(self, patrimonio: str) -> Any:
+        pass
+
+    @abstractmethod
+    def cadastrar_bem(self, bem: BemEntity) -> Any:
+        pass
+
+    @abstractmethod
+    def editar_bem(self, bem: BemEntity) -> Any:
+        pass
+
+    @abstractmethod
+    def remover_bem(self, id: int, user: Any) -> Any:
         pass

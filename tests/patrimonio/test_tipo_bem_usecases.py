@@ -2,6 +2,7 @@ from unittest import mock
 import pytest
 
 from core.types import ResultError, ResultSuccess
+from patrimonio.domain.entities import TipoBemEntity
 from patrimonio.usecases import (
     ListarTiposBemUsecase,
     CadastrarTipoBemUsecase,
@@ -12,15 +13,15 @@ from patrimonio.usecases import (
 
 @pytest.fixture
 def tipo_bem():
-    return {"id": 1, "descricao": "Projetor"}
+    return TipoBemEntity(id=1, descricao="Projetor")
 
 
 @pytest.fixture
 def lista_tipos_bem():
     return [
-        {"id": 1, "descricao": "Projetor"},
-        {"id": 2, "descricao": "Notebook Dell"},
-        {"id": 3, "descricao": "Frasco laboratorio"},
+        TipoBemEntity(id=1, descricao="Projetor"),
+        TipoBemEntity(id=2, descricao="Notebook Dell"),
+        TipoBemEntity(id=3, descricao="Frasco laboratorio"),
     ]
 
 
@@ -73,9 +74,9 @@ def test_cadastrar_tipo_bem_usecase(tipo_bem):
     usecase = CadastrarTipoBemUsecase(repo, policy)
 
     if usecase.pode_criar():
-        result = usecase.execute(tipo_bem["descricao"])
+        result = usecase.execute(tipo_bem.descricao)
 
-    repo.cadastrar_tipo_bem.assert_called_with(tipo_bem["descricao"], user)
+    repo.cadastrar_tipo_bem.assert_called_with(tipo_bem.descricao, user)
     policy.pode_criar.assert_called_with()
 
     assert result
@@ -93,7 +94,7 @@ def test_nao_pode_cadastrar_tipo_bem_usecase(tipo_bem):
 
     usecase = CadastrarTipoBemUsecase(repo, policy)
 
-    result = usecase.execute(tipo_bem["descricao"])
+    result = usecase.execute(tipo_bem.descricao)
 
     repo.cadastrar_tipo_bem.assert_not_called()
     policy.pode_criar.assert_called_with()
@@ -113,15 +114,15 @@ def test_editar_tipo_bem_usecase(tipo_bem):
 
     usecase = EditarTipoBemUsecase(repo, policy)
 
-    result = usecase.get_tipo_bem(tipo_bem["id"])
+    result = usecase.get_tipo_bem(tipo_bem.id)
     encontrado = result.value
 
     assert encontrado
 
-    result = usecase.execute(encontrado["id"], encontrado["descricao"])
+    result = usecase.execute(encontrado.id, encontrado.descricao)
 
-    repo.buscar_por_id.assert_called_with(tipo_bem["id"])
-    repo.editar_tipo_bem.assert_called_with(tipo_bem["id"], tipo_bem["descricao"], user)
+    repo.buscar_por_id.assert_called_with(tipo_bem.id)
+    repo.editar_tipo_bem.assert_called_with(tipo_bem.id, tipo_bem.descricao, user)
     policy.pode_editar.assert_called_with(tipo_bem)
 
     assert result
@@ -140,13 +141,13 @@ def test_nao_pode_editar_tipo_bem_usecase(tipo_bem):
 
     usecase = EditarTipoBemUsecase(repo, policy)
 
-    result = usecase.get_tipo_bem(tipo_bem["id"])
+    result = usecase.get_tipo_bem(tipo_bem.id)
     assert not result
     assert isinstance(result, ResultError)
 
-    result = usecase.execute(tipo_bem["id"], tipo_bem["descricao"])
+    result = usecase.execute(tipo_bem.id, tipo_bem.descricao)
 
-    repo.buscar_por_id.assert_called_with(tipo_bem["id"])
+    repo.buscar_por_id.assert_called_with(tipo_bem.id)
     repo.editar_tipo_bem.assert_not_called()
     policy.pode_editar.assert_called_with(tipo_bem)
 
@@ -165,9 +166,9 @@ def test_remover_tipo_bem_usecase(tipo_bem):
 
     usecase = RemoverTipoBemUsecase(repo, policy)
 
-    result = usecase.execute(tipo_bem["id"])
+    result = usecase.execute(tipo_bem.id)
 
-    repo.remover_tipo_bem.assert_called_with(tipo_bem["id"], user)
+    repo.remover_tipo_bem.assert_called_with(tipo_bem.id, user)
     policy.pode_remover.assert_called_with(tipo_bem)
 
     assert result
@@ -186,7 +187,7 @@ def test_nao_pode_remover_tipo_bem_usecase(tipo_bem):
 
     usecase = RemoverTipoBemUsecase(repo, policy)
 
-    result = usecase.execute(tipo_bem["id"])
+    result = usecase.execute(tipo_bem.id)
 
     repo.remover_tipo_bem.assert_not_called()
     policy.pode_remover.assert_called_with(tipo_bem)
