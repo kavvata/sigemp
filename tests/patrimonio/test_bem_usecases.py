@@ -110,12 +110,7 @@ def test_cadastrar_bem_usecase(bem):
     repo.buscar_por_patrimonio.assert_called_with(bem.patrimonio)
     print(result.mensagem)
     repo.cadastrar_bem.assert_called_with(
-        bem.patrimonio,
-        bem.descricao,
-        bem.tipo_id,
-        bem.grau_fragilidade_id,
-        bem.estado_conservacao_id,
-        bem.marca_modelo_id,
+        bem,
         user,
     )
     assert isinstance(result, ResultSuccess)
