@@ -589,10 +589,10 @@ class CriarBemView(CreateView):
         novo_bem = BemEntity(
             patrimonio=form.cleaned_data["patrimonio"],
             descricao=form.cleaned_data["descricao"],
-            grau_fragilidade_id=form.cleaned_data["grau_fragilidade"],
-            tipo_id=form.cleaned_data["tipo"],
-            estado_conservacao_id=form.cleaned_data["estado_conservacao"],
-            marca_modelo_id=form.cleaned_data["marca_modelo"],
+            grau_fragilidade_id=form.cleaned_data["grau_fragilidade"].id,
+            tipo_id=form.cleaned_data["tipo"].id,
+            estado_conservacao_id=form.cleaned_data["estado_conservacao"].id,
+            marca_modelo_id=form.cleaned_data["marca_modelo"].id,
         )
         result = usecase.execute(novo_bem)
 
@@ -616,7 +616,7 @@ class EditarBemView(UpdateView):
         usecase = EditarBemUsecase(repo, policy)
 
         if not usecase.pode_editar(usecase.get_bem(pk)):
-            raise PermissionDenied("Voce nao tem permissao para editar marca/modelo.")
+            raise PermissionDenied("Voce nao tem permissao para editar bens móveis.")
 
         return super().get(request, *args, **kwargs)
 
