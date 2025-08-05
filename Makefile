@@ -1,8 +1,15 @@
+build:
+	docker compose build
 up:
-	docker-compose up
-
-tailwind:
-	docker-compose exec web pipenv run python manage.py tailwind start
-
+	docker compose up
 down:
 	docker-compose down
+
+tailwind:
+	docker-compose exec web python manage.py tailwind start
+
+migrate:
+	docker-compose exec web python manage.py migrate
+
+shell:
+	docker-compose exec web python manage.py shell

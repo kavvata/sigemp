@@ -1,21 +1,92 @@
 {% load static tailwind_tags %}
 <!DOCTYPE html>
 <html lang="pt-BR">
-	<head>
-    <title>Sigemp</title>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<meta http-equiv="X-UA-Compatible" content="ie=edge">
-		{% tailwind_css %}
-	</head>
-
-	<body class="bg-gray-50 leading-normal tracking-normal w-screen h-screen">
-        {% include "navigation.html" %}
-        <div class="pt-6 bg-gray-200 h-screen flex-col items-center justify-center">
-          <div class="pt-6">
-            {% block content %}
-            {% endblock %}
-          </div>
+    <head>
+        <title>
+            {% block title %}Sigemp{% endblock %}
+        </title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+              rel="stylesheet" />
+        <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+        {% tailwind_css %}
+        {% block head %}{% endblock %}
+    </head>
+    <body class="bg-gray-50 text-gray-900 dark:text-gray-200 dark:bg-gray-900 leading-normal tracking-normal w-screen h-screen"
+          x-data="{ sidebarOpen: JSON.parse(localStorage.getItem('sidebarOpen') ?? 'true'), toggleSidebar() { this.sidebarOpen = !this.sidebarOpen; localStorage.setItem('sidebarOpen', JSON.stringify(this.sidebarOpen)); } }">
+        <div class="flex flex-row">
+            <div x-show="sidebarOpen"
+                 x-transition:enter="transition transform duration-300"
+                 x-transition:enter-start="-translate-x-full"
+                 x-transition:enter-end="translate-x-0"
+                 x-transition:leave="transition transform duration-300"
+                 x-transition:leave-start="translate-x-0"
+                 x-transition:leave-end="-translate-x-full"
+                 class="w-64 flex-shrink-0 z-50">{% include "navigation.html" %}</div>
+            <section class="bg-gray-200 dark:bg-gray-800 h-screen w-full flex-col items-center justify-center">
+                <div class="px-6 w-full flex flex-row h-16 gap-4 justify-between bg-gray-50 text-gray-900 dark:text-gray-200 dark:bg-gray-900">
+                    <div class="flex justify-end items-center gap-2 ">
+                        <button @click="toggleSidebar()"
+                                class="group rounded-md px-3 py-2 flex items-center gap-2 text-sm font-medium transition-all  text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <i class="material-symbols-outlined transition-transform duration-300 align-middle">dock_to_right</i>
+                        </button>
+                        <p class="flex items-center font-semibold">Sistema de Gerenciamento de Empréstimo de Bens Móveis</p>
+                    </div>
+                    <div x-data="themeToggle()"
+                         x-init="init()"
+                         class="flex justify-end p-4 items-center">
+                        <button @click="toggle()"
+                                class="group rounded-md px-3 py-2 flex items-center gap-2 text-sm font-medium transition-all  text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <i class="material-symbols-outlined transition-transform duration-300 align-middle"
+                               x-text="theme === 'dark' ? 'dark_mode' : 'light_mode'"></i>
+                        </button>
+                    </div>
+                </div>
+                <main class="p-6">
+                    <div class="mt-6 ">
+                        <section class="max-w-7xl mx-auto flex items-center justify-between mb-8">
+                            <div>
+                                <h1 class="font-bold text-2xl">
+                                    {% block page_title %}{% endblock %}
+                                </h1>
+                            </div>
+                            <div>
+                                {% block actions %}
+                                {% endblock actions %}
+                            </div>
+                        </section>
+                        {% block content %}{% endblock %}
+                    </div>
+                </main>
+            </section>
         </div>
-	</body>
+        <script>
+          function themeToggle() {
+              return {
+                init() {
+                  const stored = localStorage.getItem('theme');
+                  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                  this.theme = stored || (prefersDark ? 'dark' : 'light');
+
+                  if (this.theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                  }
+                },
+                toggle() {
+                  this.theme = this.theme === 'dark' ? 'light' : 'dark';
+                  if (this.theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                  }
+                  localStorage.setItem('theme', this.theme);
+                }
+              };
+            }
+        </script>
+    </body>
 </html>

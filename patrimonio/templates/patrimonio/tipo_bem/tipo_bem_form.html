@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+  {% block page_title %} {% if form.instance.id %} Editar {{ form.instance.descricao }} {% else %} Cadastrar Tipo de Bem {% endif %} {% endblock %}
+{% block actions %}
+    {% if form.instance.id %}
+        <a href="{% url 'patrimonio:remover_tipo_bem' form.instance.id %}"
+           class="rounded-md py-2 gap-2 flex px-4 border border-red-500 text-red-600 dark:border-red-400 dark:text-red-300 bg-red-50 dark:bg-gray-800 items-center font-semibold text-sm transition-all duration-300 ease-in-out hover:bg-red-100 dark:hover:bg-gray-700 hover:ring-2 hover:ring-red-300 dark:hover:ring-red-500/40 hover:shadow-md cursor-pointer">
+            <i class="material-symbols-outlined align-middle">delete</i>
+            <span>Remover</span>
+        </a>
+    {% endif %}
+{% endblock actions %}
+{% block content %}
+    <section class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white max-w-7xl mx-auto p-4 gap-y-4 shadow-md rounded-md">
+        <form method="post">
+            {% csrf_token %}
+            <div class="flex flex-col gap-2 max-w-64">
+                <label class="text-gray-800 dark:text-white text-sm font-semibold"
+                       for="descricao">{{ form.descricao.label }}</label>
+                {% render_field form.descricao class="block w-full min-w-0 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500  dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500" %}
+            </div>
+            <div class="mt-8">
+                <button type="submit"
+                        class="rounded-md py-2 gap-2 flex px-4 border border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-300 bg-blue-50 dark:bg-gray-800 items-center font-semibold text-sm transition-all duration-300 ease-in-out hover:bg-blue-100 dark:hover:bg-gray-700 hover:ring-2 hover:ring-blue-300 dark:hover:ring-blue-500/40 hover:shadow-md cursor-pointer">
+                    Salvar
+                </button>
+            </div>
+        </form>
+    </section>
+{% endblock %}

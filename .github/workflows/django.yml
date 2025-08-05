@@ -2,9 +2,9 @@ name: Django CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "dev" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "dev" ]
 
 jobs:
   build:
@@ -28,5 +28,4 @@ jobs:
         pipenv install && pipenv install --dev
     - name: Run Tests
       run: |
-        pipenv run pytest
-        pipenv run python ./manage.py test
+        DJANGO_SETTINGS_MODULE=sigemp.test_settings pipenv run pytest

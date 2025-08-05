@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Any
 
 
 class Result(ABC):
@@ -6,12 +7,12 @@ class Result(ABC):
         self.mensagem = mensagem
 
     @abstractmethod
-    def __bool__(self):
+    def __bool__(self) -> bool:
         pass
 
 
 class ResultSuccess(Result):
-    def __init__(self, value: any, mensagem="") -> None:
+    def __init__(self, value: Any, mensagem="") -> None:
         self.value = value
         super().__init__(mensagem)
 
