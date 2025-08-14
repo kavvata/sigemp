@@ -3,7 +3,12 @@ import pytest
 
 from core.types import ResultError, ResultSuccess
 from ensino.domain.entities import CampusEntity
-from ensino.usecases import CadastrarCampusUsecase, ListarCampiUsecase
+from ensino.usecases import (
+    CadastrarCampusUsecase,
+    EditarCampusUsecase,
+    ListarCampiUsecase,
+    RemoverCampusUsecase,
+)
 
 
 @pytest.fixture
@@ -87,12 +92,62 @@ def test_nao_pode_cadastrar_campus(campus):
 
 
 def test_editar_campus(campus):
-    raise NotImplementedError
+    repo = mock.Mock()
+    policy = mock.Mock()
+
+    policy.pode_editar.return_value = True
+    repo.buscar_por_id.return_value = campus
+    repo.editar_campus.return_value = campus
+
+    usecase = EditarCampusUsecase(repo, policy)
+    result = usecase.execute(campus)
+
+    repo.buscar_por_id.assert_called_with(campus.id)
+    repo.editar_campus.assert_called_with(campus, policy.user)
+    assert isinstance(result, ResultSuccess)
+    assert result.value == campus
+
+
+def test_nao_pode_editar_campus(campus):
+    repo = mock.Mock()
+    policy = mock.Mock()
+
+    policy.pode_editar.return_value = False
+    repo.buscar_por_id.return_value = campus
+    repo.editar_campus.return_value = campus
+
+    usecase = EditarCampusUsecase(repo, policy)
+    result = usecase.execute(campus)
+
+    repo.editar_campus.assert_not_called()
+    assert isinstance(result, ResultError)
 
 
 def test_remover_campus(campus):
-    raise NotImplementedError
+    repo = mock.Mock()
+    policy = mock.Mock()
+
+    policy.pode_remover.return_value = True
+    repo.buscar_por_id.return_value = campus
+    repo.remover_campus.return_value = campus
+
+    usecase = RemoverCampusUsecase(repo, policy)
+    result = usecase.execute(campus.id)
+
+    repo.remover_campus.assert_called_with(campus.id, policy.user)
+    assert isinstance(result, ResultSuccess)
 
 
 def test_nao_pode_remover_campus(campus):
-    raise NotImplementedError
+    repo = mock.Mock()
+    policy = mock.Mock()
+
+    policy.pode_remover.return_value = False
+    repo.buscar_por_id.return_value = campus
+    repo.remover_campus.return_value = campus
+
+    usecase = RemoverCampusUsecase(repo, policy)
+    result = usecase.execute(campus.id)
+
+    repo.remover_campus.assert_not_called()
+    assert isinstance(result, ResultError)
