@@ -7,3 +7,4 @@ from core.domain.entities import TimeStampableEntity
 class CampusEntity(TimeStampableEntity):
     sigla: str
     nome: str
+    id: int = None
