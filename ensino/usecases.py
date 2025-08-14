@@ -43,3 +43,39 @@ class CadastrarCampusUsecase:
             return ResultSuccess(resposta)
         except Exception as e:
             return ResultError(f"Erro ao cadastrar campus: {e}")
+
+
+class EditarCampusUsecase:
+    def __init__(self, repo: CampusRepository, policy: CampusPolicy) -> None:
+        self.repo = repo
+        self.policy = policy
+
+    def pode_editar(self):
+        return self.policy.pode_editar()
+
+    def get_campus(self, id: int):
+        try:
+            campus = self.repo.buscar_por_id(id)
+        except Exception as e:
+            return ResultError(f"Erro ao buscar campus: {e}")
+
+        if not self.policy.pode_editar(campus):
+            return ResultError("Você não tem permissão para realizar esta ação.")
+
+        return ResultSuccess(campus)
+
+    def execute(self, campus: CampusEntity):
+        if not self.policy.pode_editar():
+            return ResultError("Você não tem permissão para editar campus.")
+
+        resultado_busca_por_id = self.get_campus(campus.id)
+        if not resultado_busca_por_id:
+            return resultado_busca_por_id
+
+        try:
+            resposta = self.repo.editar_campus(campus, self.policy.user)
+            return ResultSuccess(resposta)
+        except Exception as e:
+            return ResultError(f"Erro ao editar campus: {e}")
+
+
