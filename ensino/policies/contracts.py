@@ -15,13 +15,13 @@ class CampusPolicy(ABC):
         pass
 
     @abstractmethod
-    def pode_editar(self, tipo_bem) -> bool:
+    def pode_editar(self, campus) -> bool:
         pass
 
     @abstractmethod
-    def pode_remover(self, tipo_bem) -> bool:
+    def pode_remover(self, campus) -> bool:
         pass
 
     @abstractmethod
-    def pode_visualizar(self, tipo_bem) -> bool:
+    def pode_visualizar(self, campus) -> bool:
         pass
