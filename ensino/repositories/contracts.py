@@ -23,5 +23,5 @@ class CampusRepository(ABC):
         pass
 
     @abstractmethod
-    def remover_campus(self, campus: CampusEntity, user: Any):
+    def remover_campus(self, id: int, user: Any):
         pass
