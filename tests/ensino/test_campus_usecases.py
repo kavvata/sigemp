@@ -3,7 +3,7 @@ import pytest
 
 from core.types import ResultError, ResultSuccess
 from ensino.domain.entities import CampusEntity
-from ensino.usecases import ListarCampiUsecase
+from ensino.usecases import CadastrarCampusUsecase, ListarCampiUsecase
 
 
 @pytest.fixture
@@ -27,7 +27,7 @@ def test_listar_campi(lista_campi):
     policy = mock.Mock()
 
     repo.listar_campi.return_value = lista_campi
-    repo.pode_listar.return_value = True
+    policy.pode_listar.return_value = True
 
     usecase = ListarCampiUsecase(repo, policy)
     result = usecase.execute()
@@ -45,7 +45,7 @@ def test_nao_pode_listar_campi(lista_campi):
     policy = mock.Mock()
 
     repo.listar_campi.return_value = lista_campi
-    repo.pode_listar.return_value = False
+    policy.pode_listar.return_value = False
 
     usecase = ListarCampiUsecase(repo, policy)
     result = usecase.execute()
@@ -58,11 +58,32 @@ def test_nao_pode_listar_campi(lista_campi):
 
 
 def test_cadastrar_campus(campus):
-    raise NotImplementedError
+    repo = mock.Mock()
+    policy = mock.Mock()
+
+    repo.cadastrar_campus.return_value = campus
+    policy.pode_criar.return_value = True
+
+    usecase = CadastrarCampusUsecase(repo, policy)
+    result = usecase.execute(campus)
+
+    repo.cadastrar_campus.assert_called_with(campus, policy.user)
+    assert isinstance(result, ResultSuccess)
+    assert result.value == campus
 
 
 def test_nao_pode_cadastrar_campus(campus):
-    raise NotImplementedError
+    repo = mock.Mock()
+    policy = mock.Mock()
+
+    repo.cadastrar_campus.return_value = campus
+    policy.pode_criar.return_value = False
+
+    usecase = CadastrarCampusUsecase(repo, policy)
+    result = usecase.execute(campus)
+
+    repo.cadastrar_campus.assert_not_called()
+    assert isinstance(result, ResultError)
 
 
 def test_editar_campus(campus):
