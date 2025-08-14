@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 
+from typing import Any
+
 from ensino.domain.entities import CampusEntity
 
 
@@ -13,13 +15,13 @@ class CampusRepository(ABC):
         pass
 
     @abstractmethod
-    def cadastrar_campus(self, campus: CampusEntity):
+    def cadastrar_campus(self, campus: CampusEntity, user: Any):
         pass
 
     @abstractmethod
-    def editar_campus(self, campus: CampusEntity):
+    def editar_campus(self, campus: CampusEntity, user: Any):
         pass
 
     @abstractmethod
-    def remover_campus(self, campus: CampusEntity):
+    def remover_campus(self, campus: CampusEntity, user: Any):
         pass
