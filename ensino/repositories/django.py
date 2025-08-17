@@ -52,4 +52,5 @@ class DjangoCampusRepository(CampusRepository):
 
         campus.removido_em = timezone.now()
         campus.alterado_por = user
+        campus.save()
         return CampusMapper.from_model(campus)
