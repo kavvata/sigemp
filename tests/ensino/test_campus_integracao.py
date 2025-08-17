@@ -104,12 +104,12 @@ def test_nao_pode_criar_campus(client, test_user, campus_entity: CampusEntity):
 
     assert response.status_code == 403
     assert not Campus.objects.filter(nome=campus_entity.nome).exists()
-    assertTemplateNotUsed(response, "patrimonio/campus/campus_form.html")
+    assertTemplateNotUsed(response, "ensino/campus/campus_form.html")
 
 
 @pytest.mark.django_db
 def test_editar_campus(admin_client, campus_entity: CampusEntity, campus):
-    url = reverse_lazy("patrimonio:editar_bem", args=[campus.pk])
+    url = reverse_lazy("ensino:editar_campus", args=[campus.pk])
 
     response = admin_client.get(url)
 
@@ -125,13 +125,13 @@ def test_editar_campus(admin_client, campus_entity: CampusEntity, campus):
     campus.refresh_from_db()
     assert campus.sigla == campus_entity.sigla
     assertContains(response, campus_entity.nome)
-    assertTemplateUsed(response, "patrimonio/campus/campus_form.html")
+    assertTemplateUsed(response, "ensino/campus/campus_list.html")
 
 
 @pytest.mark.django_db
 def test_nao_pode_editar_campus(client, test_user, campus_entity: CampusEntity, campus):
     client.force_login(test_user)
-    url = reverse_lazy("patrimonio:editar_bem", args=[campus.pk])
+    url = reverse_lazy("ensino:editar_campus", args=[campus.pk])
 
     response = client.get(url)
 
@@ -161,7 +161,7 @@ def test_remover_campus(admin_client, campus):
     assert campus.removido_em is not None
 
     response = admin_client.get(reverse_lazy("ensino:listar_campi"))
-    assertNotContains(response, campus.descricao)
+    assertNotContains(response, campus.nome)
 
 
 @pytest.mark.django_db
