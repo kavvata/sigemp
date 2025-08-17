@@ -43,7 +43,7 @@ def lista_campi(db):
     ]
 
     campi_models = [
-        Campus.objects.get_or_create(e.to_dict())[0] for e in lista_entities
+        Campus.objects.get_or_create(**e.to_dict())[0] for e in lista_entities
     ]
     yield campi_models
 

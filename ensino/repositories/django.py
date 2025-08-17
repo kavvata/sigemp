@@ -27,7 +27,7 @@ class DjangoCampusRepository(CampusRepository):
     def cadastrar_campus(self, campus: CampusEntity, user: User):
         return CampusMapper.from_model(
             Campus.objects.create(
-                campus.to_dict(["timestamps", "id"]),
+                **campus.to_dict(["timestamps", "id"]),
                 alterado_por=user,
             )
         )
@@ -35,7 +35,7 @@ class DjangoCampusRepository(CampusRepository):
     def editar_campus(self, campus: CampusEntity, user: User):
         try:
             Campus.objects.filter(pk=campus.id).update(
-                campus.to_dict(["timestamps", "id"]), alterado_por=user
+                **campus.to_dict(["timestamps", "id"]), alterado_por=user
             )
         except Campus.DoesNotExist as e:
             e.add_note(f"Campus com id '{campus.id}' não encontrado.")
