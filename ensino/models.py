@@ -7,3 +7,6 @@ from core.models import Timestampable
 class Campus(Timestampable, models.Model):
     sigla = models.CharField(null=False, blank=False, max_length=32)
     nome = models.CharField(null=False, blank=False, max_length=255)
+
+    def __str__(self) -> str:
+        return self.nome
