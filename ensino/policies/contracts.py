@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 class CampusPolicy(ABC):
     def __init__(self, user) -> None:
-        super.__init__()
+        super().__init__()
         self.user = user
 
     @abstractmethod
