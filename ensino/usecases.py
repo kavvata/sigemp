@@ -50,8 +50,8 @@ class EditarCampusUsecase:
         self.repo = repo
         self.policy = policy
 
-    def pode_editar(self):
-        return self.policy.pode_editar()
+    def pode_editar(self, campus):
+        return self.policy.pode_editar(campus)
 
     def get_campus(self, id: int):
         try:
