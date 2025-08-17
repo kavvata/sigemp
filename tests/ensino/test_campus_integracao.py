@@ -33,6 +33,7 @@ def campus(db):
     model.delete()
 
 
+@pytest.fixture
 def lista_campi(db):
     lista_entities = [
         CampusEntity(sigla="PNG", nome="Paranaguá"),
