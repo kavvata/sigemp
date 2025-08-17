@@ -1,25 +1,27 @@
-from django.shortcuts import render
-
 from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, UpdateView
 
-from ensino.models import Campus
-from ensino.policies.django import DjangoCampusPolicy
-from ensino.repositories.django import DjangoCampusRepository
+from ensino.models import Campus, Curso
+from ensino.policies.django import DjangoCampusPolicy, DjangoCursoPolicy
+from ensino.repositories.django import DjangoCampusRepository, DjangoCursoRepository
 from ensino.usecases import (
     ListarCampiUsecase,
     CadastrarCampusUsecase,
     EditarCampusUsecase,
     RemoverCampusUsecase,
+    ListarCursosUsecase,
+    CadastrarCursoUsecase,
+    EditarCursoUsecase,
+    RemoverCursoUsecase,
 )
-from ensino.domain.entities import CampusEntity
+from ensino.domain.entities import CampusEntity, CursoEntity
 
 from typing import Any
 
-from ensino.presentation.forms import CampusForm
+from ensino.presentation.forms import CampusForm, CursoForm
 
 # Create your views here.
 
@@ -68,7 +70,7 @@ class CriarCampusView(CreateView):
         usecase = CadastrarCampusUsecase(repo, policy)
 
         if not usecase.pode_criar():
-            raise PermissionDenied("Voce nao tem permissao para criar bens móveis.")
+            raise PermissionDenied("Voce nao tem permissao para criar campus.")
 
         return super().get(request, *args, **kwargs)
 
@@ -78,7 +80,7 @@ class CriarCampusView(CreateView):
         usecase = CadastrarCampusUsecase(repo, policy)
 
         if not usecase.pode_criar():
-            raise PermissionDenied("Voce nao tem permissao para criar bens móveis.")
+            raise PermissionDenied("Voce nao tem permissao para criar campus.")
 
         novo_campus = CampusEntity(
             sigla=form.cleaned_data["sigla"],
@@ -106,7 +108,7 @@ class EditarCampusView(UpdateView):
         usecase = EditarCampusUsecase(repo, policy)
 
         if not usecase.pode_editar(usecase.get_campus(pk)):
-            raise PermissionDenied("Voce nao tem permissao para editar bens móveis.")
+            raise PermissionDenied("Voce nao tem permissao para editar campus.")
 
         return super().get(request, *args, **kwargs)
 
@@ -142,3 +144,124 @@ def remover_campus(request, pk):
         raise PermissionDenied(result.mensagem)
 
     return redirect(reverse_lazy("ensino:listar_campi"))
+
+
+class ListarCursoView(ListView):
+    model = Curso
+    paginate_by = 10
+    template_name = "ensino/curso/curso_list.html"
+    context_object_name = "lista_campi"
+
+    def get_queryset(self):
+        policy = DjangoCursoPolicy(self.request.user)
+        repo = DjangoCursoRepository()
+        usecase = ListarCursosUsecase(repo, policy)
+
+        if not usecase.pode_listar():
+            raise PermissionDenied("Voce nao tem permissao para visualizar campi")
+
+        result = usecase.execute()
+
+        if not result:
+            raise PermissionDenied(result.mensagem)
+
+        return result.value
+
+    def get_context_data(self, **kwargs: Any):
+        context = super().get_context_data(**kwargs)
+        policy = DjangoCursoPolicy(self.request.user)
+        repo = DjangoCursoRepository()
+
+        usecase = CadastrarCursoUsecase(repo, policy)
+
+        context["pode_criar"] = usecase.pode_criar()
+
+        return context
+
+
+class CriarCursoView(CreateView):
+    template_name = "ensino/curso/curso_form.html"
+    form_class = CursoForm
+    success_url = reverse_lazy("ensino:listar_cursos")
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        repo = DjangoCursoRepository()
+        policy = DjangoCursoPolicy(self.request.user)
+        usecase = CadastrarCursoUsecase(repo, policy)
+
+        if not usecase.pode_criar():
+            raise PermissionDenied("Voce nao tem permissao para criar curso.")
+
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        repo = DjangoCursoRepository()
+        policy = DjangoCursoPolicy(self.request.user)
+        usecase = CadastrarCursoUsecase(repo, policy)
+
+        if not usecase.pode_criar():
+            raise PermissionDenied("Voce nao tem permissao para criar curso.")
+
+        novo_curso = CursoEntity(
+            sigla=form.cleaned_data["sigla"],
+            nome=form.cleaned_data["nome"],
+            campus_id=form.cleaned_data["campus"],
+        )
+        result = usecase.execute(novo_curso)
+
+        if not result:
+            raise PermissionDenied(result.mensagem)
+
+        return redirect(self.success_url)
+
+
+class EditarCursoView(UpdateView):
+    template_name = "ensino/curso/curso_form.html"
+    queryset = Curso.objects.filter(removido_em__isnull=True)
+    form_class = CursoForm
+    success_url = reverse_lazy("ensino:listar_cursos")
+
+    def get(
+        self, request: HttpRequest, pk: int, *args: Any, **kwargs: Any
+    ) -> HttpResponse:
+        repo = DjangoCursoRepository()
+        policy = DjangoCursoPolicy(self.request.user)
+        usecase = EditarCursoUsecase(repo, policy)
+
+        if not usecase.pode_editar(usecase.get_curso(pk)):
+            raise PermissionDenied("Voce nao tem permissao para editar cursos.")
+
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        repo = DjangoCursoRepository()
+        policy = DjangoCursoPolicy(self.request.user)
+        usecase = EditarCursoUsecase(repo, policy)
+
+        result = usecase.get_curso(form.instance.id)
+        if not result:
+            raise PermissionDenied(result.mensagem)
+
+        curso = CursoEntity(
+            id=form.instance.id,
+            sigla=form.cleaned_data["sigla"],
+            nome=form.cleaned_data["nome"],
+        )
+        result = usecase.execute(curso)
+
+        if not result:
+            raise PermissionDenied(result.mensagem)
+
+        return redirect(self.success_url)
+
+
+def remover_curso(request, pk):
+    repo = DjangoCursoRepository()
+    policy = DjangoCursoPolicy(request.user)
+
+    usecase = RemoverCursoUsecase(repo, policy)
+    result = usecase.execute(pk)
+    if not result:
+        raise PermissionDenied(result.mensagem)
+
+    return redirect(reverse_lazy("ensino:listar_cursos"))
