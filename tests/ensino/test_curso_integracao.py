@@ -173,6 +173,7 @@ def test_criar_curso(admin_client, curso_entity: CursoEntity):
     assert response.status_code == 200
 
     form_data = curso_entity.to_dict(["timestamps", "id", "campus_sigla"])
+    form_data["campus"] = form_data.pop("campus_id")
 
     response = admin_client.post(url, form_data, follow=True)
     assert response.status_code == 200
@@ -193,6 +194,7 @@ def test_nao_pode_criar_curso(client, test_user, curso_entity: CursoEntity):
     assert response.status_code == 403
 
     form_data = curso_entity.to_dict(["timestamps", "id", "campus_sigla"])
+    form_data["campus"] = form_data.pop("campus_id")
 
     response = client.post(url, form_data, follow=True)
 
@@ -214,6 +216,7 @@ def test_editar_curso(admin_client, curso_entity: CursoEntity, curso):
     curso_entity.id = curso.id
     curso_entity.sigla = "PGUA"
     form_data = curso_entity.to_dict(exclude=["timestamps", "campus_sigla"])
+    form_data["campus"] = form_data.pop("campus_id")
 
     response = admin_client.post(url, form_data, follow=True)
     curso.refresh_from_db()
