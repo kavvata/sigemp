@@ -120,7 +120,8 @@ def lista_cursos(db, lista_campi):
     ]
 
     lista_models = [
-        Curso.objects.get_or_create(e.to_dict(["timestamps"])) for e in lista_entities
+        Curso.objects.get_or_create(e.to_dict(["timestamps"]))[0]
+        for e in lista_entities
     ]
     yield lista_models
 
