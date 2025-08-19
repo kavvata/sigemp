@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Optional
 
 from core.domain.entities import TimeStampableEntity
 
@@ -16,3 +17,7 @@ class CursoEntity(TimeStampableEntity):
     nome: str
     campus_id: int
     id: int = None
+    campus_sigla: Optional[str] = None
+
+    def __str__(self) -> str:
+        return f"{self.nome} ({self.campus_sigla})"

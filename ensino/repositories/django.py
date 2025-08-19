@@ -75,7 +75,7 @@ class DjangoCursoRepository(CursoRepository):
     def cadastrar_curso(self, curso: CursoEntity, user: User):
         return CursoMapper.from_model(
             Curso.objects.create(
-                **curso.to_dict(["timestamps", "id"]),
+                **curso.to_dict(["timestamps", "id", "campus_sigla"]),
                 alterado_por=user,
             )
         )
@@ -83,7 +83,7 @@ class DjangoCursoRepository(CursoRepository):
     def editar_curso(self, curso: CursoEntity, user: User):
         try:
             Curso.objects.filter(pk=curso.id).update(
-                **curso.to_dict(["timestamps", "id"]), alterado_por=user
+                **curso.to_dict(["timestamps", "id", "campus_sigla"]), alterado_por=user
             )
         except Curso.DoesNotExist as e:
             e.add_note(f"Curso com id '{curso.id}' não encontrado.")

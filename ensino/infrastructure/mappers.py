@@ -18,6 +18,7 @@ class CursoMapper:
     def from_model(instance: Curso):
         model_dict = model_to_dict(instance)
         model_dict["campus_id"] = model_dict.pop("campus")
+        model_dict["campus_sigla"] = instance.campus.sigla
         return CursoEntity(**model_dict)
 
     @staticmethod

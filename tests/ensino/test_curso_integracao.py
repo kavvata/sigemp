@@ -23,7 +23,14 @@ def test_user(db):
 @pytest.fixture
 def campus(db):
     entity = CampusEntity(id=1, sigla="PNG", nome="Paranaguá")
-    model, _criado = Campus.objects.get_or_create(entity.to_dict(["timestamps"]))
+    model, _criado = Campus.objects.get_or_create(
+        entity.to_dict(
+            [
+                "timestamps",
+                "campus_sigla",
+            ]
+        )
+    )
     yield model
 
     model.delete()
@@ -63,7 +70,7 @@ def curso(campus):
         nome="Técnologo em Análise e Desenvolvimento de Sistemas",
         campus_id=1,
     )
-    model, _criado = Curso.objects.get_or_create(e.to_dict(["timestamps"]))
+    model, _criado = Curso.objects.get_or_create(**e.to_dict(["timestamps", "sigla"]))
     yield model
 
     model.delete()
@@ -120,7 +127,15 @@ def lista_cursos(db, lista_campi):
     ]
 
     lista_models = [
-        Curso.objects.get_or_create(e.to_dict(["timestamps"]))[0]
+        Curso.objects.get_or_create(
+            **e.to_dict(
+                [
+                    "timestamps",
+                    "id",
+                    "campus_sigla",
+                ]
+            )
+        )[0]
         for e in lista_entities
     ]
     yield lista_models
@@ -155,11 +170,11 @@ def test_criar_curso(admin_client, curso_entity: CursoEntity):
 
     assert response.status_code == 200
 
-    form_data = curso_entity.to_dict(["timestamps", "id"])
+    form_data = curso_entity.to_dict(["timestamps", "id", "campus_sigla"])
 
     response = admin_client.post(url, form_data, follow=True)
-
     assert response.status_code == 200
+
     assert Curso.objects.filter(nome=curso_entity.nome).exists()
     assertContains(response, curso_entity.nome)
     assertTemplateUsed(response, "ensino/curso/curso_list.html")
@@ -175,7 +190,7 @@ def test_nao_pode_criar_curso(client, test_user, curso_entity: CursoEntity):
 
     assert response.status_code == 403
 
-    form_data = curso_entity.to_dict(["timestamps", "id"])
+    form_data = curso_entity.to_dict(["timestamps", "id", "campus_sigla"])
 
     response = client.post(url, form_data, follow=True)
 
@@ -196,7 +211,7 @@ def test_editar_curso(admin_client, curso_entity: CursoEntity, curso):
     original = curso.sigla
     curso_entity.id = curso.id
     curso_entity.sigla = "PGUA"
-    form_data = curso_entity.to_dict(exclude=["timestamps"])
+    form_data = curso_entity.to_dict(exclude=["timestamps", "campus_sigla"])
 
     response = admin_client.post(url, form_data, follow=True)
     curso.refresh_from_db()
@@ -218,7 +233,7 @@ def test_nao_pode_editar_curso(client, test_user, curso_entity: CursoEntity, cur
 
     curso_entity.id = curso.id
     curso_entity.sigla = "PGUA"
-    form_data = curso_entity.to_dict(exclude=["timestamps"])
+    form_data = curso_entity.to_dict(exclude=["timestamps", "campus_sigla"])
 
     response = client.post(url, form_data, follow=True)
     assertTemplateNotUsed(response, "ensino/curso/curso_list.html")
