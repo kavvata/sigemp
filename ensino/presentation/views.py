@@ -150,7 +150,7 @@ class ListarCursoView(ListView):
     model = Curso
     paginate_by = 10
     template_name = "ensino/curso/curso_list.html"
-    context_object_name = "lista_campi"
+    context_object_name = "lista_cursos"
 
     def get_queryset(self):
         policy = DjangoCursoPolicy(self.request.user)
