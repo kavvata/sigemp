@@ -15,7 +15,9 @@ class Campus(Timestampable, models.Model):
 class Curso(Timestampable, models.Model):
     sigla = models.CharField(null=False, blank=False, max_length=32)
     nome = models.CharField(null=False, blank=False, max_length=255)
-    campus = models.ForeignKey(Campus, null=False, blank=False)
+    campus = models.ForeignKey(
+        Campus, null=False, blank=False, on_delete=models.CASCADE
+    )
 
     def __str__(self) -> str:
         return f"{self.nome} ({self.campus.sigla})"
