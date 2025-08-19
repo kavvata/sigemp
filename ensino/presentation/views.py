@@ -158,7 +158,7 @@ class ListarCursoView(ListView):
         usecase = ListarCursosUsecase(repo, policy)
 
         if not usecase.pode_listar():
-            raise PermissionDenied("Voce nao tem permissao para visualizar campi")
+            raise PermissionDenied("Voce nao tem permissao para visualizar cursos")
 
         result = usecase.execute()
 
@@ -246,6 +246,7 @@ class EditarCursoView(UpdateView):
             id=form.instance.id,
             sigla=form.cleaned_data["sigla"],
             nome=form.cleaned_data["nome"],
+            campus_id=form.cleaned_data["campus"],
         )
         result = usecase.execute(curso)
 
