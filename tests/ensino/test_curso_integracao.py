@@ -70,7 +70,9 @@ def curso(campus):
         nome="Técnologo em Análise e Desenvolvimento de Sistemas",
         campus_id=1,
     )
-    model, _criado = Curso.objects.get_or_create(**e.to_dict(["timestamps", "sigla"]))
+    model, _criado = Curso.objects.get_or_create(
+        **e.to_dict(["timestamps", "campus_sigla"])
+    )
     yield model
 
     model.delete()
