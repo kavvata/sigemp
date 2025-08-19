@@ -205,7 +205,7 @@ class CriarCursoView(CreateView):
         novo_curso = CursoEntity(
             sigla=form.cleaned_data["sigla"],
             nome=form.cleaned_data["nome"],
-            campus_id=form.cleaned_data["campus"],
+            campus_id=form.cleaned_data["campus"].id,
         )
         result = usecase.execute(novo_curso)
 
