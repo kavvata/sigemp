@@ -55,7 +55,7 @@ def test_nao_pode_listar_campi(lista_campi):
     usecase = ListarCampiUsecase(repo, policy)
     result = usecase.execute()
 
-    repo.listar_bens.assert_not_called()
+    repo.listar_campus.assert_not_called()
     policy.pode_listar.assert_called_with()
 
     assert not result
