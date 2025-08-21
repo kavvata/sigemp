@@ -51,3 +51,29 @@ class CursoPolicy(ABC):
     @abstractmethod
     def pode_visualizar(self, curso) -> bool:
         pass
+
+
+class FormaSelecaoPolicy(ABC):
+    def __init__(self, user) -> None:
+        super().__init__()
+        self.user = user
+
+    @abstractmethod
+    def pode_listar(self) -> bool:
+        pass
+
+    @abstractmethod
+    def pode_criar(self) -> bool:
+        pass
+
+    @abstractmethod
+    def pode_editar(self, forma_selecao) -> bool:
+        pass
+
+    @abstractmethod
+    def pode_remover(self, forma_selecao) -> bool:
+        pass
+
+    @abstractmethod
+    def pode_visualizar(self, forma_selecao) -> bool:
+        pass

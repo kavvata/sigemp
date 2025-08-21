@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 from typing import Any
 
-from ensino.domain.entities import CampusEntity, CursoEntity
+from ensino.domain.entities import CampusEntity, CursoEntity, FormaSelecaoEntity
 
 
 class CampusRepository(ABC):
@@ -46,4 +46,26 @@ class CursoRepository(ABC):
 
     @abstractmethod
     def remover_curso(self, id: int, user: Any):
+        pass
+
+
+class FormaSelecaoRepository(ABC):
+    @abstractmethod
+    def listar_formas_selecao(self):
+        pass
+
+    @abstractmethod
+    def buscar_por_id(self, id: int):
+        pass
+
+    @abstractmethod
+    def cadastrar_forma_selecao(self, curso: FormaSelecaoEntity, user: Any):
+        pass
+
+    @abstractmethod
+    def editar_forma_selecao(self, curso: FormaSelecaoEntity, user: Any):
+        pass
+
+    @abstractmethod
+    def remover_forma_selecao(self, id: int, user: Any):
         pass
