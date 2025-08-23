@@ -16,12 +16,10 @@ from ensino.usecases import (
 @pytest.fixture
 def forma_selecao():
     base_date = datetime(2020, 1, 1)
-    return (
-        FormaSelecaoEntity(
-            descricao="Edital N°01/2020",
-            periodo_inicio=base_date,
-            periodo_fim=base_date + timedelta(days=180),
-        ),
+    return FormaSelecaoEntity(
+        descricao="Edital N°01/2020",
+        periodo_inicio=base_date,
+        periodo_fim=base_date + timedelta(days=180),
     )
 
 
