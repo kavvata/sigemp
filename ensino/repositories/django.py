@@ -1,9 +1,13 @@
 from django.contrib.auth.models import User
 from django.utils import timezone
-from ensino.infrastructure.mappers import CampusMapper, CursoMapper
-from ensino.models import Campus, Curso
-from ensino.repositories.contracts import CampusRepository, CursoRepository
-from ensino.domain.entities import CampusEntity, CursoEntity
+from ensino.infrastructure.mappers import CampusMapper, CursoMapper, FormaSelecaoMapper
+from ensino.models import Campus, Curso, FormaSelecao
+from ensino.repositories.contracts import (
+    CampusRepository,
+    CursoRepository,
+    FormaSelecaoRepository,
+)
+from ensino.domain.entities import CampusEntity, CursoEntity, FormaSelecaoEntity
 
 
 class DjangoCampusRepository(CampusRepository):
@@ -102,3 +106,56 @@ class DjangoCursoRepository(CursoRepository):
         curso.alterado_por = user
         curso.save()
         return CursoMapper.from_model(curso)
+
+
+class DjangoFormaSelecaoRepository(FormaSelecaoRepository):
+    def listar_formas_selecao(self):
+        return [
+            FormaSelecaoMapper.from_model(forma_selecao)
+            for forma_selecao in FormaSelecao.objects.filter(
+                removido_em__isnull=True
+            ).order_by("periodo_inicio")
+        ]
+
+    def buscar_por_id(self, id: int):
+        try:
+            forma_selecao = FormaSelecao.objects.get(pk=id, removido_em__isnull=True)
+        except FormaSelecao.DoesNotExist as e:
+            e.add_note(f"FormaSelecao com id '{id}' não encontrado.")
+            raise e
+        else:
+            return FormaSelecaoMapper.from_model(forma_selecao)
+
+    def cadastrar_forma_selecao(self, forma_selecao: FormaSelecaoEntity, user: User):
+        return FormaSelecaoMapper.from_model(
+            FormaSelecao.objects.create(
+                **forma_selecao.to_dict(["timestamps", "id", "campus_sigla"]),
+                alterado_por=user,
+            )
+        )
+
+    def editar_forma_selecao(self, forma_selecao: FormaSelecaoEntity, user: User):
+        try:
+            FormaSelecao.objects.filter(pk=forma_selecao.id).update(
+                **forma_selecao.to_dict(["timestamps", "id", "campus_sigla"]),
+                alterado_por=user,
+            )
+        except FormaSelecao.DoesNotExist as e:
+            e.add_note(f"FormaSelecao com id '{forma_selecao.id}' não encontrado.")
+            raise e
+
+        return FormaSelecaoMapper.from_model(
+            FormaSelecao.objects.get(pk=forma_selecao.id)
+        )
+
+    def remover_forma_selecao(self, id: int, user: User):
+        try:
+            forma_selecao = FormaSelecao.objects.get(pk=id)
+        except FormaSelecao.DoesNotExist as e:
+            e.add_note(f"FormaSelecao com id '{id}' não encontrado.")
+            raise e
+
+        forma_selecao.removido_em = timezone.now()
+        forma_selecao.alterado_por = user
+        forma_selecao.save()
+        return FormaSelecaoMapper.from_model(forma_selecao)

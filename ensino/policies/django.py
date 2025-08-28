@@ -1,6 +1,6 @@
 from typing import override
 from django.contrib.auth.models import User
-from ensino.policies.contracts import CampusPolicy, CursoPolicy
+from ensino.policies.contracts import CampusPolicy, CursoPolicy, FormaSelecaoPolicy
 
 
 class DjangoCampusPolicy(CampusPolicy):
@@ -74,4 +74,41 @@ class DjangoCursoPolicy(CursoPolicy):
             self.user.is_superuser
             or self.user.has_perm("ensino:view_curso")
             and curso.removido_em is None
+        )
+
+
+class DjangoFormaSelecaoPolicy(FormaSelecaoPolicy):
+    def __init__(self, user: User) -> None:
+        super().__init__(user)
+
+    @override
+    def pode_listar(self) -> bool:
+        return self.user.is_superuser or self.user.has_perm("ensino:view_formaselecao")
+
+    @override
+    def pode_criar(self) -> bool:
+        return self.user.is_superuser or self.user.has_perm("ensino:add_formaselecao")
+
+    @override
+    def pode_editar(self, formaselecao) -> bool:
+        return (
+            self.user.is_superuser
+            or self.user.has_perm("ensino:change_formaselecao")
+            and formaselecao.removido_em is None
+        )
+
+    @override
+    def pode_remover(self, formaselecao) -> bool:
+        return (
+            self.user.is_superuser
+            or self.user.has_perm("ensino:delete_formaselecao")
+            and formaselecao.removido_em is None
+        )
+
+    @override
+    def pode_visualizar(self, formaselecao) -> bool:
+        return (
+            self.user.is_superuser
+            or self.user.has_perm("ensino:view_formaselecao")
+            and formaselecao.removido_em is None
         )
