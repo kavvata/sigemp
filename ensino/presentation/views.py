@@ -4,9 +4,17 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, UpdateView
 
-from ensino.models import Campus, Curso
-from ensino.policies.django import DjangoCampusPolicy, DjangoCursoPolicy
-from ensino.repositories.django import DjangoCampusRepository, DjangoCursoRepository
+from ensino.models import Campus, Curso, FormaSelecao
+from ensino.policies.django import (
+    DjangoCampusPolicy,
+    DjangoCursoPolicy,
+    DjangoFormaSelecaoPolicy,
+)
+from ensino.repositories.django import (
+    DjangoCampusRepository,
+    DjangoCursoRepository,
+    DjangoFormaSelecaoRepository,
+)
 from ensino.usecases import (
     ListarCampiUsecase,
     CadastrarCampusUsecase,
@@ -16,12 +24,16 @@ from ensino.usecases import (
     CadastrarCursoUsecase,
     EditarCursoUsecase,
     RemoverCursoUsecase,
+    ListarFormasSelecaoUsecase,
+    CadastrarFormaSelecaoUsecase,
+    EditarFormaSelecaoUsecase,
+    RemoverFormaSelecaoUsecase,
 )
-from ensino.domain.entities import CampusEntity, CursoEntity
+from ensino.domain.entities import CampusEntity, CursoEntity, FormaSelecaoEntity
 
 from typing import Any
 
-from ensino.presentation.forms import CampusForm, CursoForm
+from ensino.presentation.forms import CampusForm, CursoForm, FormaSelecaoForm
 
 # Create your views here.
 
@@ -266,3 +278,127 @@ def remover_curso(request, pk):
         raise PermissionDenied(result.mensagem)
 
     return redirect(reverse_lazy("ensino:listar_cursos"))
+
+
+class ListarFormaSelecaoView(ListView):
+    model = FormaSelecao
+    paginate_by = 10
+    template_name = "ensino/forma_selecao/formaselecao_list.html"
+    context_object_name = "lista_formas_selecao"
+
+    def get_queryset(self):
+        policy = DjangoFormaSelecaoPolicy(self.request.user)
+        repo = DjangoFormaSelecaoRepository()
+        usecase = ListarFormasSelecaoUsecase(repo, policy)
+
+        if not usecase.pode_listar():
+            raise PermissionDenied(
+                "Voce nao tem permissao para visualizar formas de seleção."
+            )
+
+        result = usecase.execute()
+
+        if not result:
+            raise PermissionDenied(result.mensagem)
+
+        return result.value
+
+    def get_context_data(self, **kwargs: Any):
+        context = super().get_context_data(**kwargs)
+        policy = DjangoFormaSelecaoPolicy(self.request.user)
+        repo = DjangoFormaSelecaoRepository()
+
+        usecase = CadastrarFormaSelecaoUsecase(repo, policy)
+
+        context["pode_criar"] = usecase.pode_criar()
+
+        return context
+
+
+class CriarFormaSelecaoView(CreateView):
+    template_name = "ensino/forma_selecao/formaselecao_form.html"
+    form_class = FormaSelecaoForm
+    success_url = reverse_lazy("ensino:listar_formas_selecao")
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        repo = DjangoFormaSelecaoRepository()
+        policy = DjangoFormaSelecaoPolicy(self.request.user)
+        usecase = CadastrarFormaSelecaoUsecase(repo, policy)
+
+        if not usecase.pode_criar():
+            raise PermissionDenied("Voce nao tem permissao para criar forma_selecao.")
+
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        repo = DjangoFormaSelecaoRepository()
+        policy = DjangoFormaSelecaoPolicy(self.request.user)
+        usecase = CadastrarFormaSelecaoUsecase(repo, policy)
+
+        if not usecase.pode_criar():
+            raise PermissionDenied("Voce nao tem permissao para criar forma_selecao.")
+
+        novo_forma_selecao = FormaSelecaoEntity(
+            descricao=form.cleaned_data["descricao"],
+            periodo_inicio=form.cleaned_data["periodo_inicio"],
+            periodo_fim=form.cleaned_data["periodo_fim"],
+        )
+        result = usecase.execute(novo_forma_selecao)
+
+        if not result:
+            raise PermissionDenied(result.mensagem)
+
+        return redirect(self.success_url)
+
+
+class EditarFormaSelecaoView(UpdateView):
+    template_name = "ensino/forma_selecao/formaselecao_form.html"
+    queryset = FormaSelecao.objects.filter(removido_em__isnull=True)
+    form_class = FormaSelecaoForm
+    success_url = reverse_lazy("ensino:listar_formas_selecao")
+
+    def get(
+        self, request: HttpRequest, pk: int, *args: Any, **kwargs: Any
+    ) -> HttpResponse:
+        repo = DjangoFormaSelecaoRepository()
+        policy = DjangoFormaSelecaoPolicy(self.request.user)
+        usecase = EditarFormaSelecaoUsecase(repo, policy)
+
+        if not usecase.pode_editar(usecase.get_forma_selecao(pk)):
+            raise PermissionDenied("Voce nao tem permissao para editar forma_selecao.")
+
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        repo = DjangoFormaSelecaoRepository()
+        policy = DjangoFormaSelecaoPolicy(self.request.user)
+        usecase = EditarFormaSelecaoUsecase(repo, policy)
+
+        result = usecase.get_forma_selecao(form.instance.id)
+        if not result:
+            raise PermissionDenied(result.mensagem)
+
+        forma_selecao = FormaSelecaoEntity(
+            id=form.instance.id,
+            descricao=form.cleaned_data["descricao"],
+            periodo_inicio=form.cleaned_data["periodo_inicio"],
+            periodo_fim=form.cleaned_data["periodo_fim"],
+        )
+        result = usecase.execute(forma_selecao)
+
+        if not result:
+            raise PermissionDenied(result.mensagem)
+
+        return redirect(self.success_url)
+
+
+def remover_forma_selecao(request, pk):
+    repo = DjangoFormaSelecaoRepository()
+    policy = DjangoFormaSelecaoPolicy(request.user)
+
+    usecase = RemoverFormaSelecaoUsecase(repo, policy)
+    result = usecase.execute(pk)
+    if not result:
+        raise PermissionDenied(result.mensagem)
+
+    return redirect(reverse_lazy("ensino:listar_formas_selecao"))
