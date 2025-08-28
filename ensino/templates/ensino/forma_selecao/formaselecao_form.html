@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block page_title %}
+  {% if form.instance.id %} Editar {{ form.instance.nome }} {% else %} Cadastrar Forma de Seleção {% endif %}
+{% endblock %}
+{% block actions %}
+    {% if form.instance.id %}
+        <a href="{% url 'ensino:remover_forma_selecao' form.instance.id %}"
+
+           class="forma_selecaor-pointer flex items-center gap-2 rounded-md border border-red-500 bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 transition-all duration-300 ease-in-out hover:bg-red-100 hover:shadow-md hover:ring-2 hover:ring-red-300 dark:border-red-400 dark:bg-gray-800 dark:text-red-300 dark:hover:bg-gray-700 dark:hover:ring-red-500/40">
+            <i class="material-symbols-outlined align-middle">delete</i>
+            <span>Remover</span>
+        </a>
+    {% endif %}
+{% endblock actions %}
+{% block content %}
+<section class="mx-auto max-w-4xl gap-y-6 rounded-md bg-gray-50 p-6 text-gray-900 shadow-md dark:bg-gray-900 dark:text-white">
+    <form method="post" class="grid grid-cols-1 gap-6 md:grid-cols-2">
+        {% csrf_token %}
+
+        {% for field in form.visible_fields %}
+          <div class="flex flex-col gap-2">
+              <div class="flex flex-row">
+                <label class="text-sm font-semibold text-gray-800 dark:text-white"
+                    for="{{ field.id_for_label }}">{{ field.label }}</label>
+
+                {% if field.errors %}
+                  <div class="px-2 text-sm font-bold text-red-600 dark:text-red-400">
+                    {{ field.errors }}
+                  </div>
+                {% endif %}
+              </div>
+              {% render_field field class="block w-full min-w-0 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500" %}
+          </div>
+        {% endfor %}
+
+        <div class="col-span-full mt-4">
+            <button type="submit"
+                    class="forma_selecaor-pointer flex items-center gap-2 rounded-md border border-blue-500 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-600 transition-all duration-300 ease-in-out hover:bg-blue-100 hover:shadow-md hover:ring-2 hover:ring-blue-300 dark:border-blue-400 dark:bg-gray-800 dark:text-blue-300 dark:hover:bg-gray-700 dark:hover:ring-blue-500/40">
+                Salvar
+            </button>
+        </div>
+    </form>
+</section>
+{% endblock %}
