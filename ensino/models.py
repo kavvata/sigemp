@@ -21,3 +21,12 @@ class Curso(Timestampable, models.Model):
 
     def __str__(self) -> str:
         return f"{self.nome} ({self.campus.sigla})"
+
+
+class FormaSelecao(Timestampable, models.Model):
+    descricao = models.CharField(null=False, blank=False, max_length=255)
+    periodo_inicio = models.DateField(null=False, blank=False)
+    periodo_fim = models.DateField(null=False, blank=False)
+
+    def __str__(self) -> str:
+        return self.descricao
