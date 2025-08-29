@@ -19,8 +19,16 @@
 
         {% for field in form.visible_fields %}
           <div class="flex flex-col gap-2">
-              <label class="text-gray-800 dark:text-white text-sm font-semibold"
+              <div class="flex flex-row">
+                <label class="text-sm font-semibold text-gray-800 dark:text-white"
                     for="{{ field.id_for_label }}">{{ field.label }}</label>
+
+                {% if field.errors %}
+                  <div class="px-2 text-sm font-bold text-red-600 dark:text-red-400">
+                    {{ field.errors }}
+                  </div>
+                {% endif %}
+              </div>
               {% render_field field class="block w-full min-w-0 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500" %}
           </div>
         {% endfor %}
