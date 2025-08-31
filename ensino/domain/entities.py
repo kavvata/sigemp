@@ -30,3 +30,16 @@ class FormaSelecaoEntity(TimeStampableEntity):
     periodo_inicio: datetime
     periodo_fim: datetime
     id: Optional[int] = None
+
+
+@dataclass(kw_only=True)
+class AlunoEntity(TimeStampableEntity):
+    nome: str
+    nome_responsavel: Optional[str] = None
+    cpf: str
+    email: str
+    matricula: str
+    telefone: str
+    forma_selecao_id: int
+    curso_id: int
+    id: Optional[int] = None
