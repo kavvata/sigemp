@@ -1,8 +1,14 @@
 from abc import ABC, abstractmethod
 
-from typing import Any
+from typing import Any, Unpack
 
-from ensino.domain.entities import CampusEntity, CursoEntity, FormaSelecaoEntity
+from ensino.domain.entities import (
+    CampusEntity,
+    CursoEntity,
+    FormaSelecaoEntity,
+    AlunoEntity,
+)
+from ensino.repositories.filters import AlunoFiltro
 
 
 class CampusRepository(ABC):
@@ -68,4 +74,30 @@ class FormaSelecaoRepository(ABC):
 
     @abstractmethod
     def remover_forma_selecao(self, id: int, user: Any):
+        pass
+
+
+class AlunoRepository(ABC):
+    @abstractmethod
+    def listar_alunos(self):
+        pass
+
+    @abstractmethod
+    def buscar_por_id(self, id: int):
+        pass
+
+    @abstractmethod
+    def buscar(self, **filtros: Unpack[AlunoFiltro]):
+        pass
+
+    @abstractmethod
+    def cadastrar_aluno(self, aluno: AlunoEntity, user: Any):
+        pass
+
+    @abstractmethod
+    def editar_aluno(self, aluno: AlunoEntity, user: Any):
+        pass
+
+    @abstractmethod
+    def remover_aluno(self, id: int, user: Any):
         pass
