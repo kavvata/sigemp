@@ -18,6 +18,13 @@ from .formaselecao_usecases import (
     RemoverFormaSelecaoUsecase,
 )
 
+from .aluno_usecases import (
+    ListarAlunosUsecase,
+    CadastrarAlunoUsecase,
+    EditarAlunoUsecase,
+    RemoverAlunoUsecase,
+)
+
 __all__ = [
     "ListarCampiUsecase",
     "CadastrarCampusUsecase",
@@ -31,4 +38,8 @@ __all__ = [
     "EditarFormaSelecaoUsecase",
     "RemoverFormaSelecaoUsecase",
     "RemoverCursoUsecase",
+    "ListarAlunosUsecase",
+    "CadastrarAlunoUsecase",
+    "EditarAlunoUsecase",
+    "RemoverAlunoUsecase",
 ]
