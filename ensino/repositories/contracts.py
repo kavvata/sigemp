@@ -59,11 +59,11 @@ class FormaSelecaoRepository(ABC):
         pass
 
     @abstractmethod
-    def cadastrar_forma_selecao(self, curso: FormaSelecaoEntity, user: Any):
+    def cadastrar_forma_selecao(self, forma_selecao: FormaSelecaoEntity, user: Any):
         pass
 
     @abstractmethod
-    def editar_forma_selecao(self, curso: FormaSelecaoEntity, user: Any):
+    def editar_forma_selecao(self, forma_selecao: FormaSelecaoEntity, user: Any):
         pass
 
     @abstractmethod
