@@ -40,7 +40,7 @@ class Aluno(Timestampable, models.Model):
     matricula = models.CharField(null=False, blank=False, max_length=65)
     telefone = models.CharField(null=False, blank=False, max_length=65)
 
-    forma_selecao: models.ForeignKey(
+    forma_selecao = models.ForeignKey(
         FormaSelecao,
         blank=False,
         null=False,
