@@ -1,13 +1,26 @@
+from typing import Optional, Unpack
 from django.contrib.auth.models import User
 from django.utils import timezone
-from ensino.infrastructure.mappers import CampusMapper, CursoMapper, FormaSelecaoMapper
-from ensino.models import Campus, Curso, FormaSelecao
+from ensino.infrastructure.mappers import (
+    AlunoMapper,
+    CampusMapper,
+    CursoMapper,
+    FormaSelecaoMapper,
+)
+from ensino.models import Aluno, Campus, Curso, FormaSelecao
 from ensino.repositories.contracts import (
+    AlunoRepository,
     CampusRepository,
     CursoRepository,
     FormaSelecaoRepository,
 )
-from ensino.domain.entities import CampusEntity, CursoEntity, FormaSelecaoEntity
+from ensino.domain.entities import (
+    AlunoEntity,
+    CampusEntity,
+    CursoEntity,
+    FormaSelecaoEntity,
+)
+from ensino.repositories.filters import AlunoFiltro
 
 
 class DjangoCampusRepository(CampusRepository):
@@ -159,3 +172,64 @@ class DjangoFormaSelecaoRepository(FormaSelecaoRepository):
         forma_selecao.alterado_por = user
         forma_selecao.save()
         return FormaSelecaoMapper.from_model(forma_selecao)
+
+
+class DjangoAlunoRepository(AlunoRepository):
+    def listar_alunos(self):
+        lista_alunos = Aluno.objects.filter(removido_em__isnull=True).order_by(
+            "curso__nome", "nome"
+        )
+
+        return [AlunoMapper.from_model(aluno) for aluno in lista_alunos]
+
+    def buscar_por_id(self, id: int):
+        try:
+            aluno = Aluno.objects.get(id=id)
+        except Aluno.DoesNotExist as e:
+            e.add_nome(f"Aluno com o id '{id} não encontrado.'")
+            raise e
+
+        return AlunoMapper.from_model(aluno)
+
+    def buscar(self, **filtros: Unpack[AlunoFiltro]) -> Optional[AlunoEntity]:
+        try:
+            aluno = Aluno.objects.get(**filtros, removido_em__isnull=True)
+        except Aluno.DoesNotExist as e:
+            e.add_note(
+                f"Não foi possível encontrar um aluno com o seguinte filtro: {filtros}"
+            )
+            raise e
+        except Aluno.MultipleObjectsReturned as e:
+            e.add_note(
+                f"Mais de um aluno encontrado com o filtro especificado: \nfiltro: {filtros}"
+            )
+
+        return AlunoMapper.from_model(aluno)
+
+    def cadastrar_aluno(self, aluno: AlunoEntity, user: User):
+        return AlunoMapper.from_model(
+            Aluno.objects.create(**aluno.to_dict(["timestamps", "id"])),
+            criado_por=user,
+        )
+
+    def editar_aluno(self, aluno: AlunoEntity, user: User):
+        try:
+            Aluno.objects.filter(pk=aluno.id).update(
+                **aluno.to_dict(["timestamps", "id"], alterado_por=user)
+            )
+        except Aluno.DoesNotExist as e:
+            e.add_note(f"Aluno com id '{aluno.id}' não encontrado.")
+            raise e
+
+        return AlunoMapper.from_model(Aluno.objects.get(pk=aluno.id))
+
+    def remover_aluno(self, id: int, user: User):
+        try:
+            aluno = Aluno.objects.get(pk=id)
+        except Aluno.DoesNotExist as e:
+            e.add_nome(f"Aluno com o id '{id} não encontrado.'")
+            raise e
+        aluno.removido_em = timezone.now()
+        aluno.alterado_por = user
+
+        return AlunoMapper.from_model(aluno)
