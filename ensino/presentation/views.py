@@ -4,16 +4,18 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, UpdateView
 
-from ensino.models import Campus, Curso, FormaSelecao
+from ensino.models import Campus, Curso, FormaSelecao, Aluno
 from ensino.policies.django import (
     DjangoCampusPolicy,
     DjangoCursoPolicy,
     DjangoFormaSelecaoPolicy,
+    DjangoAlunoPolicy,
 )
 from ensino.repositories.django import (
     DjangoCampusRepository,
     DjangoCursoRepository,
     DjangoFormaSelecaoRepository,
+    DjangoAlunoRepository,
 )
 from ensino.usecases import (
     ListarCampiUsecase,
@@ -28,12 +30,21 @@ from ensino.usecases import (
     CadastrarFormaSelecaoUsecase,
     EditarFormaSelecaoUsecase,
     RemoverFormaSelecaoUsecase,
+    ListarAlunosUsecase,
+    CadastrarAlunoUsecase,
+    EditarAlunoUsecase,
+    RemoverAlunoUsecase,
 )
-from ensino.domain.entities import CampusEntity, CursoEntity, FormaSelecaoEntity
+from ensino.domain.entities import (
+    CampusEntity,
+    CursoEntity,
+    FormaSelecaoEntity,
+    AlunoEntity,
+)
 
 from typing import Any
 
-from ensino.presentation.forms import CampusForm, CursoForm, FormaSelecaoForm
+from ensino.presentation.forms import CampusForm, CursoForm, FormaSelecaoForm, AlunoForm
 
 # Create your views here.
 
@@ -402,3 +413,125 @@ def remover_forma_selecao(request, pk):
         raise PermissionDenied(result.mensagem)
 
     return redirect(reverse_lazy("ensino:listar_formas_selecao"))
+
+
+class ListarAlunoView(ListView):
+    model = Aluno
+    paginate_by = 10
+    template_name = "ensino/aluno/aluno_list.html"
+    context_object_name = "lista_alunos"
+
+    def get_queryset(self):
+        policy = DjangoAlunoPolicy(self.request.user)
+        repo = DjangoAlunoRepository()
+        usecase = ListarAlunosUsecase(repo, policy)
+
+        if not usecase.pode_listar():
+            raise PermissionDenied("Voce nao tem permissao para visualizar alunos.")
+
+        result = usecase.execute()
+
+        if not result:
+            raise PermissionDenied(result.mensagem)
+
+        return result.value
+
+    def get_context_data(self, **kwargs: Any):
+        context = super().get_context_data(**kwargs)
+        policy = DjangoAlunoPolicy(self.request.user)
+        repo = DjangoAlunoRepository()
+
+        usecase = CadastrarAlunoUsecase(repo, policy)
+
+        context["pode_criar"] = usecase.pode_criar()
+
+        return context
+
+
+class CriarAlunoView(CreateView):
+    template_name = "ensino/aluno/aluno_form.html"
+    form_class = AlunoForm
+    success_url = reverse_lazy("ensino:listar_alunos")
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        repo = DjangoAlunoRepository()
+        policy = DjangoAlunoPolicy(self.request.user)
+        usecase = CadastrarAlunoUsecase(repo, policy)
+
+        if not usecase.pode_criar():
+            raise PermissionDenied("Voce nao tem permissao para criar aluno.")
+
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        repo = DjangoAlunoRepository()
+        policy = DjangoAlunoPolicy(self.request.user)
+        usecase = CadastrarAlunoUsecase(repo, policy)
+
+        if not usecase.pode_criar():
+            raise PermissionDenied("Voce nao tem permissao para criar aluno.")
+
+        novo_aluno = AlunoEntity(
+            descricao=form.cleaned_data["descricao"],
+            periodo_inicio=form.cleaned_data["periodo_inicio"],
+            periodo_fim=form.cleaned_data["periodo_fim"],
+        )
+        result = usecase.execute(novo_aluno)
+
+        if not result:
+            raise PermissionDenied(result.mensagem)
+
+        return redirect(self.success_url)
+
+
+class EditarAlunoView(UpdateView):
+    template_name = "ensino/aluno/aluno_form.html"
+    queryset = Aluno.objects.filter(removido_em__isnull=True)
+    form_class = AlunoForm
+    success_url = reverse_lazy("ensino:listar_alunos")
+
+    def get(
+        self, request: HttpRequest, pk: int, *args: Any, **kwargs: Any
+    ) -> HttpResponse:
+        repo = DjangoAlunoRepository()
+        policy = DjangoAlunoPolicy(self.request.user)
+        usecase = EditarAlunoUsecase(repo, policy)
+
+        if not usecase.pode_editar(usecase.get_aluno(pk)):
+            raise PermissionDenied("Voce nao tem permissao para editar aluno.")
+
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        repo = DjangoAlunoRepository()
+        policy = DjangoAlunoPolicy(self.request.user)
+        usecase = EditarAlunoUsecase(repo, policy)
+
+        result = usecase.get_aluno(form.instance.id)
+        if not result:
+            raise PermissionDenied(result.mensagem)
+
+        aluno = AlunoEntity(
+            id=form.instance.id,
+            descricao=form.cleaned_data["descricao"],
+            periodo_inicio=form.cleaned_data["periodo_inicio"],
+            periodo_fim=form.cleaned_data["periodo_fim"],
+        )
+        result = usecase.execute(aluno)
+
+        if not result:
+            raise PermissionDenied(result.mensagem)
+
+        return redirect(self.success_url)
+
+
+def remover_aluno(request, pk):
+    repo = DjangoAlunoRepository()
+    policy = DjangoAlunoPolicy(request.user)
+
+    usecase = RemoverAlunoUsecase(repo, policy)
+    result = usecase.execute(pk)
+    if not result:
+        raise PermissionDenied(result.mensagem)
+
+    return redirect(reverse_lazy("ensino:listar_alunos"))
