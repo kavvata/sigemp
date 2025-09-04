@@ -57,10 +57,12 @@
                       @click.away="openMenu = false"
                       x-transition
                       class="absolute left-full top-0 ml-2 mt-0 bg-white border dark:bg-gray-900  dark:border-gray-700 shadow-lg rounded w-48 z-50">
-                      <a href="{% url 'ensino:listar_campi' %}"
-                        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Campi</a>
+                      <a href="{% url 'ensino:listar_alunos' %}"
+                        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Alunos</a>
                       <a href="{% url 'ensino:listar_cursos' %}"
                         class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Cursos</a>
+                      <a href="{% url 'ensino:listar_campi' %}"
+                        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Campi</a>
                       <a href="{% url 'ensino:listar_formas_selecao' %}"
                         class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Formas de Seleção</a>
                   </div>
