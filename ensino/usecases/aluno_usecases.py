@@ -35,6 +35,18 @@ class CadastrarAlunoUsecase:
         if not self.policy.pode_criar():
             return ResultError("Você não tem permissão para cadastrar aluno.")
 
+        existente = self.repo.buscar(matricula=novo_aluno.matricula)
+        if existente:
+            return ResultError(f"Matricula {novo_aluno.matricula} já cadastrada.")
+
+        existente = self.repo.buscar(cpf=novo_aluno.cpf)
+        if existente:
+            return ResultError(f"CPF {novo_aluno.cpf} já cadastrado.")
+
+        existente = self.repo.buscar(email=novo_aluno.email)
+        if existente:
+            return ResultError(f"Email {novo_aluno.email} já cadastrado.")
+
         try:
             resposta = self.repo.cadastrar_aluno(
                 novo_aluno,
@@ -55,7 +67,7 @@ class EditarAlunoUsecase:
 
     def get_aluno(self, id: int):
         try:
-            aluno = self.repo.buscar_por_id(id)
+            aluno = self.repo.buscar(id=id)
         except Exception as e:
             return ResultError(f"Erro ao buscar aluno: {e}")
 
@@ -71,6 +83,18 @@ class EditarAlunoUsecase:
         resultado_busca_por_id = self.get_aluno(aluno.id)
         if not resultado_busca_por_id:
             return resultado_busca_por_id
+
+        existente = self.repo.buscar(matricula=aluno.matricula)
+        if existente and aluno.id != existente.id:
+            return ResultError(f"Matricula {aluno.matricula} já cadastrada.")
+
+        existente = self.repo.buscar(cpf=aluno.cpf)
+        if existente and aluno.id != existente.id:
+            return ResultError(f"CPF {aluno.cpf} já cadastrado.")
+
+        existente = self.repo.buscar(email=aluno.email)
+        if existente and aluno.id != existente.id:
+            return ResultError(f"Email {aluno.email} já cadastrado.")
 
         try:
             resposta = self.repo.editar_aluno(aluno, self.policy.user)
