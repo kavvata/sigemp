@@ -1,6 +1,11 @@
 from django.forms import model_to_dict
-from ensino.domain.entities import CampusEntity, CursoEntity, FormaSelecaoEntity
-from ensino.models import Campus, Curso, FormaSelecao
+from ensino.domain.entities import (
+    AlunoEntity,
+    CampusEntity,
+    CursoEntity,
+    FormaSelecaoEntity,
+)
+from ensino.models import Aluno, Campus, Curso, FormaSelecao
 
 
 class CampusMapper:
@@ -34,3 +39,18 @@ class FormaSelecaoMapper:
     @staticmethod
     def from_dict(data: dict):
         return FormaSelecaoEntity(**data)
+
+
+class AlunoMapper:
+    @staticmethod
+    def from_model(model: Aluno):
+        model_dict = model_to_dict(model)
+
+        model_dict["forma_selecao_id"] = model_dict.pop("forma_selecao")
+        model_dict["curso_id"] = model_dict.pop("curso")
+
+        return AlunoMapper.from_dict(model_dict)
+
+    @staticmethod
+    def from_dict(data: dict):
+        return AlunoEntity(**data)
