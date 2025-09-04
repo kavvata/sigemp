@@ -1,6 +1,11 @@
 from typing import override
 from django.contrib.auth.models import User
-from ensino.policies.contracts import CampusPolicy, CursoPolicy, FormaSelecaoPolicy
+from ensino.policies.contracts import (
+    CampusPolicy,
+    CursoPolicy,
+    FormaSelecaoPolicy,
+    AlunoPolicy,
+)
 
 
 class DjangoCampusPolicy(CampusPolicy):
@@ -111,4 +116,41 @@ class DjangoFormaSelecaoPolicy(FormaSelecaoPolicy):
             self.user.is_superuser
             or self.user.has_perm("ensino:view_formaselecao")
             and formaselecao.removido_em is None
+        )
+
+
+class DjangoAlunoPolicy(AlunoPolicy):
+    def __init__(self, user: User) -> None:
+        super().__init__(user)
+
+    @override
+    def pode_listar(self) -> bool:
+        return self.user.is_superuser or self.user.has_perm("ensino:view_aluno")
+
+    @override
+    def pode_criar(self) -> bool:
+        return self.user.is_superuser or self.user.has_perm("ensino:add_aluno")
+
+    @override
+    def pode_editar(self, aluno) -> bool:
+        return (
+            self.user.is_superuser
+            or self.user.has_perm("ensino:change_aluno")
+            and aluno.removido_em is None
+        )
+
+    @override
+    def pode_remover(self, aluno) -> bool:
+        return (
+            self.user.is_superuser
+            or self.user.has_perm("ensino:delete_aluno")
+            and aluno.removido_em is None
+        )
+
+    @override
+    def pode_visualizar(self, aluno) -> bool:
+        return (
+            self.user.is_superuser
+            or self.user.has_perm("ensino:view_aluno")
+            and aluno.removido_em is None
         )
