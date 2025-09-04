@@ -30,3 +30,28 @@ class FormaSelecao(Timestampable, models.Model):
 
     def __str__(self) -> str:
         return self.descricao
+
+
+class Aluno(Timestampable, models.Model):
+    nome = models.CharField(null=False, blank=False, max_length=255)
+    nome_responsavel = models.CharField(null=True, blank=False, max_length=255)
+    cpf = models.CharField(null=False, blank=False, max_length=11)
+    email = models.CharField(null=False, blank=False, max_length=255)
+    matricula = models.CharField(null=False, blank=False, max_length=65)
+    telefone = models.CharField(null=False, blank=False, max_length=65)
+
+    forma_selecao: models.ForeignKey(
+        FormaSelecao,
+        blank=False,
+        null=False,
+        on_delete=models.CASCADE,
+    )
+    curso = models.ForeignKey(
+        Curso,
+        null=False,
+        blank=False,
+        on_delete=models.CASCADE,
+    )
+
+    def __str__(self) -> str:
+        return f"{self.nome} ({self.matricula})"
