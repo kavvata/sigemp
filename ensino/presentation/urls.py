@@ -66,4 +66,24 @@ urlpatterns = [
         views.remover_forma_selecao,
         name="remover_forma_selecao",
     ),
+    path(
+        "aluno/",
+        views.ListarAlunoView.as_view(),
+        name="listar_alunos",
+    ),
+    path(
+        "aluno/add",
+        views.CriarAlunoView.as_view(),
+        name="criar_aluno",
+    ),
+    path(
+        "aluno/change/<int:pk>/",
+        views.EditarAlunoView.as_view(),
+        name="editar_aluno",
+    ),
+    path(
+        "aluno/delete/<int:pk>/",
+        views.remover_aluno,
+        name="remover_aluno",
+    ),
 ]
