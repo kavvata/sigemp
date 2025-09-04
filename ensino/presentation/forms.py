@@ -1,7 +1,7 @@
 from django import forms
 from django.forms.widgets import DateInput
 
-from ensino.models import Campus, Curso, FormaSelecao
+from ensino.models import Aluno, Campus, Curso, FormaSelecao
 
 
 class CampusForm(forms.ModelForm):
@@ -44,3 +44,18 @@ class FormaSelecaoForm(forms.ModelForm):
             )
 
         return periodo_fim
+
+
+class AlunoForm(forms.ModelForm):
+    class Meta:
+        model = Aluno
+        fields = [
+            "nome",
+            "nome_responsavel",
+            "cpf",
+            "email",
+            "matricula",
+            "telefone",
+            "curso",
+            "forma_selecao",
+        ]
