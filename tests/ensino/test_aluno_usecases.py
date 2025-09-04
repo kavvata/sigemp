@@ -15,6 +15,7 @@ from ensino.usecases import (
 @pytest.fixture
 def aluno():
     return AlunoEntity(
+        id=1,
         nome="João da Silva",
         cpf="12345678901",
         email="joao.silva@ifpr.edu.br",
@@ -29,6 +30,7 @@ def aluno():
 def lista_alunos():
     return [
         AlunoEntity(
+            id=1,
             nome="João da Silva",
             cpf="12345678901",
             email="joao.silva@ifpr.edu.br",
@@ -38,6 +40,7 @@ def lista_alunos():
             curso_id=1,
         ),
         AlunoEntity(
+            id=2,
             nome="Ana Pereira",
             nome_responsavel="Carlos Pereira",
             cpf="98765432100",
@@ -48,6 +51,7 @@ def lista_alunos():
             curso_id=1,
         ),
         AlunoEntity(
+            id=3,
             nome="Lucas Andrade",
             nome_responsavel="Fernanda Andrade",
             cpf="45678912300",
@@ -58,6 +62,7 @@ def lista_alunos():
             curso_id=2,
         ),
         AlunoEntity(
+            id=4,
             nome="Beatriz Costa",
             cpf="32165498700",
             email="beatriz.costa@ifpr.edu.br",
@@ -67,6 +72,7 @@ def lista_alunos():
             curso_id=2,
         ),
         AlunoEntity(
+            id=5,
             nome="Marcos Oliveira",
             cpf="15975348620",
             email="marcos.oliveira@ifpr.edu.br",
@@ -124,6 +130,8 @@ def test_cadastrar_aluno(aluno: AlunoEntity):
     result = usecase.execute(aluno)
 
     repo.buscar.assert_any_call(matricula=aluno.matricula)
+    repo.buscar.assert_any_call(cpf=aluno.cpf)
+    repo.buscar.assert_any_call(email=aluno.email)
     repo.cadastrar_aluno.assert_called_with(aluno, policy.user)
     assert isinstance(result, ResultSuccess)
     assert result.value == aluno
@@ -215,11 +223,13 @@ def test_nao_pode_editar_aluno(aluno: AlunoEntity):
     assert isinstance(result, ResultError)
 
 
-def test_nao_pode_editar_aluno_matricula_repetida(aluno: AlunoEntity):
+def test_nao_pode_editar_aluno_matricula_repetida(
+    aluno: AlunoEntity, lista_alunos: list[AlunoEntity]
+):
     repo = mock.Mock()
     policy = mock.Mock()
     policy.pode_editar.return_value = True
-    repo.buscar.side_effect = lambda **f: aluno if "matricula" in f else None
+    repo.buscar.side_effect = lambda **f: lista_alunos[1] if "matricula" in f else None
 
     usecase = EditarAlunoUsecase(repo, policy)
     result = usecase.execute(aluno)
@@ -229,11 +239,13 @@ def test_nao_pode_editar_aluno_matricula_repetida(aluno: AlunoEntity):
     assert isinstance(result, ResultError)
 
 
-def test_nao_pode_editar_aluno_cpf_repetido(aluno: AlunoEntity):
+def test_nao_pode_editar_aluno_cpf_repetido(
+    aluno: AlunoEntity, lista_alunos: list[AlunoEntity]
+):
     repo = mock.Mock()
     policy = mock.Mock()
     policy.pode_editar.return_value = True
-    repo.buscar.side_effect = lambda **f: aluno if "cpf" in f else None
+    repo.buscar.side_effect = lambda **f: lista_alunos[1] if "cpf" in f else None
 
     usecase = EditarAlunoUsecase(repo, policy)
     result = usecase.execute(aluno)
@@ -243,11 +255,13 @@ def test_nao_pode_editar_aluno_cpf_repetido(aluno: AlunoEntity):
     assert isinstance(result, ResultError)
 
 
-def test_nao_pode_editar_aluno_email_repetido(aluno: AlunoEntity):
+def test_nao_pode_editar_aluno_email_repetido(
+    aluno: AlunoEntity, lista_alunos: list[AlunoEntity]
+):
     repo = mock.Mock()
     policy = mock.Mock()
     policy.pode_editar.return_value = True
-    repo.buscar.side_effect = lambda **f: aluno if "email" in f else None
+    repo.buscar.side_effect = lambda **f: lista_alunos[1] if "email" in f else None
 
     usecase = EditarAlunoUsecase(repo, policy)
     result = usecase.execute(aluno)
