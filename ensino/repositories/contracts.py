@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from typing import Any, Unpack
+from typing import Any, Optional, Unpack
 
 from ensino.domain.entities import (
     CampusEntity,
@@ -87,7 +87,7 @@ class AlunoRepository(ABC):
         pass
 
     @abstractmethod
-    def buscar(self, **filtros: Unpack[AlunoFiltro]):
+    def buscar(self, **filtros: Unpack[AlunoFiltro]) -> Optional[AlunoEntity]:
         pass
 
     @abstractmethod
