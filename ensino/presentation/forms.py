@@ -11,6 +11,10 @@ class CampusForm(forms.ModelForm):
 
 
 class CursoForm(forms.ModelForm):
+    campus = forms.ModelChoiceField(
+        queryset=Campus.objects.filter(removido_em__isnull=True)
+    )
+
     class Meta:
         model = Curso
         fields = ["nome", "sigla", "campus"]
@@ -47,6 +51,14 @@ class FormaSelecaoForm(forms.ModelForm):
 
 
 class AlunoForm(forms.ModelForm):
+    curso = forms.ModelChoiceField(
+        queryset=Curso.objects.filter(removido_em__isnull=True)
+    )
+
+    forma_selecao = forms.ModelChoiceField(
+        queryset=FormaSelecao.objects.filter(removido_em__isnull=True)
+    )
+
     class Meta:
         model = Aluno
         fields = [
