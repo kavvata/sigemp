@@ -51,6 +51,7 @@ class FormaSelecaoForm(forms.ModelForm):
 
 
 class AlunoForm(forms.ModelForm):
+    nome_responsavel = forms.CharField(required=False)
     curso = forms.ModelChoiceField(
         queryset=Curso.objects.filter(removido_em__isnull=True)
     )
