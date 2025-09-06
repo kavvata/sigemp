@@ -208,7 +208,8 @@ class DjangoAlunoRepository(AlunoRepository):
     def editar_aluno(self, aluno: AlunoEntity, user: User):
         try:
             Aluno.objects.filter(pk=aluno.id).update(
-                **aluno.to_dict(["timestamps", "id"], alterado_por=user)
+                **aluno.to_dict(["timestamps", "id"]),
+                alterado_por=user,
             )
         except Aluno.DoesNotExist as e:
             e.add_note(f"Aluno com id '{aluno.id}' não encontrado.")
