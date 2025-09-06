@@ -34,6 +34,22 @@ class MarcaModeloForm(forms.ModelForm):
 
 
 class BemForm(forms.ModelForm):
+    tipo = forms.ModelChoiceField(
+        queryset=TipoBem.objects.filter(removido_em__isnull=True),
+    )
+
+    grau_fragilidade = forms.ModelChoiceField(
+        queryset=GrauFragilidade.objects.filter(removido_em__isnull=True),
+    )
+
+    estado_conservacao = forms.ModelChoiceField(
+        queryset=EstadoConservacao.objects.filter(removido_em__isnull=True),
+    )
+
+    marca_modelo = forms.ModelChoiceField(
+        queryset=MarcaModelo.objects.filter(removido_em__isnull=True),
+    )
+
     class Meta:
         model = Bem
         fields = [
