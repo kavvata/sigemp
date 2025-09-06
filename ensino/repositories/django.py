@@ -225,4 +225,6 @@ class DjangoAlunoRepository(AlunoRepository):
         aluno.removido_em = timezone.now()
         aluno.alterado_por = user
 
+        aluno.save()
+
         return AlunoMapper.from_model(aluno)
