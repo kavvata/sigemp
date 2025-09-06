@@ -1,12 +1,13 @@
 {% extends "base.html" %}
 {% load widget_tweaks %}
 {% block page_title %}
-  {% if form.instance.id %} Editar {{ form.instance.descricao }} {% else %} Cadastrar Bem {% endif %}
+  {% if form.instance.id %} Editar {{ form.instance.nome }} {% else %} Cadastrar Forma de Seleção {% endif %}
 {% endblock %}
 {% block actions %}
     {% if form.instance.id %}
-        <a href="{% url 'patrimonio:remover_bem' form.instance.id %}"
-           class="flex cursor-pointer items-center gap-2 rounded-md border border-red-500 bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 transition-all duration-300 ease-in-out hover:bg-red-100 hover:shadow-md hover:ring-2 hover:ring-red-300 dark:border-red-400 dark:bg-gray-800 dark:text-red-300 dark:hover:bg-gray-700 dark:hover:ring-red-500/40">
+        <a href="{% url 'ensino:remover_forma_selecao' form.instance.id %}"
+
+           class="cursor-pointer flex items-center gap-2 rounded-md border border-red-500 bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 transition-all duration-300 ease-in-out hover:bg-red-100 hover:shadow-md hover:ring-2 hover:ring-red-300 dark:border-red-400 dark:bg-gray-800 dark:text-red-300 dark:hover:bg-gray-700 dark:hover:ring-red-500/40">
             <i class="material-symbols-outlined align-middle">delete</i>
             <span>Remover</span>
         </a>
@@ -35,7 +36,7 @@
 
         <div class="col-span-full mt-4">
             <button type="submit"
-                    class="flex cursor-pointer items-center gap-2 rounded-md border border-blue-500 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-600 transition-all duration-300 ease-in-out hover:bg-blue-100 hover:shadow-md hover:ring-2 hover:ring-blue-300 dark:border-blue-400 dark:bg-gray-800 dark:text-blue-300 dark:hover:bg-gray-700 dark:hover:ring-blue-500/40">
+                    class="cursor-pointer flex items-center gap-2 rounded-md border border-blue-500 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-600 transition-all duration-300 ease-in-out hover:bg-blue-100 hover:shadow-md hover:ring-2 hover:ring-blue-300 dark:border-blue-400 dark:bg-gray-800 dark:text-blue-300 dark:hover:bg-gray-700 dark:hover:ring-blue-500/40">
                 Salvar
             </button>
         </div>

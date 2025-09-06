@@ -108,7 +108,6 @@ def test_cadastrar_bem_usecase(bem):
     result = usecase.execute(bem)
 
     repo.buscar_por_patrimonio.assert_called_with(bem.patrimonio)
-    print(result.mensagem)
     repo.cadastrar_bem.assert_called_with(
         bem,
         user,

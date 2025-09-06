@@ -1,0 +1,89 @@
+from django.urls import path
+
+from . import views
+
+
+app_name = "ensino"
+
+urlpatterns = [
+    path(
+        "campus/",
+        views.ListarCampusView.as_view(),
+        name="listar_campi",
+    ),
+    path(
+        "campus/add",
+        views.CriarCampusView.as_view(),
+        name="criar_campus",
+    ),
+    path(
+        "campus/change/<int:pk>/",
+        views.EditarCampusView.as_view(),
+        name="editar_campus",
+    ),
+    path(
+        "campus/delete/<int:pk>/",
+        views.remover_campus,
+        name="remover_campus",
+    ),
+    path(
+        "curso/",
+        views.ListarCursoView.as_view(),
+        name="listar_cursos",
+    ),
+    path(
+        "curso/add",
+        views.CriarCursoView.as_view(),
+        name="criar_curso",
+    ),
+    path(
+        "curso/change/<int:pk>/",
+        views.EditarCursoView.as_view(),
+        name="editar_curso",
+    ),
+    path(
+        "curso/delete/<int:pk>/",
+        views.remover_curso,
+        name="remover_curso",
+    ),
+    path(
+        "forma_selecao/",
+        views.ListarFormaSelecaoView.as_view(),
+        name="listar_formas_selecao",
+    ),
+    path(
+        "forma_selecao/add",
+        views.CriarFormaSelecaoView.as_view(),
+        name="criar_forma_selecao",
+    ),
+    path(
+        "forma_selecao/change/<int:pk>/",
+        views.EditarFormaSelecaoView.as_view(),
+        name="editar_forma_selecao",
+    ),
+    path(
+        "forma_selecao/delete/<int:pk>/",
+        views.remover_forma_selecao,
+        name="remover_forma_selecao",
+    ),
+    path(
+        "aluno/",
+        views.ListarAlunoView.as_view(),
+        name="listar_alunos",
+    ),
+    path(
+        "aluno/add",
+        views.CriarAlunoView.as_view(),
+        name="criar_aluno",
+    ),
+    path(
+        "aluno/change/<int:pk>/",
+        views.EditarAlunoView.as_view(),
+        name="editar_aluno",
+    ),
+    path(
+        "aluno/delete/<int:pk>/",
+        views.remover_aluno,
+        name="remover_aluno",
+    ),
+]

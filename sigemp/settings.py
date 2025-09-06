@@ -40,6 +40,7 @@ TAILWIND_APP_NAME = "theme"
 
 INSTALLED_APPS = [
     "patrimonio.apps.PatrimonioConfig",
+    "ensino.apps.EnsinoConfig",
     "core.apps.CoreConfig",
     "django.contrib.admin",
     "django.contrib.auth",
