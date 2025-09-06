@@ -390,7 +390,8 @@ def test_editar_aluno_sem_permissao(
 
     assertTemplateNotUsed(response, "ensino/aluno/aluno_list.html")
     aluno.refresh_from_db()
-    assert aluno.descricao == original
+    assert aluno.email == original
+    assert not aluno.email == aluno_entity
 
 
 @pytest.mark.django_db
