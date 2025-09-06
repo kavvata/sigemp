@@ -192,19 +192,8 @@ class DjangoAlunoRepository(AlunoRepository):
         return AlunoMapper.from_model(aluno)
 
     def buscar(self, **filtros: Unpack[AlunoFiltro]) -> Optional[AlunoEntity]:
-        try:
-            aluno = Aluno.objects.get(**filtros, removido_em__isnull=True)
-        except Aluno.DoesNotExist as e:
-            e.add_note(
-                f"Não foi possível encontrar um aluno com o seguinte filtro: {filtros}"
-            )
-            raise e
-        except Aluno.MultipleObjectsReturned as e:
-            e.add_note(
-                f"Mais de um aluno encontrado com o filtro especificado: \nfiltro: {filtros}"
-            )
-
-        return AlunoMapper.from_model(aluno)
+        lista_alunos = Aluno.objects.filter(**filtros, removido_em__isnull=True)
+        return [AlunoMapper.from_model(aluno) for aluno in lista_alunos]
 
     def cadastrar_aluno(self, aluno: AlunoEntity, user: User):
         return AlunoMapper.from_model(
