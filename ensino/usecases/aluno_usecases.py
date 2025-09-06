@@ -84,16 +84,16 @@ class EditarAlunoUsecase:
         if not resultado_busca_por_id:
             return resultado_busca_por_id
 
-        existente = self.repo.buscar(matricula=aluno.matricula)
-        if existente and aluno.id != existente.id:
+        encontrados = self.repo.buscar(matricula=aluno.matricula)
+        if encontrados and aluno.id not in [aluno.id for aluno in encontrados]:
             return ResultError(f"Matricula {aluno.matricula} já cadastrada.")
 
-        existente = self.repo.buscar(cpf=aluno.cpf)
-        if existente and aluno.id != existente.id:
+        encontrados = self.repo.buscar(cpf=aluno.cpf)
+        if encontrados and aluno.id not in [aluno.id for aluno in encontrados]:
             return ResultError(f"CPF {aluno.cpf} já cadastrado.")
 
-        existente = self.repo.buscar(email=aluno.email)
-        if existente and aluno.id != existente.id:
+        encontrados = self.repo.buscar(email=aluno.email)
+        if encontrados and aluno.id not in [aluno.id for aluno in encontrados]:
             return ResultError(f"Email {aluno.email} já cadastrado.")
 
         try:
