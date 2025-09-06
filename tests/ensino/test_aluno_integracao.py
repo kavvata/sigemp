@@ -418,8 +418,8 @@ def test_nao_pode_editar_aluno_matricula_repetida(
     assert response.status_code == 403
     assert (
         Aluno.objects.filter(
-            matricula=aluno.matricula,
-            id=aluno.id,
+            matricula=lista_alunos[1].matricula,
+            id=lista_alunos[1].id,
         ).count()
         == 1
     )
@@ -455,8 +455,8 @@ def test_nao_pode_editar_aluno_cpf_repetido(
     assert response.status_code == 403
     assert (
         Aluno.objects.filter(
-            cpf=aluno.cpf,
-            id=aluno.id,
+            cpf=lista_alunos[1].cpf,
+            id=lista_alunos[1].id,
         ).count()
         == 1
     )
@@ -492,8 +492,8 @@ def test_nao_pode_editar_aluno_email_repetido(
     assert response.status_code == 403
     assert (
         Aluno.objects.filter(
-            email=aluno.email,
-            id=aluno.id,
+            email=lista_alunos[1].email,
+            id=lista_alunos[1].id,
         ).count()
         == 1
     )
