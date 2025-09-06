@@ -472,9 +472,14 @@ class CriarAlunoView(CreateView):
             raise PermissionDenied("Voce nao tem permissao para criar aluno.")
 
         novo_aluno = AlunoEntity(
-            descricao=form.cleaned_data["descricao"],
-            periodo_inicio=form.cleaned_data["periodo_inicio"],
-            periodo_fim=form.cleaned_data["periodo_fim"],
+            nome=form.cleaned_data["nome"],
+            cpf=form.cleaned_data["cpf"],
+            matricula=form.cleaned_data["matricula"],
+            nome_responsavel=form.cleaned_data["nome_responsavel"],
+            email=form.cleaned_data["email"],
+            telefone=form.cleaned_data["telefone"],
+            curso_id=form.cleaned_data["curso"].id,
+            forma_selecao_id=form.cleaned_data["forma_selecao"].id,
         )
         result = usecase.execute(novo_aluno)
 
@@ -513,9 +518,14 @@ class EditarAlunoView(UpdateView):
 
         aluno = AlunoEntity(
             id=form.instance.id,
-            descricao=form.cleaned_data["descricao"],
-            periodo_inicio=form.cleaned_data["periodo_inicio"],
-            periodo_fim=form.cleaned_data["periodo_fim"],
+            nome=form.cleaned_data["nome"],
+            cpf=form.cleaned_data["cpf"],
+            matricula=form.cleaned_data["matricula"],
+            nome_responsavel=form.cleaned_data["nome_responsavel"],
+            email=form.cleaned_data["email"],
+            telefone=form.cleaned_data["telefone"],
+            curso_id=form.cleaned_data["curso"].id,
+            forma_selecao_id=form.cleaned_data["forma_selecao"].id,
         )
         result = usecase.execute(aluno)
 
