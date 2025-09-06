@@ -197,8 +197,12 @@ class DjangoAlunoRepository(AlunoRepository):
 
     def cadastrar_aluno(self, aluno: AlunoEntity, user: User):
         return AlunoMapper.from_model(
-            Aluno.objects.create(**aluno.to_dict(["timestamps", "id"])),
-            criado_por=user,
+            Aluno.objects.create(
+                **aluno.to_dict(
+                    ["timestamps", "id"],
+                ),
+                criado_por=user,
+            ),
         )
 
     def editar_aluno(self, aluno: AlunoEntity, user: User):
