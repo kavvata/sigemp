@@ -154,7 +154,7 @@ def test_nao_pode_cadastrar_aluno_matricula_repetida(aluno: AlunoEntity):
     repo = mock.Mock()
     policy = mock.Mock()
     policy.pode_criar.return_value = True
-    repo.buscar.side_effect = lambda **f: aluno if "matricula" in f else None
+    repo.buscar.side_effect = lambda **f: [aluno] if "matricula" in f else None
 
     usecase = CadastrarAlunoUsecase(repo, policy)
     result = usecase.execute(aluno)
@@ -168,7 +168,7 @@ def test_nao_pode_cadastrar_aluno_cpf_repetido(aluno: AlunoEntity):
     repo = mock.Mock()
     policy = mock.Mock()
     policy.pode_criar.return_value = True
-    repo.buscar.side_effect = lambda **f: aluno if "cpf" in f else None
+    repo.buscar.side_effect = lambda **f: [aluno] if "cpf" in f else None
 
     usecase = CadastrarAlunoUsecase(repo, policy)
     result = usecase.execute(aluno)
@@ -182,7 +182,7 @@ def test_nao_pode_cadastrar_aluno_email_repetido(aluno: AlunoEntity):
     repo = mock.Mock()
     policy = mock.Mock()
     policy.pode_criar.return_value = True
-    repo.buscar.side_effect = lambda **f: aluno if "email" in f else None
+    repo.buscar.side_effect = lambda **f: [aluno] if "email" in f else None
 
     usecase = CadastrarAlunoUsecase(repo, policy)
     result = usecase.execute(aluno)
@@ -229,7 +229,9 @@ def test_nao_pode_editar_aluno_matricula_repetida(
     repo = mock.Mock()
     policy = mock.Mock()
     policy.pode_editar.return_value = True
-    repo.buscar.side_effect = lambda **f: lista_alunos[1] if "matricula" in f else None
+    repo.buscar.side_effect = (
+        lambda **f: [lista_alunos[1]] if "matricula" in f else None
+    )
 
     usecase = EditarAlunoUsecase(repo, policy)
     result = usecase.execute(aluno)
@@ -245,7 +247,7 @@ def test_nao_pode_editar_aluno_cpf_repetido(
     repo = mock.Mock()
     policy = mock.Mock()
     policy.pode_editar.return_value = True
-    repo.buscar.side_effect = lambda **f: lista_alunos[1] if "cpf" in f else None
+    repo.buscar.side_effect = lambda **f: [lista_alunos[1]] if "cpf" in f else None
 
     usecase = EditarAlunoUsecase(repo, policy)
     result = usecase.execute(aluno)
@@ -261,7 +263,7 @@ def test_nao_pode_editar_aluno_email_repetido(
     repo = mock.Mock()
     policy = mock.Mock()
     policy.pode_editar.return_value = True
-    repo.buscar.side_effect = lambda **f: lista_alunos[1] if "email" in f else None
+    repo.buscar.side_effect = lambda **f: [lista_alunos[1]] if "email" in f else None
 
     usecase = EditarAlunoUsecase(repo, policy)
     result = usecase.execute(aluno)
