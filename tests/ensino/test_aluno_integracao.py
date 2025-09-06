@@ -15,6 +15,7 @@ from ensino.domain.entities import (
     CursoEntity,
     FormaSelecaoEntity,
 )
+from ensino.infrastructure.mappers import AlunoMapper
 from ensino.models import Aluno, Campus, Curso, FormaSelecao
 
 from pprint import pprint as print
@@ -407,7 +408,7 @@ def test_nao_pode_editar_aluno_matricula_repetida(
 
     aluno.matricula = lista_alunos[1].matricula
 
-    data = aluno.to_dict(exclude=["timestamps"])
+    data = AlunoMapper.from_model(aluno).to_dict(exclude=["timestamps"])
     data["curso"] = data.pop("curso_id")
     data["forma_selecao"] = data.pop("forma_selecao_id")
     data["nome_responsavel"] = ""
@@ -444,7 +445,7 @@ def test_nao_pode_editar_aluno_cpf_repetido(
 
     aluno.cpf = lista_alunos[1].cpf
 
-    data = aluno.to_dict(exclude=["timestamps"])
+    data = AlunoMapper.from_model(aluno).to_dict(exclude=["timestamps"])
     data["curso"] = data.pop("curso_id")
     data["forma_selecao"] = data.pop("forma_selecao_id")
     data["nome_responsavel"] = ""
@@ -481,7 +482,7 @@ def test_nao_pode_editar_aluno_email_repetido(
 
     aluno.email = lista_alunos[1].email
 
-    data = aluno.to_dict(exclude=["timestamps"])
+    data = AlunoMapper.from_model(aluno).to_dict(exclude=["timestamps"])
     data["curso"] = data.pop("curso_id")
     data["forma_selecao"] = data.pop("forma_selecao_id")
     data["nome_responsavel"] = ""
