@@ -6,15 +6,15 @@
 {% block actions %}
     {% if form.instance.id %}
         <a href="{% url 'patrimonio:remover_bem' form.instance.id %}"
-           class="rounded-md py-2 gap-2 flex px-4 border border-red-500 text-red-600 dark:border-red-400 dark:text-red-300 bg-red-50 dark:bg-gray-800 items-center font-semibold text-sm transition-all duration-300 ease-in-out hover:bg-red-100 dark:hover:bg-gray-700 hover:ring-2 hover:ring-red-300 dark:hover:ring-red-500/40 hover:shadow-md cursor-pointer">
+           class="flex cursor-pointer items-center gap-2 rounded-md border border-red-500 bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 transition-all duration-300 ease-in-out hover:bg-red-100 hover:shadow-md hover:ring-2 hover:ring-red-300 dark:border-red-400 dark:bg-gray-800 dark:text-red-300 dark:hover:bg-gray-700 dark:hover:ring-red-500/40">
             <i class="material-symbols-outlined align-middle">delete</i>
             <span>Remover</span>
         </a>
     {% endif %}
 {% endblock actions %}
 {% block content %}
-<section class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white max-w-4xl mx-auto p-6 gap-y-6 shadow-md rounded-md">
-    <form method="post" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<section class="mx-auto max-w-4xl gap-y-6 rounded-md bg-gray-50 p-6 text-gray-900 shadow-md dark:bg-gray-900 dark:text-white">
+    <form method="post" class="grid grid-cols-1 gap-6 md:grid-cols-2">
         {% csrf_token %}
 
         {% for field in form.visible_fields %}
@@ -35,7 +35,7 @@
 
         <div class="col-span-full mt-4">
             <button type="submit"
-                    class="rounded-md py-2 gap-2 flex px-4 border border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-300 bg-blue-50 dark:bg-gray-800 items-center font-semibold text-sm transition-all duration-300 ease-in-out hover:bg-blue-100 dark:hover:bg-gray-700 hover:ring-2 hover:ring-blue-300 dark:hover:ring-blue-500/40 hover:shadow-md cursor-pointer">
+                    class="flex cursor-pointer items-center gap-2 rounded-md border border-blue-500 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-600 transition-all duration-300 ease-in-out hover:bg-blue-100 hover:shadow-md hover:ring-2 hover:ring-blue-300 dark:border-blue-400 dark:bg-gray-800 dark:text-blue-300 dark:hover:bg-gray-700 dark:hover:ring-blue-500/40">
                 Salvar
             </button>
         </div>
