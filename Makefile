@@ -13,3 +13,6 @@ migrate:
 
 shell:
 	docker-compose exec web python manage.py shell
+
+collectstatic:
+	docker-compose exec web python manage.py collectstatic
