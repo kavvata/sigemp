@@ -75,9 +75,9 @@ def test_cadastrar_tipo_ocorrencia_usecase(tipo_ocorrencia):
     usecase = CadastrarTipoOcorrenciaUsecase(repo, policy)
 
     if usecase.pode_criar():
-        result = usecase.execute(tipo_ocorrencia.descricao)
+        result = usecase.execute(tipo_ocorrencia)
 
-    repo.cadastrar_tipo_ocorrencia.assert_called_with(tipo_ocorrencia.descricao, user)
+    repo.cadastrar_tipo_ocorrencia.assert_called_with(tipo_ocorrencia, user)
     policy.pode_criar.assert_called_with()
 
     assert result
@@ -95,10 +95,10 @@ def test_nao_pode_cadastrar_tipo_ocorrencia_usecase(tipo_ocorrencia):
 
     usecase = CadastrarTipoOcorrenciaUsecase(repo, policy)
 
-    result = usecase.execute(tipo_ocorrencia.descricao)
+    result = usecase.execute(tipo_ocorrencia)
 
     repo.cadastrar_tipo_ocorrencia.assert_not_called()
-    policy.pode_criar.assert_called_with()
+    policy.pode_criar.assert_called()
 
     assert not result
     assert isinstance(result, ResultError)
@@ -120,12 +120,10 @@ def test_editar_tipo_ocorrencia_usecase(tipo_ocorrencia):
 
     assert encontrado
 
-    result = usecase.execute(encontrado.id, encontrado.descricao)
+    result = usecase.execute(encontrado)
 
     repo.buscar_por_id.assert_called_with(tipo_ocorrencia.id)
-    repo.editar_tipo_ocorrencia.assert_called_with(
-        tipo_ocorrencia.id, tipo_ocorrencia.descricao, user
-    )
+    repo.editar_tipo_ocorrencia.assert_called_with(encontrado, user)
     policy.pode_editar.assert_called_with(tipo_ocorrencia)
 
     assert result
@@ -148,7 +146,7 @@ def test_nao_pode_editar_tipo_ocorrencia_usecase(tipo_ocorrencia):
     assert not result
     assert isinstance(result, ResultError)
 
-    result = usecase.execute(tipo_ocorrencia.id, tipo_ocorrencia.descricao)
+    result = usecase.execute(tipo_ocorrencia)
 
     repo.buscar_por_id.assert_called_with(tipo_ocorrencia.id)
     repo.editar_tipo_ocorrencia.assert_not_called()
