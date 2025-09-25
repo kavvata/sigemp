@@ -8,8 +8,8 @@ from pytest_django.asserts import (
     assertTemplateUsed,
 )
 
-from ensino.domain.entities import TipoOcorrenciaEntity
-from ensino.models import TipoOcorrencia
+from emprestimo.domain.entities import TipoOcorrenciaEntity
+from emprestimo.models import TipoOcorrencia
 
 
 @pytest.fixture
@@ -54,20 +54,20 @@ def lista_tipos_ocorrencia(db):
 
 @pytest.mark.django_db
 def test_listar_tipos_ocorrencia(lista_tipos_ocorrencia, admin_client):
-    response = admin_client.get(reverse_lazy("ensino:listar_tipos_ocorrencia"))
+    response = admin_client.get(reverse_lazy("emprestimo:listar_tipos_ocorrencia"))
     for descricao in [
         tipo_ocorrencia.descricao for tipo_ocorrencia in lista_tipos_ocorrencia
     ]:
         assertContains(response, descricao)
 
-    assertTemplateUsed(response, "ensino/tipo_ocorrencia/tiposocorrencia_list.html")
+    assertTemplateUsed(response, "emprestimo/tipo_ocorrencia/tipoocorrencia_list.html")
 
 
 @pytest.mark.django_db
 def test_nao_pode_listar_tipos_ocorrencia(client, test_user):
     client.force_login(test_user)
 
-    url = reverse_lazy("ensino:listar_tipos_ocorrencia")
+    url = reverse_lazy("emprestimo:listar_tipos_ocorrencia")
     response = client.get(url)
 
     assert response.status_code == 403
@@ -77,15 +77,13 @@ def test_nao_pode_listar_tipos_ocorrencia(client, test_user):
 def test_criar_tipo_ocorrencia(
     admin_client, tipo_ocorrencia_entity: TipoOcorrenciaEntity
 ):
-    url = reverse_lazy("ensino:criar_tipo_ocorrencia")
+    url = reverse_lazy("emprestimo:criar_tipo_ocorrencia")
     response = admin_client.get(url)
-    assertTemplateUsed(response, "ensino/tipo_ocorrencia/tiposocorrencia_form.html")
+    assertTemplateUsed(response, "emprestimo/tipo_ocorrencia/tipoocorrencia_form.html")
 
     assert response.status_code == 200
 
     form_data = tipo_ocorrencia_entity.to_dict(["timestamps", "id"])
-    form_data["periodo_inicio"] = form_data["periodo_inicio"].strftime("%Y-%m-%d")
-    form_data["periodo_fim"] = form_data["periodo_fim"].strftime("%Y-%m-%d")
 
     response = admin_client.post(url, form_data, follow=True)
 
@@ -94,7 +92,7 @@ def test_criar_tipo_ocorrencia(
         descricao=tipo_ocorrencia_entity.descricao
     ).exists()
     assertContains(response, tipo_ocorrencia_entity.descricao)
-    assertTemplateUsed(response, "ensino/tipo_ocorrencia/tiposocorrencia_list.html")
+    assertTemplateUsed(response, "emprestimo/tipo_ocorrencia/tipoocorrencia_list.html")
 
 
 @pytest.mark.django_db
@@ -103,15 +101,13 @@ def test_nao_pode_criar_tipo_ocorrencia(
 ):
     client.force_login(test_user)
 
-    url = reverse_lazy("ensino:criar_tipo_ocorrencia")
+    url = reverse_lazy("emprestimo:criar_tipo_ocorrencia")
 
     response = client.get(url)
 
     assert response.status_code == 403
 
     form_data = tipo_ocorrencia_entity.to_dict(["timestamps", "id"])
-    form_data["periodo_inicio"] = form_data["periodo_inicio"].strftime("%Y-%m-%d")
-    form_data["periodo_fim"] = form_data["periodo_fim"].strftime("%Y-%m-%d")
 
     response = client.post(url, form_data, follow=True)
 
@@ -119,33 +115,33 @@ def test_nao_pode_criar_tipo_ocorrencia(
     assert not TipoOcorrencia.objects.filter(
         descricao=tipo_ocorrencia_entity.descricao
     ).exists()
-    assertTemplateNotUsed(response, "ensino/tipo_ocorrencia/tiposocorrencia_form.html")
+    assertTemplateNotUsed(
+        response, "emprestimo/tipo_ocorrencia/tipoocorrencia_form.html"
+    )
 
 
 @pytest.mark.django_db
 def test_editar_tipo_ocorrencia(
     admin_client, tipo_ocorrencia_entity: TipoOcorrenciaEntity, tipo_ocorrencia
 ):
-    url = reverse_lazy("ensino:editar_tipo_ocorrencia", args=[tipo_ocorrencia.pk])
+    url = reverse_lazy("emprestimo:editar_tipo_ocorrencia", args=[tipo_ocorrencia.pk])
 
     response = admin_client.get(url)
 
-    assertTemplateUsed(response, "ensino/tipo_ocorrencia/tiposocorrencia_form.html")
+    assertTemplateUsed(response, "emprestimo/tipo_ocorrencia/tipoocorrencia_form.html")
     assert response.status_code == 200
 
     original = tipo_ocorrencia.descricao
     tipo_ocorrencia_entity.id = tipo_ocorrencia.id
-    tipo_ocorrencia_entity.descricao = "Edital Número 01/2020"
+    tipo_ocorrencia_entity.descricao = "Esquecimento"
 
     form_data = tipo_ocorrencia_entity.to_dict(exclude=["timestamps"])
-    form_data["periodo_inicio"] = form_data["periodo_inicio"].strftime("%Y-%m-%d")
-    form_data["periodo_fim"] = form_data["periodo_fim"].strftime("%Y-%m-%d")
 
     response = admin_client.post(url, form_data, follow=True)
     tipo_ocorrencia.refresh_from_db()
     assert tipo_ocorrencia.descricao == tipo_ocorrencia_entity.descricao
     assertContains(response, tipo_ocorrencia_entity.descricao)
-    assertTemplateUsed(response, "ensino/tipo_ocorrencia/tiposocorrencia_list.html")
+    assertTemplateUsed(response, "emprestimo/tipo_ocorrencia/tipoocorrencia_list.html")
 
 
 @pytest.mark.django_db
@@ -153,7 +149,7 @@ def test_nao_pode_editar_tipo_ocorrencia(
     client, test_user, tipo_ocorrencia_entity: TipoOcorrenciaEntity, tipo_ocorrencia
 ):
     client.force_login(test_user)
-    url = reverse_lazy("ensino:editar_tipo_ocorrencia", args=[tipo_ocorrencia.pk])
+    url = reverse_lazy("emprestimo:editar_tipo_ocorrencia", args=[tipo_ocorrencia.pk])
 
     response = client.get(url)
 
@@ -162,21 +158,21 @@ def test_nao_pode_editar_tipo_ocorrencia(
     original = tipo_ocorrencia.descricao
 
     tipo_ocorrencia_entity.id = tipo_ocorrencia.id
-    tipo_ocorrencia_entity.descricao = "Edital Nº XXX/2025"
+    tipo_ocorrencia_entity.descricao = "Esquecimento"
 
     form_data = tipo_ocorrencia_entity.to_dict(exclude=["timestamps"])
-    form_data["periodo_inicio"] = form_data["periodo_inicio"].strftime("%Y-%m-%d")
-    form_data["periodo_fim"] = form_data["periodo_fim"].strftime("%Y-%m-%d")
 
     response = client.post(url, form_data, follow=True)
-    assertTemplateNotUsed(response, "ensino/tipo_ocorrencia/tiposocorrencia_list.html")
+    assertTemplateNotUsed(
+        response, "emprestimo/tipo_ocorrencia/tipoocorrencia_list.html"
+    )
     tipo_ocorrencia.refresh_from_db()
     assert tipo_ocorrencia.descricao == original
 
 
 @pytest.mark.django_db
 def test_remover_tipo_ocorrencia(admin_client, tipo_ocorrencia):
-    url = reverse_lazy("ensino:remover_tipo_ocorrencia", args=[tipo_ocorrencia.pk])
+    url = reverse_lazy("emprestimo:remover_tipo_ocorrencia", args=[tipo_ocorrencia.pk])
 
     response = admin_client.post(url, follow=True)
 
@@ -185,7 +181,7 @@ def test_remover_tipo_ocorrencia(admin_client, tipo_ocorrencia):
     assert response.status_code == 200
     assert tipo_ocorrencia.removido_em is not None
 
-    response = admin_client.get(reverse_lazy("ensino:listar_tipos_ocorrencia"))
+    response = admin_client.get(reverse_lazy("emprestimo:listar_tipos_ocorrencia"))
     assertNotContains(response, tipo_ocorrencia.descricao)
 
 
@@ -193,7 +189,7 @@ def test_remover_tipo_ocorrencia(admin_client, tipo_ocorrencia):
 def test_nao_pode_remover_tipo_ocorrencia(client, test_user, tipo_ocorrencia):
     client.force_login(test_user)
 
-    url = reverse_lazy("ensino:remover_tipo_ocorrencia", args=[tipo_ocorrencia.pk])
+    url = reverse_lazy("emprestimo:remover_tipo_ocorrencia", args=[tipo_ocorrencia.pk])
     response = client.post(url, follow=True)
 
     tipo_ocorrencia.refresh_from_db()
