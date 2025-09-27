@@ -1,6 +1,10 @@
+from django.contrib.auth.models import User
 from django.db import models
 
 from core.models import Timestampable
+from emprestimo.domain.types import EmprestimoEstadoEnum
+from ensino.models import Aluno
+from patrimonio.models import Bem
 
 
 # Create your models here.
@@ -9,3 +13,28 @@ class TipoOcorrencia(Timestampable, models.Model):
 
     def __str__(self) -> str:
         return f"{self.descricao}"
+
+
+class Emprestimo(Timestampable, models.Model):
+    data_emprestimo = models.DateField(auto_now_add=True)
+    data_devolucao_prevista = models.DateField()
+    data_devolucao = models.DateField(null=True, blank=True)
+    devolucao_ciente_por = models.ForeignKey(
+        User,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+    )
+    bem = models.ForeignKey(
+        Bem,
+        on_delete=models.PROTECT,
+    )
+    aluno = models.ForeignKey(
+        Aluno,
+        on_delete=models.PROTECT,
+    )
+    estado = models.CharField(
+        choices=EmprestimoEstadoEnum.choices(),
+        max_length=50,
+    )
+    observacoes = models.TextField(null=True, blank=True)
