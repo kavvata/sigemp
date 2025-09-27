@@ -79,16 +79,16 @@ def test_cadastrar_emprestimo_usecase(emprestimo):
     user = mock.Mock()
     policy.user = user
 
-    repo.buscar_bem.return_value = mock.Mock(estado=1)
-    repo.buscar_emprestimos_ativos_por_aluno.return_value = []
+    repo.buscar_ativo_por_bem.return_value = None
+    repo.buscar_ativos_por_aluno.return_value = []
     repo.cadastrar_emprestimo.return_value = emprestimo
     policy.pode_criar.return_value = True
 
     usecase = CadastrarEmprestimoUsecase(repo, policy)
     result = usecase.execute(emprestimo)
 
-    repo.buscar_bem.assert_called_with(emprestimo.bem_id)
-    repo.buscar_emprestimos_ativos_por_aluno.assert_called_with(emprestimo.aluno_id)
+    repo.buscar_ativo_por_bem.assert_called_with(emprestimo.bem_id)
+    repo.buscar_ativos_por_aluno.assert_called_with(emprestimo.aluno_id)
     repo.cadastrar_emprestimo.assert_called_with(emprestimo, user)
 
     assert isinstance(result, ResultSuccess)
@@ -100,15 +100,19 @@ def test_nao_pode_cadastrar_emprestimo_usecase(emprestimo):
     policy = mock.Mock()
     user = mock.Mock()
     policy.user = user
-    policy.pode_criar.return_value = True
 
-    repo.buscar_bem.return_value = mock.Mock(estado=2)
-    repo.buscar_emprestimos_ativos_por_aluno.return_value = []
+    repo.buscar_ativo_por_bem.return_value = None
+    repo.buscar_ativos_por_aluno.return_value = []
+    repo.cadastrar_emprestimo.return_value = emprestimo
+    policy.pode_criar.return_value = False
+
     usecase = CadastrarEmprestimoUsecase(repo, policy)
-
     result = usecase.execute(emprestimo)
 
-    repo.buscar_bem.assert_called_with(emprestimo.bem_id)
+    repo.buscar_ativo_por_bem.assert_not_called()
+    repo.buscar_ativos_por_aluno.assert_not_called()
+    repo.cadastrar_emprestimo.assert_not_called()
+
     assert isinstance(result, ResultError)
 
 
@@ -119,13 +123,14 @@ def test_nao_pode_cadastrar_emprestimo_quando_aluno_tem_ativo(emprestimo):
     policy.user = user
     policy.pode_criar.return_value = True
 
-    repo.buscar_bem.return_value = mock.Mock(estado=1)
-    repo.buscar_emprestimos_ativos_por_aluno.return_value = [mock.Mock()]
+    repo.buscar_ativo_por_bem.return_value = None
+    repo.buscar_ativos_por_aluno.return_value = [mock.Mock(estado=1)]
     usecase = CadastrarEmprestimoUsecase(repo, policy)
 
     result = usecase.execute(emprestimo)
 
-    repo.buscar_emprestimos_ativos_por_aluno.assert_called_with(emprestimo.aluno_id)
+    repo.buscar_ativo_por_bem.assert_called_with(emprestimo.bem_id)
+    repo.buscar_ativos_por_aluno.assert_called_with(emprestimo.aluno_id)
     assert isinstance(result, ResultError)
 
 
@@ -145,7 +150,7 @@ def test_registrar_devolucao_emprestimo_usecase():
     policy.user = user
     policy.pode_editar.return_value = True
 
-    def registrar_devolucao_mock(e):
+    def registrar_devolucao_mock(e, _user):
         e.data_devolucao = date.today()
         e.estado = 2
         return e
@@ -154,6 +159,8 @@ def test_registrar_devolucao_emprestimo_usecase():
 
     usecase = RegistrarDevolucaoEmprestimoUsecase(repo, policy)
     result = usecase.execute(emprestimo)
+
+    print(result)
 
     repo.registrar_devolucao.assert_called_with(emprestimo, user)
     assert isinstance(result, ResultSuccess)
@@ -239,7 +246,7 @@ def test_remover_emprestimo_usecase(emprestimo):
     result = usecase.execute(emprestimo.id)
 
     repo.buscar_por_id.assert_called_with(emprestimo.id)
-    repo.remover_emprestimo.assert_called_with(emprestimo, user)
+    repo.remover_emprestimo.assert_called_with(emprestimo.id, user)
 
     assert isinstance(result, ResultSuccess)
 
