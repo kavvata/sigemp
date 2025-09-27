@@ -1,4 +1,5 @@
 from unittest import mock
+from datetime import date
 import pytest
 
 from core.types import ResultError, ResultSuccess
@@ -8,6 +9,9 @@ from emprestimo.usecases import (
     CadastrarEmprestimoUsecase,
     EditarEmprestimoUsecase,
     RemoverEmprestimoUsecase,
+    GerarTermoResponsabilidadeUsecase,
+    GerarTermoDevolucaoUsecase,
+    RegistrarDevolucaoEmprestimoUsecase,
 )
 
 
@@ -75,7 +79,7 @@ def test_cadastrar_emprestimo_usecase(emprestimo):
     user = mock.Mock()
     policy.user = user
 
-    repo.buscar_bem.return_value = mock.Mock(estado="Disponível")
+    repo.buscar_bem.return_value = mock.Mock(estado=1)
     repo.buscar_emprestimos_ativos_por_aluno.return_value = []
     repo.cadastrar_emprestimo.return_value = emprestimo
     policy.pode_criar.return_value = True
@@ -98,7 +102,7 @@ def test_nao_pode_cadastrar_emprestimo_usecase(emprestimo):
     policy.user = user
     policy.pode_criar.return_value = True
 
-    repo.buscar_bem.return_value = mock.Mock(estado="Emprestado")
+    repo.buscar_bem.return_value = mock.Mock(estado=2)
     repo.buscar_emprestimos_ativos_por_aluno.return_value = []
     usecase = CadastrarEmprestimoUsecase(repo, policy)
 
@@ -115,13 +119,78 @@ def test_nao_pode_cadastrar_emprestimo_quando_aluno_tem_ativo(emprestimo):
     policy.user = user
     policy.pode_criar.return_value = True
 
-    repo.buscar_bem.return_value = mock.Mock(estado="Disponível")
+    repo.buscar_bem.return_value = mock.Mock(estado=1)
     repo.buscar_emprestimos_ativos_por_aluno.return_value = [mock.Mock()]
     usecase = CadastrarEmprestimoUsecase(repo, policy)
 
     result = usecase.execute(emprestimo)
 
     repo.buscar_emprestimos_ativos_por_aluno.assert_called_with(emprestimo.aluno_id)
+    assert isinstance(result, ResultError)
+
+
+def test_registrar_devolucao_emprestimo_usecase():
+    emprestimo = EmprestimoEntity(
+        data_emprestimo=date(2025, 9, 1),
+        data_devolucao_prevista=date(2025, 9, 15),
+        data_devolucao=None,
+        estado=1,
+        bem_id=1,
+        aluno_id=1,
+    )
+
+    repo = mock.Mock()
+    policy = mock.Mock()
+    user = mock.Mock()
+    policy.user = user
+    policy.pode_editar.return_value = True
+
+    def registrar_devolucao_mock(e):
+        e.data_devolucao = date.today()
+        e.estado = 2
+        return e
+
+    repo.registrar_devolucao.side_effect = registrar_devolucao_mock
+
+    usecase = RegistrarDevolucaoEmprestimoUsecase(repo, policy)
+    result = usecase.execute(emprestimo)
+
+    repo.registrar_devolucao.assert_called_with(emprestimo, user)
+    assert isinstance(result, ResultSuccess)
+    assert result.value.data_devolucao is not None
+    assert result.value.estado == 2
+
+
+def test_nao_pode_registrar_devolucao_emprestimo_ja_devolvido_usecase():
+    emprestimo = EmprestimoEntity(
+        data_emprestimo=date(2025, 9, 1),
+        data_devolucao_prevista=date(2025, 9, 15),
+        data_devolucao=date(2025, 9, 10),
+        estado=2,
+        bem_id=1,
+        aluno_id=1,
+    )
+
+    repo = mock.Mock()
+    policy = mock.Mock()
+    user = mock.Mock()
+    policy.user = user
+    policy.pode_editar.return_value = True
+
+    # Registrar devolução deve retornar um erro se já devolvido
+    def registrar_devolucao_mock(e):
+        if e.data_devolucao is not None:
+            raise ValueError("Empréstimo já devolvido")
+        e.data_devolucao = date.today()
+        e.estado = 2
+        return e
+
+    repo.registrar_devolucao.side_effect = registrar_devolucao_mock
+
+    usecase = RegistrarDevolucaoEmprestimoUsecase(repo, policy)
+    result = usecase.execute(emprestimo)
+
+    repo.registrar_devolucao.assert_called_with(emprestimo, user)
     assert isinstance(result, ResultError)
 
 
@@ -185,3 +254,101 @@ def test_nao_pode_remover_emprestimo_usecase(emprestimo):
 
     policy.pode_remover.assert_called()
     assert isinstance(result, ResultError)
+
+
+def test_gerar_termo_responsabilidade_usecase_sucesso(emprestimo):
+    repo = mock.Mock()
+    policy = mock.Mock()
+    user = mock.Mock()
+    policy.user = user
+    policy.pode_gerar_termos.return_value = True
+
+    repo.gerar_termo_responsabilidade.return_value = "Termo de responsabilidade em pdf"
+
+    usecase = GerarTermoResponsabilidadeUsecase(repo, policy)
+    result = usecase.execute(emprestimo)
+
+    repo.gerar_termo_responsabilidade.assert_called_with(emprestimo, user)
+    policy.pode_gerar_termos.assert_called()
+    assert isinstance(result, ResultSuccess)
+    assert result.value == "Termo de responsabilidade em pdf"
+
+
+def test_gerar_termo_responsabilidade_usecase_sem_permissao(emprestimo):
+    repo = mock.Mock()
+    policy = mock.Mock()
+    user = mock.Mock()
+    policy.user = user
+    policy.pode_gerar_termos.return_value = False
+
+    usecase = GerarTermoResponsabilidadeUsecase(repo, policy)
+    result = usecase.execute(emprestimo)
+
+    policy.pode_gerar_termos.assert_called()
+    assert isinstance(result, ResultError)
+
+
+def test_gerar_termo_responsabilidade_usecase_erro_repo(emprestimo):
+    repo = mock.Mock()
+    policy = mock.Mock()
+    user = mock.Mock()
+    policy.user = user
+    policy.pode_gerar_termos.return_value = True
+
+    repo.gerar_termo_responsabilidade.side_effect = Exception("Falha no PDF")
+
+    usecase = GerarTermoResponsabilidadeUsecase(repo, policy)
+    result = usecase.execute(emprestimo)
+
+    repo.gerar_termo_responsabilidade.assert_called_with(emprestimo, user)
+    assert isinstance(result, ResultError)
+    assert "Falha no PDF" in str(result.value)
+
+
+def test_gerar_termo_devolucao_usecase_sucesso(emprestimo):
+    repo = mock.Mock()
+    policy = mock.Mock()
+    user = mock.Mock()
+    policy.user = user
+    policy.pode_gerar_termos.return_value = True
+
+    repo.gerar_termo_devolucao.return_value = "Termo de devolucao em pdf"
+
+    usecase = GerarTermoDevolucaoUsecase(repo, policy)
+    result = usecase.execute(emprestimo)
+
+    repo.gerar_termo_devolucao.assert_called_with(emprestimo, user)
+    policy.pode_gerar_termos.assert_called()
+    assert isinstance(result, ResultSuccess)
+    assert result.value == "Termo de devolucao em pdf"
+
+
+def test_gerar_termo_devolucao_usecase_sem_permissao(emprestimo):
+    repo = mock.Mock()
+    policy = mock.Mock()
+    user = mock.Mock()
+    policy.user = user
+    policy.pode_gerar_termos.return_value = False
+
+    usecase = GerarTermoDevolucaoUsecase(repo, policy)
+    result = usecase.execute(emprestimo)
+
+    policy.pode_gerar_termos.assert_called()
+    assert isinstance(result, ResultError)
+
+
+def test_gerar_termo_devolucao_usecase_erro_repo(emprestimo):
+    repo = mock.Mock()
+    policy = mock.Mock()
+    user = mock.Mock()
+    policy.user = user
+    policy.pode_gerar_termos.return_value = True
+
+    repo.gerar_termo_devolucao.side_effect = Exception("Falha no PDF")
+
+    usecase = GerarTermoDevolucaoUsecase(repo, policy)
+    result = usecase.execute(emprestimo)
+
+    repo.gerar_termo_devolucao.assert_called_with(emprestimo, user)
+    assert isinstance(result, ResultError)
+    assert "Falha no PDF" in str(result.value)
