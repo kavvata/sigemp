@@ -1,3 +1,4 @@
+from io import BytesIO
 from unittest import mock
 from datetime import date
 import pytest
@@ -5,6 +6,7 @@ import pytest
 from core.types import ResultError, ResultSuccess
 from emprestimo.domain.entities import EmprestimoEntity
 from emprestimo.domain.types import EmprestimoEstadoEnum
+from emprestimo.services.contracts import PDFService
 from emprestimo.usecases import (
     ListarEmprestimosUsecase,
     CadastrarEmprestimoUsecase,
@@ -14,6 +16,23 @@ from emprestimo.usecases import (
     GerarTermoDevolucaoUsecase,
     RegistrarDevolucaoEmprestimoUsecase,
 )
+
+
+@pytest.fixture
+def mock_pdf_service():
+    return mock.Mock(spec=PDFService)
+
+
+@pytest.fixture
+def mock_emprestimo_repo():
+    return mock.Mock()
+
+
+@pytest.fixture
+def mock_policy():
+    policy = mock.Mock()
+    policy.user = mock.Mock()
+    return policy
 
 
 @pytest.fixture
@@ -266,120 +285,156 @@ def test_nao_pode_remover_emprestimo_usecase(emprestimo):
     assert isinstance(result, ResultError)
 
 
-def test_gerar_termo_responsabilidade_usecase_sucesso(emprestimo):
-    repo = mock.Mock()
-    policy = mock.Mock()
-    user = mock.Mock()
-    policy.user = user
-    policy.pode_gerar_termos.return_value = True
+def test_gerar_termo_responsabilidade_usecase_sucesso(
+    emprestimo, mock_emprestimo_repo, mock_policy, mock_pdf_service
+):
+    mock_policy.pode_gerar_termos.return_value = True
 
-    repo.gerar_termo_responsabilidade.return_value = "Termo de responsabilidade em pdf"
+    pdf_content = BytesIO(b"termo de responsabilidade")
+    mock_pdf_service.gerar_termo_responsabilidade.return_value = pdf_content
 
-    usecase = GerarTermoResponsabilidadeUsecase(repo, policy)
+    usecase = GerarTermoResponsabilidadeUsecase(
+        mock_emprestimo_repo, mock_policy, mock_pdf_service
+    )
     result = usecase.execute(emprestimo)
 
-    repo.gerar_termo_responsabilidade.assert_called_with(emprestimo, user)
-    policy.pode_gerar_termos.assert_called()
+    mock_policy.pode_gerar_termos.assert_called_once()
+    mock_pdf_service.gerar_termo_responsabilidade.assert_called_once_with(
+        emprestimo, mock_policy.user
+    )
     assert isinstance(result, ResultSuccess)
-    assert result.value == "Termo de responsabilidade em pdf"
+    assert result.value == pdf_content
 
 
-def test_gerar_termo_responsabilidade_usecase_sem_permissao(emprestimo):
-    repo = mock.Mock()
-    policy = mock.Mock()
-    user = mock.Mock()
-    policy.user = user
-    policy.pode_gerar_termos.return_value = False
+def test_gerar_termo_responsabilidade_usecase_sem_permissao(
+    emprestimo, mock_emprestimo_repo, mock_policy, mock_pdf_service
+):
+    mock_policy.pode_gerar_termos.return_value = False
 
-    usecase = GerarTermoResponsabilidadeUsecase(repo, policy)
+    usecase = GerarTermoResponsabilidadeUsecase(
+        mock_emprestimo_repo, mock_policy, mock_pdf_service
+    )
     result = usecase.execute(emprestimo)
 
-    policy.pode_gerar_termos.assert_called()
+    mock_policy.pode_gerar_termos.assert_called_once()
+    mock_pdf_service.gerar_termo_responsabilidade.assert_not_called()
     assert isinstance(result, ResultError)
 
 
 def test_nao_pode_gerar_termo_responsabilidade_emprestimo_finalizado(
-    emprestimo: EmprestimoEntity,
+    emprestimo, mock_emprestimo_repo, mock_policy, mock_pdf_service
 ):
-    repo = mock.Mock()
-    policy = mock.Mock()
-    user = mock.Mock()
-    policy.user = user
-    policy.pode_gerar_termos.return_value = True
+    mock_policy.pode_gerar_termos.return_value = True
+    emprestimo_finalizado: EmprestimoEntity = emprestimo
+    emprestimo_finalizado.data_devolucao = date(2025, 9, 25)
+    emprestimo_finalizado.estado = EmprestimoEstadoEnum.FINALIZADO
+
+    usecase = GerarTermoResponsabilidadeUsecase(
+        mock_emprestimo_repo, mock_policy, mock_pdf_service
+    )
+    result = usecase.execute(emprestimo_finalizado)
+
+    mock_policy.pode_gerar_termos.assert_called_once()
+    mock_pdf_service.gerar_termo_responsabilidade.assert_not_called()
+    assert isinstance(result, ResultError)
+
+
+def test_gerar_termo_responsabilidade_usecase_erro_pdf_service(
+    emprestimo, mock_emprestimo_repo, mock_policy, mock_pdf_service
+):
+    mock_policy.pode_gerar_termos.return_value = True
+    mock_pdf_service.gerar_termo_responsabilidade.side_effect = Exception(
+        "Erro ao gerar PDF"
+    )
+
+    usecase = GerarTermoResponsabilidadeUsecase(
+        mock_emprestimo_repo, mock_policy, mock_pdf_service
+    )
+    result = usecase.execute(emprestimo)
+
+    mock_policy.pode_gerar_termos.assert_called_once()
+    mock_pdf_service.gerar_termo_responsabilidade.assert_called_once_with(
+        emprestimo, mock_policy.user
+    )
+    assert isinstance(result, ResultError)
+    assert "Erro ao gerar PDF" in result.mensagem
+
+
+def test_gerar_termo_devolucao_usecase_sucesso(
+    emprestimo: EmprestimoEntity, mock_emprestimo_repo, mock_policy, mock_pdf_service
+):
+    mock_policy.pode_gerar_termos.return_value = True
 
     emprestimo.estado = EmprestimoEstadoEnum.FINALIZADO
+    emprestimo.data_devolucao = date(2025, 9, 25)
 
-    repo.gerar_termo_responsabilidade.return_value = "Termo de responsabilidade em pdf"
+    pdf_content = BytesIO(b"Termo de devolucao")
+    mock_pdf_service.gerar_termo_devolucao.return_value = pdf_content
 
-    usecase = GerarTermoResponsabilidadeUsecase(repo, policy)
+    usecase = GerarTermoDevolucaoUsecase(
+        mock_emprestimo_repo, mock_policy, mock_pdf_service
+    )
     result = usecase.execute(emprestimo)
 
-    policy.pode_gerar_termos.assert_called()
-    repo.gerar_termo_responsabilidade.assert_not_called()
-    assert isinstance(result, ResultError)
-
-
-def test_gerar_termo_responsabilidade_usecase_erro_repo(emprestimo):
-    repo = mock.Mock()
-    policy = mock.Mock()
-    user = mock.Mock()
-    policy.user = user
-    policy.pode_gerar_termos.return_value = True
-
-    repo.gerar_termo_responsabilidade.side_effect = Exception("Erro ao gerar PDF")
-
-    usecase = GerarTermoResponsabilidadeUsecase(repo, policy)
-    result = usecase.execute(emprestimo)
-
-    repo.gerar_termo_responsabilidade.assert_called_with(emprestimo, user)
-    assert isinstance(result, ResultError)
-    assert "Erro ao gerar PDF" in str(result.mensagem)
-
-
-def test_gerar_termo_devolucao_usecase_sucesso(emprestimo):
-    repo = mock.Mock()
-    policy = mock.Mock()
-    user = mock.Mock()
-    policy.user = user
-    policy.pode_gerar_termos.return_value = True
-
-    repo.gerar_termo_devolucao.return_value = "Termo de devolucao em pdf"
-
-    usecase = GerarTermoDevolucaoUsecase(repo, policy)
-    result = usecase.execute(emprestimo)
-
-    repo.gerar_termo_devolucao.assert_called_with(emprestimo, user)
-    policy.pode_gerar_termos.assert_called()
+    mock_policy.pode_gerar_termos.assert_called_once()
+    mock_pdf_service.gerar_termo_devolucao.assert_called_once_with(
+        emprestimo, mock_policy.user
+    )
     assert isinstance(result, ResultSuccess)
-    assert result.value == "Termo de devolucao em pdf"
+    assert result.value == pdf_content
 
 
-def test_gerar_termo_devolucao_usecase_sem_permissao(emprestimo):
-    repo = mock.Mock()
-    policy = mock.Mock()
-    user = mock.Mock()
-    policy.user = user
-    policy.pode_gerar_termos.return_value = False
+def test_gerar_termo_devolucao_usecase_sem_permissao(
+    emprestimo, mock_emprestimo_repo, mock_policy, mock_pdf_service
+):
+    mock_policy.pode_gerar_termos.return_value = False
 
-    usecase = GerarTermoDevolucaoUsecase(repo, policy)
+    usecase = GerarTermoDevolucaoUsecase(
+        mock_emprestimo_repo, mock_policy, mock_pdf_service
+    )
     result = usecase.execute(emprestimo)
 
-    policy.pode_gerar_termos.assert_called()
+    mock_policy.pode_gerar_termos.assert_called_once()
+    mock_pdf_service.gerar_termo_devolucao.assert_not_called()
     assert isinstance(result, ResultError)
 
 
-def test_gerar_termo_devolucao_usecase_erro_repo(emprestimo):
-    repo = mock.Mock()
-    policy = mock.Mock()
-    user = mock.Mock()
-    policy.user = user
-    policy.pode_gerar_termos.return_value = True
+def test_gerar_termo_devolucao_usecase_erro_pdf_service(
+    emprestimo, mock_emprestimo_repo, mock_policy, mock_pdf_service
+):
+    mock_policy.pode_gerar_termos.return_value = True
+    mock_pdf_service.gerar_termo_devolucao.side_effect = Exception(
+        "Erro ao gerar PDF de devolução"
+    )
 
-    repo.gerar_termo_devolucao.side_effect = Exception("Erro ao gerar PDF")
+    emprestimo.estado = EmprestimoEstadoEnum.FINALIZADO
+    emprestimo.data_devolucao = date(2025, 9, 25)
 
-    usecase = GerarTermoDevolucaoUsecase(repo, policy)
+    usecase = GerarTermoDevolucaoUsecase(
+        mock_emprestimo_repo, mock_policy, mock_pdf_service
+    )
     result = usecase.execute(emprestimo)
 
-    repo.gerar_termo_devolucao.assert_called_with(emprestimo, user)
+    mock_policy.pode_gerar_termos.assert_called_once()
+    mock_pdf_service.gerar_termo_devolucao.assert_called_once_with(
+        emprestimo, mock_policy.user
+    )
     assert isinstance(result, ResultError)
-    assert "Erro ao gerar PDF" in str(result.mensagem)
+    assert "Erro ao gerar PDF" in result.mensagem
+
+
+def test_gerar_termo_devolucao_requer_emprestimo_finalizado(
+    emprestimo, mock_emprestimo_repo, mock_policy, mock_pdf_service
+):
+    mock_policy.pode_gerar_termos.return_value = True
+    emprestimo_nao_finalizado = emprestimo
+    emprestimo_nao_finalizado.data_devolucao = None
+
+    usecase = GerarTermoDevolucaoUsecase(
+        mock_emprestimo_repo, mock_policy, mock_pdf_service
+    )
+    result = usecase.execute(emprestimo_nao_finalizado)
+
+    mock_policy.pode_gerar_termos.assert_called_once()
+    mock_pdf_service.gerar_termo_devolucao.assert_not_called()
+    assert isinstance(result, ResultError)
