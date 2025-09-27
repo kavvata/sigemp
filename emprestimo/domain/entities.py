@@ -22,3 +22,4 @@ class EmprestimoEntity(TimeStampableEntity):
     aluno_id: Optional[int] = None
     estado: EmprestimoEstadoEnum
     id: Optional[int] = None
+    observacoes: str = ""
