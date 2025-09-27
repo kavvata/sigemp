@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, Optional
 
 from emprestimo.domain.entities import TipoOcorrenciaEntity, EmprestimoEntity
 
@@ -38,21 +38,39 @@ class EmprestimoRepository(ABC):
         pass
 
     @abstractmethod
-    def cadastrar_emprestimo(self, emprestimo: EmprestimoEntity, user: Any):
+    def buscar_ativo_por_bem(self, bem_id: int) -> Optional[EmprestimoEntity]:
         pass
 
     @abstractmethod
-    def editar_emprestimo(self, emprestimo: EmprestimoEntity, user: Any):
+    def buscar_ativos_por_aluno(
+        self, aluno_id: int
+    ) -> Optional[list[EmprestimoEntity]]:
         pass
 
     @abstractmethod
-    def remover_emprestimo(self, id: int, user: Any):
+    def cadastrar_emprestimo(
+        self, emprestimo: EmprestimoEntity, user: Any
+    ) -> Optional[EmprestimoEntity]:
         pass
 
     @abstractmethod
-    def gerar_termo_responsabilidade(self, emprestimo: EmprestimoEntity, user: Any):
+    def editar_emprestimo(
+        self, emprestimo: EmprestimoEntity, user: Any
+    ) -> Optional[EmprestimoEntity]:
         pass
 
     @abstractmethod
-    def gerar_termo_devolucao(self, emprestimo: EmprestimoEntity, user: Any):
+    def remover_emprestimo(self, id: int, user: Any) -> Optional[EmprestimoEntity]:
+        pass
+
+    @abstractmethod
+    def gerar_termo_responsabilidade(
+        self, emprestimo: EmprestimoEntity, user: Any
+    ) -> Optional[Any]:
+        pass
+
+    @abstractmethod
+    def gerar_termo_devolucao(
+        self, emprestimo: EmprestimoEntity, user: Any
+    ) -> Optional[Any]:
         pass
