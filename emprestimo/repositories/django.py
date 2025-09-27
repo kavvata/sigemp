@@ -1,10 +1,13 @@
 from django.utils import timezone
 
 from typing import Any
-from emprestimo.domain.entities import TipoOcorrenciaEntity
-from emprestimo.infrastructure.mappers import TipoOcorrenciaMapper
-from emprestimo.repositories.contracts import TipoOcorrenciaRepository
-from emprestimo.models import TipoOcorrencia
+from emprestimo.domain.entities import TipoOcorrenciaEntity, EmprestimoEntity
+from emprestimo.infrastructure.mappers import TipoOcorrenciaMapper, EmprestimoMapper
+from emprestimo.repositories.contracts import (
+    TipoOcorrenciaRepository,
+    EmprestimoRepository,
+)
+from emprestimo.models import TipoOcorrencia, Emprestimo
 
 
 class DjangoTipoOcorrenciaRepository(TipoOcorrenciaRepository):
@@ -60,3 +63,52 @@ class DjangoTipoOcorrenciaRepository(TipoOcorrenciaRepository):
         tipo_ocorrencia.alterado_por = user
         tipo_ocorrencia.save()
         return TipoOcorrenciaMapper.from_model(tipo_ocorrencia)
+
+
+class DjangoEmprestimoRepository(EmprestimoRepository):
+    def listar_emprestimos(self):
+        return [
+            EmprestimoMapper.from_model(emprestimo)
+            for emprestimo in Emprestimo.objects.filter(
+                removido_em__isnull=True
+            ).order_by("-data_emprestimo")
+        ]
+
+    def buscar_por_id(self, id: int):
+        try:
+            emprestimo = Emprestimo.objects.get(pk=id, removido_em__isnull=True)
+        except TipoOcorrencia.DoesNotExist as e:
+            e.add_note(f"Emprestimo com id '{id}' não encontrado.")
+            raise e
+        else:
+            return EmprestimoMapper.from_model(emprestimo)
+
+    def cadastrar_emprestimo(self, emprestimo: EmprestimoEntity, user: Any):
+        return EmprestimoMapper.from_model(
+            Emprestimo.objects.create(
+                **emprestimo.to_dict(["timestamps", "id"]),
+            )
+        )
+
+    def editar_emprestimo(self, emprestimo: EmprestimoEntity, user: Any):
+        try:
+            Emprestimo.objects.filter(pk=emprestimo.id).update(
+                **emprestimo.to_dict(["timestamps", "id"]), alterado_por=user
+            )
+        except Emprestimo.DoesNotExist as e:
+            e.add_note(f"Emprestimo com id '{emprestimo.id}' não encontrado.")
+            raise e
+
+        return EmprestimoEntity.from_model(Emprestimo.objects.get(pk=emprestimo.id))
+
+    def remover_emprestimo(self, id: int, user: Any):
+        try:
+            emprestimo = Emprestimo.objects.get(pk=id)
+        except Emprestimo.DoesNotExist as e:
+            e.add_note(f"Emprestimo com id '{id}' não encontrado.")
+            raise e
+
+        emprestimo.removido_em = timezone.now()
+        emprestimo.alterado_por = user
+        emprestimo.save()
+        return TipoOcorrenciaMapper.from_model(emprestimo)
