@@ -62,15 +62,3 @@ class EmprestimoRepository(ABC):
     @abstractmethod
     def remover_emprestimo(self, id: int, user: Any) -> Optional[EmprestimoEntity]:
         pass
-
-    @abstractmethod
-    def gerar_termo_responsabilidade(
-        self, emprestimo: EmprestimoEntity, user: Any
-    ) -> Optional[Any]:
-        pass
-
-    @abstractmethod
-    def gerar_termo_devolucao(
-        self, emprestimo: EmprestimoEntity, user: Any
-    ) -> Optional[Any]:
-        pass

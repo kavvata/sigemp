@@ -1,16 +1,21 @@
 from abc import ABC, abstractmethod
 from io import BytesIO
+from typing import Any
+
+from emprestimo.domain.entities import EmprestimoEntity
 
 
 class PDFService(ABC):
     @abstractmethod
-    def generate_pdf_from_template(self, template_path: str, context: dict) -> BytesIO:
+    def gerar_pdf_de_template(self, template_path: str, context: dict) -> BytesIO:
         pass
 
     @abstractmethod
-    def generate_termo_responsabilidade(self, emprestimo_id: int) -> BytesIO:
+    def gerar_termo_responsabilidade(
+        self, emprestimo: EmprestimoEntity, user: Any
+    ) -> BytesIO:
         pass
 
     @abstractmethod
-    def generate_termo_devolucao(self, emprestimo_id: int) -> BytesIO:
+    def gerar_termo_devolucao(self, emprestimo: EmprestimoEntity, user: Any) -> BytesIO:
         pass

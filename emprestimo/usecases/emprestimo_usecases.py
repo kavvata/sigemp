@@ -4,6 +4,7 @@ from emprestimo.domain.entities import EmprestimoEntity
 from emprestimo.domain.types import EmprestimoEstadoEnum
 from emprestimo.policies.contracts import EmprestimoPolicy
 from emprestimo.repositories.contracts import EmprestimoRepository
+from emprestimo.services.contracts import PDFService
 
 
 class ListarEmprestimosUsecase:
@@ -150,9 +151,15 @@ class RemoverEmprestimoUsecase:
 
 
 class GerarTermoResponsabilidadeUsecase:
-    def __init__(self, repo: EmprestimoRepository, policy: EmprestimoPolicy) -> None:
+    def __init__(
+        self,
+        repo: EmprestimoRepository,
+        policy: EmprestimoPolicy,
+        service: PDFService,
+    ) -> None:
         self.repo = repo
         self.policy = policy
+        self.service = service
 
     def execute(self, emprestimo: EmprestimoEntity):
         if not self.policy.pode_gerar_termos(emprestimo):
@@ -164,7 +171,7 @@ class GerarTermoResponsabilidadeUsecase:
         ):
             return ResultError("Empréstimo já finalizado")
         try:
-            resposta = self.repo.gerar_termo_responsabilidade(
+            resposta = self.service.gerar_termo_responsabilidade(
                 emprestimo, self.policy.user
             )
         except Exception as e:
@@ -174,21 +181,27 @@ class GerarTermoResponsabilidadeUsecase:
 
 
 class GerarTermoDevolucaoUsecase:
-    def __init__(self, repo: EmprestimoRepository, policy: EmprestimoPolicy) -> None:
+    def __init__(
+        self,
+        repo: EmprestimoRepository,
+        policy: EmprestimoPolicy,
+        service: PDFService,
+    ) -> None:
         self.repo = repo
         self.policy = policy
+        self.service = service
 
     def execute(self, emprestimo: EmprestimoEntity):
         if not self.policy.pode_gerar_termos(emprestimo):
             return ResultError("Você não tem permissão para gerar termos.")
 
         if (
-            emprestimo.estado != EmprestimoEstadoEnum.ATIVO
-            or emprestimo.data_devolucao is not None
+            emprestimo.estado != EmprestimoEstadoEnum.FINALIZADO
+            or emprestimo.data_devolucao is None
         ):
-            return ResultError("Empréstimo já finalizado.")
+            return ResultError("Empréstimo não finalizado.")
         try:
-            resposta = self.repo.gerar_termo_devolucao(emprestimo, self.policy.user)
+            resposta = self.service.gerar_termo_devolucao(emprestimo, self.policy.user)
         except Exception as e:
             return ResultError(f"Erro ao gerar PDF: {e}")
 
