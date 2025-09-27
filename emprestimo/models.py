@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils import timezone
 
 from core.models import Timestampable
 from emprestimo.domain.types import EmprestimoEstadoEnum
@@ -16,7 +17,7 @@ class TipoOcorrencia(Timestampable, models.Model):
 
 
 class Emprestimo(Timestampable, models.Model):
-    data_emprestimo = models.DateField(auto_now_add=True)
+    data_emprestimo = models.DateField()
     data_devolucao_prevista = models.DateField()
     data_devolucao = models.DateField(null=True, blank=True)
     devolucao_ciente_por = models.ForeignKey(
