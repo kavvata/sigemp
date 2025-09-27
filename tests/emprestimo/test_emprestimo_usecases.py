@@ -4,6 +4,7 @@ import pytest
 
 from core.types import ResultError, ResultSuccess
 from emprestimo.domain.entities import EmprestimoEntity
+from emprestimo.domain.types import EmprestimoEstadoEnum
 from emprestimo.usecases import (
     ListarEmprestimosUsecase,
     CadastrarEmprestimoUsecase,
@@ -22,7 +23,7 @@ def emprestimo():
         data_emprestimo="2025-09-01",
         data_devolucao_prevista="2025-09-15",
         data_devolucao=None,
-        estado=1,
+        estado=EmprestimoEstadoEnum.ATIVO,
         bem_id=1,
         aluno_id=1,
     )
@@ -36,7 +37,7 @@ def lista_emprestimos_em_andamento():
             data_emprestimo="2025-09-01",
             data_devolucao_prevista="2025-09-15",
             data_devolucao=None,
-            estado=1,
+            estado=EmprestimoEstadoEnum.ATIVO,
             bem_id=i,
             aluno_id=1,
         )
@@ -124,7 +125,9 @@ def test_nao_pode_cadastrar_emprestimo_quando_aluno_tem_ativo(emprestimo):
     policy.pode_criar.return_value = True
 
     repo.buscar_ativo_por_bem.return_value = None
-    repo.buscar_ativos_por_aluno.return_value = [mock.Mock(estado=1)]
+    repo.buscar_ativos_por_aluno.return_value = [
+        mock.Mock(estado=EmprestimoEstadoEnum.ATIVO)
+    ]
     usecase = CadastrarEmprestimoUsecase(repo, policy)
 
     result = usecase.execute(emprestimo)
@@ -139,7 +142,7 @@ def test_registrar_devolucao_emprestimo_usecase():
         data_emprestimo=date(2025, 9, 1),
         data_devolucao_prevista=date(2025, 9, 15),
         data_devolucao=None,
-        estado=1,
+        estado=EmprestimoEstadoEnum.ATIVO,
         bem_id=1,
         aluno_id=1,
     )
@@ -152,7 +155,7 @@ def test_registrar_devolucao_emprestimo_usecase():
 
     def registrar_devolucao_mock(e, _user):
         e.data_devolucao = date.today()
-        e.estado = 2
+        e.estado = EmprestimoEstadoEnum.FINALIZADO
         return e
 
     repo.registrar_devolucao.side_effect = registrar_devolucao_mock
@@ -165,7 +168,7 @@ def test_registrar_devolucao_emprestimo_usecase():
     repo.registrar_devolucao.assert_called_with(emprestimo, user)
     assert isinstance(result, ResultSuccess)
     assert result.value.data_devolucao is not None
-    assert result.value.estado == 2
+    assert result.value.estado == EmprestimoEstadoEnum.FINALIZADO
 
 
 def test_nao_pode_registrar_devolucao_emprestimo_ja_devolvido_usecase():
@@ -173,7 +176,7 @@ def test_nao_pode_registrar_devolucao_emprestimo_ja_devolvido_usecase():
         data_emprestimo=date(2025, 9, 1),
         data_devolucao_prevista=date(2025, 9, 15),
         data_devolucao=date(2025, 9, 10),
-        estado=2,
+        estado=EmprestimoEstadoEnum.FINALIZADO,
         bem_id=1,
         aluno_id=1,
     )
@@ -189,7 +192,7 @@ def test_nao_pode_registrar_devolucao_emprestimo_ja_devolvido_usecase():
         if e.data_devolucao is not None:
             raise ValueError("Empréstimo já devolvido")
         e.data_devolucao = date.today()
-        e.estado = 2
+        e.estado = EmprestimoEstadoEnum.FINALIZADO
         return e
 
     repo.registrar_devolucao.side_effect = registrar_devolucao_mock
@@ -295,6 +298,27 @@ def test_gerar_termo_responsabilidade_usecase_sem_permissao(emprestimo):
     assert isinstance(result, ResultError)
 
 
+def test_nao_pode_gerar_termo_responsabilidade_emprestimo_finalizado(
+    emprestimo: EmprestimoEntity,
+):
+    repo = mock.Mock()
+    policy = mock.Mock()
+    user = mock.Mock()
+    policy.user = user
+    policy.pode_gerar_termos.return_value = True
+
+    emprestimo.estado = EmprestimoEstadoEnum.FINALIZADO
+
+    repo.gerar_termo_responsabilidade.return_value = "Termo de responsabilidade em pdf"
+
+    usecase = GerarTermoResponsabilidadeUsecase(repo, policy)
+    result = usecase.execute(emprestimo)
+
+    policy.pode_gerar_termos.assert_called()
+    repo.gerar_termo_responsabilidade.assert_not_called()
+    assert isinstance(result, ResultError)
+
+
 def test_gerar_termo_responsabilidade_usecase_erro_repo(emprestimo):
     repo = mock.Mock()
     policy = mock.Mock()
@@ -302,14 +326,14 @@ def test_gerar_termo_responsabilidade_usecase_erro_repo(emprestimo):
     policy.user = user
     policy.pode_gerar_termos.return_value = True
 
-    repo.gerar_termo_responsabilidade.side_effect = Exception("Falha no PDF")
+    repo.gerar_termo_responsabilidade.side_effect = Exception("Erro ao gerar PDF")
 
     usecase = GerarTermoResponsabilidadeUsecase(repo, policy)
     result = usecase.execute(emprestimo)
 
     repo.gerar_termo_responsabilidade.assert_called_with(emprestimo, user)
     assert isinstance(result, ResultError)
-    assert "Falha no PDF" in str(result.value)
+    assert "Erro ao gerar PDF" in str(result.mensagem)
 
 
 def test_gerar_termo_devolucao_usecase_sucesso(emprestimo):
@@ -351,11 +375,11 @@ def test_gerar_termo_devolucao_usecase_erro_repo(emprestimo):
     policy.user = user
     policy.pode_gerar_termos.return_value = True
 
-    repo.gerar_termo_devolucao.side_effect = Exception("Falha no PDF")
+    repo.gerar_termo_devolucao.side_effect = Exception("Erro ao gerar PDF")
 
     usecase = GerarTermoDevolucaoUsecase(repo, policy)
     result = usecase.execute(emprestimo)
 
     repo.gerar_termo_devolucao.assert_called_with(emprestimo, user)
     assert isinstance(result, ResultError)
-    assert "Falha no PDF" in str(result.value)
+    assert "Erro ao gerar PDF" in str(result.mensagem)

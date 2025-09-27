@@ -1,5 +1,7 @@
+from typing import Optional
 from core.types import ResultError, ResultSuccess
 from emprestimo.domain.entities import EmprestimoEntity
+from emprestimo.domain.types import EmprestimoEstadoEnum
 from emprestimo.policies.contracts import EmprestimoPolicy
 from emprestimo.repositories.contracts import EmprestimoRepository
 
@@ -17,7 +19,7 @@ class ListarEmprestimosUsecase:
             return ResultError("Você não tem permissão para listar empréstimo.")
 
         try:
-            resposta = self.repo.listar_tipos_ocorrencia()
+            resposta = self.repo.listar_emprestimos()
             return ResultSuccess(resposta)
         except Exception as e:
             return ResultError(f"Erro ao listar empréstimo: {e}")
@@ -29,15 +31,31 @@ class CadastrarEmprestimoUsecase:
         self.policy = policy
 
     def pode_editar(self):
-        return self.policy.pode_editar()
+        return self.policy.pode_criar()
 
-    def execute(self, emprestimo: EmprestimoEntity):
-        if not self.policy.pode_editar():
+    def execute(self, novo_emprestimo: EmprestimoEntity):
+        if not self.policy.pode_criar():
             return ResultError("Você não tem permissão para cadastrar empréstimo")
 
         try:
+            existente: Optional[EmprestimoEntity] = self.repo.buscar_ativo_por_bem(
+                novo_emprestimo.bem_id
+            )
+            if existente:
+                return ResultError(f"Bem Possui empréstimo ativo: {existente.id}")
+        except Exception as e:
+            return ResultError(f"Erro ao cadastrar empréstimo: {e}")
+
+        try:
+            existentes = self.repo.buscar_ativos_por_aluno(novo_emprestimo.aluno_id)
+            if existentes:
+                return ResultError(f"Aluno Possui empréstimos ativos: {existente.id}")
+        except Exception as e:
+            return ResultError(f"Erro ao cadastrar empréstimo: {e}")
+
+        try:
             resposta = self.repo.cadastrar_emprestimo(
-                emprestimo,
+                novo_emprestimo,
                 self.policy.user,
             )
             return ResultSuccess(resposta)
@@ -51,9 +69,9 @@ class RegistrarDevolucaoEmprestimoUsecase:
         self.policy = policy
 
     def pode_criar(self):
-        return self.policy.pode_criar()
+        return self.policy.pode_editar()
 
-    def execute(self, novo_emprestimo: EmprestimoEntity):
+    def execute(self, emprestimo: EmprestimoEntity):
         if not self.policy.pode_editar():
             return ResultError(
                 "Você não tem permissão para registrar devolução de empréstimo"
@@ -61,7 +79,7 @@ class RegistrarDevolucaoEmprestimoUsecase:
 
         try:
             resposta = self.repo.registrar_devolucao(
-                novo_emprestimo,
+                emprestimo,
                 self.policy.user,
             )
             return ResultSuccess(resposta)
@@ -119,7 +137,7 @@ class RemoverEmprestimoUsecase:
 
         return ResultSuccess(emprestimo)
 
-    def execute(self, id):
+    def execute(self, id: int):
         resultado = self.get_emprestimo(id)
         if not resultado:
             return resultado
@@ -129,3 +147,49 @@ class RemoverEmprestimoUsecase:
             return ResultSuccess(resposta)
         except Exception as e:
             return ResultError(f"Erro ao remover empréstimo: {e}")
+
+
+class GerarTermoResponsabilidadeUsecase:
+    def __init__(self, repo: EmprestimoRepository, policy: EmprestimoPolicy) -> None:
+        self.repo = repo
+        self.policy = policy
+
+    def execute(self, emprestimo: EmprestimoEntity):
+        if not self.policy.pode_gerar_termos(emprestimo):
+            return ResultError("Você não tem permissão para gerar termos.")
+
+        if (
+            emprestimo.estado != EmprestimoEstadoEnum.ATIVO
+            or emprestimo.data_devolucao is not None
+        ):
+            return ResultError("Empréstimo já finalizado")
+        try:
+            resposta = self.repo.gerar_termo_responsabilidade(
+                emprestimo, self.policy.user
+            )
+        except Exception as e:
+            return ResultError(f"Erro ao gerar PDF: {e}")
+
+        return ResultSuccess(resposta)
+
+
+class GerarTermoDevolucaoUsecase:
+    def __init__(self, repo: EmprestimoRepository, policy: EmprestimoPolicy) -> None:
+        self.repo = repo
+        self.policy = policy
+
+    def execute(self, emprestimo: EmprestimoEntity):
+        if not self.policy.pode_gerar_termos(emprestimo):
+            return ResultError("Você não tem permissão para gerar termos.")
+
+        if (
+            emprestimo.estado != EmprestimoEstadoEnum.ATIVO
+            or emprestimo.data_devolucao is not None
+        ):
+            return ResultError("Empréstimo já finalizado.")
+        try:
+            resposta = self.repo.gerar_termo_devolucao(emprestimo, self.policy.user)
+        except Exception as e:
+            return ResultError(f"Erro ao gerar PDF: {e}")
+
+        return ResultSuccess(resposta)

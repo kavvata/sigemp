@@ -3,6 +3,7 @@ from datetime import date
 from typing import Optional
 
 from core.domain.entities import TimeStampableEntity
+from emprestimo.domain.types import EmprestimoEstadoEnum
 
 
 @dataclass(kw_only=True)
@@ -19,5 +20,5 @@ class EmprestimoEntity(TimeStampableEntity):
     devolucao_ciente_por_id: Optional[int] = None
     bem_id: Optional[int] = None
     aluno_id: Optional[int] = None
-    estado: int
+    estado: EmprestimoEstadoEnum
     id: Optional[int] = None
