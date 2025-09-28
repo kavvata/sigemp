@@ -9,6 +9,7 @@ from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from emprestimo.domain.entities import TipoOcorrenciaEntity, EmprestimoEntity
 from emprestimo.domain.types import EmprestimoEstadoEnum
+from emprestimo.infrastructure.services.django import DjangoWeasyPDFService
 from emprestimo.models import TipoOcorrencia, Emprestimo
 from emprestimo.policies.django import (
     DjangoTipoOcorrenciaPolicy,
@@ -29,7 +30,10 @@ from emprestimo.usecases import (
     EditarEmprestimoUsecase,
     RemoverEmprestimoUsecase,
 )
-from emprestimo.usecases.emprestimo_usecases import RegistrarDevolucaoEmprestimoUsecase
+from emprestimo.usecases.emprestimo_usecases import (
+    GerarTermoResponsabilidadeUsecase,
+    RegistrarDevolucaoEmprestimoUsecase,
+)
 
 
 # Create your views here.
@@ -327,3 +331,31 @@ def registrar_devolucao_view(request, pk):
     return redirect(
         reverse_lazy("emprestimo:visualizar_emprestimo", args=[emprestimo.id])
     )
+
+
+def gerar_termo_responsabilidade_view(request, pk):
+    repo = DjangoEmprestimoRepository()
+    policy = DjangoEmprestimoPolicy()
+    service = DjangoWeasyPDFService()
+
+    emprestimo = repo.buscar_por_id(pk)
+    usecase = GerarTermoResponsabilidadeUsecase(repo, policy, service)
+
+    result = usecase.execute(emprestimo)
+
+    if not result:
+        messages.error(request, result.mensagem)
+        return redirect(
+            reverse_lazy("emprestimo:visualizar_emprestimo", args=[emprestimo.id])
+        )
+
+    pdf = result.value
+    response = HttpResponse(pdf.getvalue(), content_type="application/pdf")
+    response["Content-Disposition"] = (
+        f'attachment; filename="termo_responsabilidade_{emprestimo.id}.pdf"'
+    )
+    return response
+
+
+def gerar_termo_devolucao_view(request, pk):
+    raise NotImplementedError

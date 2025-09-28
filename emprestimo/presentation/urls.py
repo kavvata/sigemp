@@ -55,4 +55,14 @@ urlpatterns = [
         views.registrar_devolucao_view,
         name="registrar_devolucao",
     ),
+    path(
+        "emprestimo/gerar_termo_responsabilidade/<int:pk>/",
+        views.gerar_termo_responsabilidade_view,
+        name="gerar_termo_responsabilidade",
+    ),
+    path(
+        "emprestimo/gerar_termo_devolucao/<int:pk>/",
+        views.gerar_termo_devolucao_view,
+        name="gerar_termo_devolucao",
+    ),
 ]
