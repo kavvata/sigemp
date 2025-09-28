@@ -1,5 +1,6 @@
 from django.forms import model_to_dict
 from emprestimo.domain.entities import EmprestimoEntity, TipoOcorrenciaEntity
+from emprestimo.domain.types import EmprestimoEstadoEnum
 from emprestimo.models import Emprestimo, TipoOcorrencia
 
 
@@ -37,5 +38,12 @@ class EmprestimoMapper:
         model_dict["aluno_id"] = model_dict.pop("aluno")
         model_dict["aluno_nome"] = model.aluno.nome
         model_dict["aluno_matricula"] = model.aluno.matricula
+
+        # NOTE: hacky solution
+        model_dict["estado"] = [
+            choice
+            for choice in EmprestimoEstadoEnum.choices()
+            if choice[0] == model_dict.get("estado")
+        ][0]
 
         return EmprestimoEntity(**model_dict)
