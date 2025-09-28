@@ -4,7 +4,7 @@ from emprestimo.domain.entities import EmprestimoEntity
 from emprestimo.domain.types import EmprestimoEstadoEnum
 from emprestimo.policies.contracts import EmprestimoPolicy
 from emprestimo.repositories.contracts import EmprestimoRepository
-from emprestimo.services.contracts import PDFService
+from emprestimo.infrastructure.services.contracts import PDFService
 
 
 class ListarEmprestimosUsecase:
