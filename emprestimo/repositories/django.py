@@ -1,7 +1,8 @@
 from django.utils import timezone
 
-from typing import Any
+from typing import Any, Optional
 from emprestimo.domain.entities import TipoOcorrenciaEntity, EmprestimoEntity
+from emprestimo.domain.types import EmprestimoEstadoEnum
 from emprestimo.infrastructure.mappers import TipoOcorrenciaMapper, EmprestimoMapper
 from emprestimo.repositories.contracts import (
     TipoOcorrenciaRepository,
@@ -82,6 +83,21 @@ class DjangoEmprestimoRepository(EmprestimoRepository):
             raise e
         else:
             return EmprestimoMapper.from_model(emprestimo)
+
+    def buscar_ativo_por_bem(self, bem_id: int) -> Optional[EmprestimoEntity]:
+        return EmprestimoMapper.from_model(
+            Emprestimo.objects.get(bem_id=bem_id, estado=EmprestimoEstadoEnum.ATIVO)
+        )
+
+    def buscar_ativos_por_aluno(
+        self, aluno_id: int
+    ) -> Optional[list[EmprestimoEntity]]:
+        return [
+            EmprestimoMapper.from_model(e)
+            for e in Emprestimo.objects.filter(
+                aluno_id=aluno_id, estado=EmprestimoEstadoEnum.ATIVO
+            )
+        ]
 
     def cadastrar_emprestimo(self, emprestimo: EmprestimoEntity, user: Any):
         return EmprestimoMapper.from_model(
