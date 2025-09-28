@@ -22,17 +22,20 @@ class EmprestimoMapper:
     def from_model(model: Emprestimo):
         model_dict = model_to_dict(model)
 
-        model_dict["devolucao_ciente_por_id"] = model_dict["devolucao_ciente_por"].id
-        del model_dict["devolucao_ciente_por"]
+        if "devolucao_ciente_por" in model_dict.keys():
+            if model_dict["devolucao_ciente_por"] is not None:
+                model_dict["devolucao_ciente_por_id"] = model_dict.pop(
+                    "devolucao_ciente_por"
+                )
 
-        model_dict["bem_id"] = model_dict["bem"].id
-        model_dict["bem_descricao"] = model_dict["bem"].descricao
-        model_dict["bem_patrimonio"] = model_dict["bem"].patrimonio
-        del model_dict["bem"]
+            del model_dict["devolucao_ciente_por"]
 
-        model_dict["aluno_id"] = model_dict["aluno"].id
-        model_dict["aluno_nome"] = model_dict["aluno"].nome
-        model_dict["aluno_matricula"] = model_dict["aluno"].matricula
-        del model_dict["aluno"]
+        model_dict["bem_id"] = model_dict.pop("bem")
+        model_dict["bem_descricao"] = model.bem.descricao
+        model_dict["bem_patrimonio"] = model.bem.patrimonio
 
-        return EmprestimoMapper.from_dict(model_dict)
+        model_dict["aluno_id"] = model_dict.pop("aluno")
+        model_dict["aluno_nome"] = model.aluno.nome
+        model_dict["aluno_matricula"] = model.aluno.matricula
+
+        return EmprestimoEntity(**model_dict)
