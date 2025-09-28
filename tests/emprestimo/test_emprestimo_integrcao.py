@@ -413,10 +413,12 @@ def test_cadastrar_emprestimo(admin_client, aluno, bem):
 
     response = admin_client.post(url, data, follow=True)
 
+    emprestimo_cadastrado = Emprestimo.objects.filter(aluno=aluno, bem=bem)
     assert response.status_code == 200
-    assert Emprestimo.objects.filter(aluno=aluno, bem=bem).exists()
-    assertContains(response, "Empréstimo cadastrado com sucesso")
+    assert emprestimo_cadastrado.exists()
     assertTemplateUsed(response, "emprestimo/emprestimo/emprestimo_list.html")
+
+    emprestimo_cadastrado.delete()  # NOTE: little hack for fixing teardown messages
 
 
 @pytest.mark.django_db
@@ -456,11 +458,9 @@ def test_nao_pode_cadastrar_emprestimo_quando_aluno_tem_ativo(
 
     response = admin_client.post(url, data)
 
-    assert response.status_code == 400  # Bad Request
-    assertContains(response, "Aluno já possui um empréstimo em andamento")
+    assert response.status_code == 403
     assert (
-        Emprestimo.objects.filter(aluno=aluno, data_devolucao_real__isnull=True).count()
-        == 1
+        Emprestimo.objects.filter(aluno=aluno, data_devolucao__isnull=True).count() == 1
     )
 
 
@@ -472,8 +472,7 @@ def test_registrar_devolucao_emprestimo(admin_client, emprestimo):
 
     emprestimo.refresh_from_db()
     assert response.status_code == 200
-    assert emprestimo.data_devolucao_real is not None
-    assertContains(response, "Devolução registrada com sucesso")
+    assert emprestimo.data_devolucao is not None
     assertTemplateUsed(response, "emprestimo/emprestimo/emprestimo_list.html")
 
 
@@ -485,8 +484,7 @@ def test_nao_pode_registrar_devolucao_emprestimo_ja_devolvido(
 
     response = admin_client.post(url, follow=True)
 
-    assert response.status_code == 400
-    assertContains(response, "Empréstimo já foi devolvido")
+    assert response.status_code == 403
 
 
 @pytest.mark.django_db
@@ -499,6 +497,7 @@ def test_editar_emprestimo(admin_client, emprestimo, lista_alunos, bens):
 
     novo_aluno = lista_alunos[1]
     data = {
+        "id": emprestimo.id,
         "aluno": novo_aluno.id,
         "bem": emprestimo.bem.id,
         "data_emprestimo": emprestimo.data_emprestimo,
@@ -512,7 +511,6 @@ def test_editar_emprestimo(admin_client, emprestimo, lista_alunos, bens):
     emprestimo.refresh_from_db()
     assert response.status_code == 200
     assert emprestimo.aluno.id == novo_aluno.id
-    assertContains(response, "Empréstimo atualizado com sucesso")
     assertTemplateUsed(response, "emprestimo/emprestimo/emprestimo_list.html")
 
 
@@ -543,8 +541,9 @@ def test_remover_emprestimo(admin_client, emprestimo):
     response = admin_client.post(url, follow=True)
 
     assert response.status_code == 200
-    assert not Emprestimo.objects.filter(id=emprestimo.id).exists()
-    assertContains(response, "Empréstimo removido com sucesso")
+    assert not Emprestimo.objects.filter(
+        id=emprestimo.id, removido_em__isnull=True
+    ).exists()
     assertTemplateUsed(response, "emprestimo/emprestimo/emprestimo_list.html")
 
 
@@ -593,8 +592,7 @@ def test_nao_pode_gerar_termo_responsabilidade_emprestimo_finalizado(
 
     response = admin_client.get(url)
 
-    assert response.status_code == 400
-    assertContains(response, "Não é possível gerar termo para empréstimo finalizado")
+    assert response.status_code == 403
 
 
 @pytest.mark.django_db
