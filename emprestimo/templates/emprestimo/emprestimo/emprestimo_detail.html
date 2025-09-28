@@ -1,6 +1,13 @@
 {% extends "base.html" %}
 {% load widget_tweaks %}
-{% block page_title %}Detalhes do Empréstimo #{{ emprestimo.id }}{% endblock %}
+{% block page_title %}
+    <div class="flex flex-row gap-2">
+        Detalhes do Empréstimo #{{ emprestimo.id }}
+        <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {% if emprestimo.get_estado_display == 'Ativo' %} bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 {% else %} bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 {% endif %}">
+            {{ emprestimo.get_estado_display }}
+        </span>
+    </div>
+{% endblock %}
 {% block actions %}
     {% if emprestimo.estado == 1 %}
         <a href="#"
@@ -73,14 +80,6 @@
             {% endif %}
         </div>
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div class="space-y-2">
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
-                <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-600 dark:bg-gray-700">
-                    <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {% if emprestimo.get_estado_display == 'Ativo' %} bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 {% else %} bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 {% endif %}">
-                        {{ emprestimo.get_estado_display }}
-                    </span>
-                </div>
-            </div>
             {% if emprestimo.devolucao_ciente_por %}
                 <div class="space-y-2">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Devolução confirmada por</label>
