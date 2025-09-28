@@ -25,7 +25,7 @@ class CriarEmprestimoForm(forms.ModelForm):
         fields = [
             "aluno",
             "bem",
-            "observacoes",
             "data_emprestimo",
             "data_devolucao_prevista",
+            "observacoes",
         ]
