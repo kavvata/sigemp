@@ -465,6 +465,55 @@ def test_nao_pode_cadastrar_emprestimo_quando_aluno_tem_ativo(
     )
 
 
+def test_visualizar_detalhes_emprestimo_ativo(admin_client, emprestimo: Emprestimo):
+    url = reverse_lazy("emprestimo:visualizar_emprestimo", args=[emprestimo.id])
+
+    response = admin_client.get(url)
+
+    assertContains(response, emprestimo.data_emprestimo.strftime("%d/%m/%Y"))
+    assertContains(response, emprestimo.observacoes)
+    assertContains(response, emprestimo.data_devolucao_prevista.strftime("%d/%m/%Y"))
+    assertContains(response, emprestimo.aluno.nome)
+    assertContains(response, emprestimo.aluno.matricula)
+    assertContains(response, emprestimo.bem.descricao)
+    assertContains(response, emprestimo.bem.patrimonio)
+    assertContains(response, emprestimo.estado)
+
+    assertContains(response, "Gerar termo de responsabilidade")
+    assertNotContains(response, "Gerar termo de devolução")
+
+    assertTemplateUsed(response, "emprestimo/emprestimo/emprestimo_detail.html")
+    assert response.status_code == 200
+
+
+def test_visualizar_detalhes_emprestimo_devolvido(
+    admin_client, emprestimo_devolvido: Emprestimo
+):
+    url = reverse_lazy(
+        "emprestimo:visualizar_emprestimo", args=[emprestimo_devolvido.id]
+    )
+
+    response = admin_client.get(url)
+
+    assertContains(response, emprestimo_devolvido.data_emprestimo.strftime("%d/%m/%Y"))
+    assertContains(response, emprestimo_devolvido.observacoes)
+    assertContains(
+        response, emprestimo_devolvido.data_devolucao_prevista.strftime("%d/%m/%Y")
+    )
+    assertContains(response, emprestimo_devolvido.data_devolucao.strftime("%d/%m/%Y"))
+    assertContains(response, emprestimo_devolvido.aluno.nome)
+    assertContains(response, emprestimo_devolvido.aluno.matricula)
+    assertContains(response, emprestimo_devolvido.bem.descricao)
+    assertContains(response, emprestimo_devolvido.bem.patrimonio)
+    assertContains(response, emprestimo_devolvido.estado)
+
+    assertNotContains(response, "Gerar termo de responsabilidade")
+    assertContains(response, "Gerar termo de devolução")
+
+    assertTemplateUsed(response, "emprestimo/emprestimo/emprestimo_detail.html")
+    assert response.status_code == 200
+
+
 @pytest.mark.django_db
 def test_registrar_devolucao_emprestimo(admin_client, emprestimo):
     url = reverse_lazy("emprestimo:registrar_devolucao", args=[emprestimo.id])
