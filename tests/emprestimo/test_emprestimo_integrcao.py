@@ -314,6 +314,10 @@ def emprestimo(aluno, bem):
         data_emprestimo=datetime.now().date(),
         data_devolucao_prevista=datetime.now().date() + timedelta(days=7),
         estado=EmprestimoEstadoEnum.ATIVO,
+        bem_descricao=bem.descricao,
+        bem_patrimonio=bem.patrimonio,
+        aluno_nome=aluno.nome,
+        aluno_matricula=aluno.matricula,
         observacoes="Empréstimo para aula de programação",
     )
     model, _criado = Emprestimo.objects.get_or_create(entity.to_dict())
@@ -329,7 +333,11 @@ def lista_emprestimos_em_andamento(lista_alunos, bens):
         entity = EmprestimoEntity(
             id=i + 1,
             aluno_id=aluno.id,
+            aluno_nome=aluno.nome,
+            aluno_matricula=aluno.matricula,
             bem_id=bem.id,
+            bem_descricao=bem.descricao,
+            bem_patrimonio=bem.patrimonio,
             data_emprestimo=datetime.now().date() - timedelta(days=i),
             data_devolucao_prevista=datetime.now().date() + timedelta(days=7 - i),
             estado=EmprestimoEstadoEnum.ATIVO,
@@ -378,9 +386,7 @@ def test_listar_emprestimos(admin_client, lista_emprestimos_em_andamento):
 
 
 @pytest.mark.django_db
-def test_nao_pode_listar_emprestimos_usecase(
-    client, test_user, lista_emprestimos_em_andamento
-):
+def test_nao_pode_listar_emprestimos(client, test_user, lista_emprestimos_em_andamento):
     client.force_login(test_user)
     url = reverse_lazy("emprestimo:listar_emprestimos")
     response = client.get(url)
@@ -390,7 +396,7 @@ def test_nao_pode_listar_emprestimos_usecase(
 
 
 @pytest.mark.django_db
-def test_cadastrar_emprestimo_usecase(admin_client, aluno, bem):
+def test_cadastrar_emprestimo(admin_client, aluno, bem):
     url = reverse_lazy("emprestimo:criar_emprestimo")
 
     response = admin_client.get(url)
@@ -414,7 +420,7 @@ def test_cadastrar_emprestimo_usecase(admin_client, aluno, bem):
 
 
 @pytest.mark.django_db
-def test_nao_pode_cadastrar_emprestimo_usecase(client, test_user, aluno, bem):
+def test_nao_pode_cadastrar_emprestimo(client, test_user, aluno, bem):
     client.force_login(test_user)
     url = reverse_lazy("emprestimo:criar_emprestimo")
 
@@ -459,7 +465,7 @@ def test_nao_pode_cadastrar_emprestimo_quando_aluno_tem_ativo(
 
 
 @pytest.mark.django_db
-def test_registrar_devolucao_emprestimo_usecase(admin_client, emprestimo):
+def test_registrar_devolucao_emprestimo(admin_client, emprestimo):
     url = reverse_lazy("emprestimo:registrar_devolucao", args=[emprestimo.id])
 
     response = admin_client.post(url, follow=True)
@@ -472,7 +478,7 @@ def test_registrar_devolucao_emprestimo_usecase(admin_client, emprestimo):
 
 
 @pytest.mark.django_db
-def test_nao_pode_registrar_devolucao_emprestimo_ja_devolvido_usecase(
+def test_nao_pode_registrar_devolucao_emprestimo_ja_devolvido(
     admin_client, emprestimo_devolvido
 ):
     url = reverse_lazy("emprestimo:registrar_devolucao", args=[emprestimo_devolvido.id])
@@ -484,7 +490,7 @@ def test_nao_pode_registrar_devolucao_emprestimo_ja_devolvido_usecase(
 
 
 @pytest.mark.django_db
-def test_editar_emprestimo_usecase(admin_client, emprestimo, lista_alunos, bens):
+def test_editar_emprestimo(admin_client, emprestimo, lista_alunos, bens):
     url = reverse_lazy("emprestimo:editar_emprestimo", args=[emprestimo.id])
 
     response = admin_client.get(url)
@@ -511,7 +517,7 @@ def test_editar_emprestimo_usecase(admin_client, emprestimo, lista_alunos, bens)
 
 
 @pytest.mark.django_db
-def test_nao_pode_editar_emprestimo_usecase(client, test_user, emprestimo):
+def test_nao_pode_editar_emprestimo(client, test_user, emprestimo):
     client.force_login(test_user)
     url = reverse_lazy("emprestimo:editar_emprestimo", args=[emprestimo.id])
 
@@ -531,7 +537,7 @@ def test_nao_pode_editar_emprestimo_usecase(client, test_user, emprestimo):
 
 
 @pytest.mark.django_db
-def test_remover_emprestimo_usecase(admin_client, emprestimo):
+def test_remover_emprestimo(admin_client, emprestimo):
     url = reverse_lazy("emprestimo:remover_emprestimo", args=[emprestimo.id])
 
     response = admin_client.post(url, follow=True)
@@ -543,7 +549,7 @@ def test_remover_emprestimo_usecase(admin_client, emprestimo):
 
 
 @pytest.mark.django_db
-def test_nao_pode_remover_emprestimo_usecase(client, test_user, emprestimo):
+def test_nao_pode_remover_emprestimo(client, test_user, emprestimo):
     client.force_login(test_user)
     url = reverse_lazy("emprestimo:remover_emprestimo", args=[emprestimo.id])
 
@@ -554,7 +560,7 @@ def test_nao_pode_remover_emprestimo_usecase(client, test_user, emprestimo):
 
 
 @pytest.mark.django_db
-def test_gerar_termo_responsabilidade_usecase_sucesso(admin_client, emprestimo):
+def test_gerar_termo_responsabilidade_sucesso(admin_client, emprestimo):
     url = reverse_lazy("emprestimo:gerar_termo_responsabilidade", args=[emprestimo.id])
 
     response = admin_client.get(url)
@@ -568,9 +574,7 @@ def test_gerar_termo_responsabilidade_usecase_sucesso(admin_client, emprestimo):
 
 
 @pytest.mark.django_db
-def test_gerar_termo_responsabilidade_usecase_sem_permissao(
-    client, test_user, emprestimo
-):
+def test_gerar_termo_responsabilidade_sem_permissao(client, test_user, emprestimo):
     client.force_login(test_user)
     url = reverse_lazy("emprestimo:gerar_termo_responsabilidade", args=[emprestimo.id])
 
@@ -594,7 +598,7 @@ def test_nao_pode_gerar_termo_responsabilidade_emprestimo_finalizado(
 
 
 @pytest.mark.django_db
-def test_gerar_termo_responsabilidade_usecase_erro_repo(admin_client, emprestimo):
+def test_gerar_termo_responsabilidade_erro_repo(admin_client, emprestimo):
     emprestimo_id = emprestimo.id
     emprestimo.delete()
 
@@ -606,7 +610,7 @@ def test_gerar_termo_responsabilidade_usecase_erro_repo(admin_client, emprestimo
 
 
 @pytest.mark.django_db
-def test_gerar_termo_devolucao_usecase_sucesso(admin_client, emprestimo_devolvido):
+def test_gerar_termo_devolucao_sucesso(admin_client, emprestimo_devolvido):
     url = reverse_lazy(
         "emprestimo:gerar_termo_devolucao", args=[emprestimo_devolvido.id]
     )
@@ -623,9 +627,7 @@ def test_gerar_termo_devolucao_usecase_sucesso(admin_client, emprestimo_devolvid
 
 
 @pytest.mark.django_db
-def test_gerar_termo_devolucao_usecase_sem_permissao(
-    client, test_user, emprestimo_devolvido
-):
+def test_gerar_termo_devolucao_sem_permissao(client, test_user, emprestimo_devolvido):
     client.force_login(test_user)
     url = reverse_lazy(
         "emprestimo:gerar_termo_devolucao", args=[emprestimo_devolvido.id]
@@ -637,7 +639,7 @@ def test_gerar_termo_devolucao_usecase_sem_permissao(
 
 
 @pytest.mark.django_db
-def test_gerar_termo_devolucao_usecase_erro_repo(admin_client, emprestimo_devolvido):
+def test_gerar_termo_devolucao_erro_repo(admin_client, emprestimo_devolvido):
     emprestimo_id = emprestimo_devolvido.id
     emprestimo_devolvido.delete()
 
