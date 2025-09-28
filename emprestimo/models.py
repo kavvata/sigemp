@@ -36,6 +36,5 @@ class Emprestimo(Timestampable, models.Model):
     )
     estado = models.IntegerField(
         choices=EmprestimoEstadoEnum.choices(),
-        max_length=50,
     )
     observacoes = models.TextField(null=True, blank=True)
