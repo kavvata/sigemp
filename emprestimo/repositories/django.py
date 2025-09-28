@@ -86,9 +86,14 @@ class DjangoEmprestimoRepository(EmprestimoRepository):
             return EmprestimoMapper.from_model(emprestimo)
 
     def buscar_ativo_por_bem(self, bem_id: int) -> Optional[EmprestimoEntity]:
-        return EmprestimoMapper.from_model(
-            Emprestimo.objects.get(bem_id=bem_id, estado=EmprestimoEstadoEnum.ATIVO)
-        )
+        try:
+            emprestimo = EmprestimoMapper.from_model(
+                Emprestimo.objects.get(bem_id=bem_id, estado=EmprestimoEstadoEnum.ATIVO)
+            )
+        except Emprestimo.DoesNotExist:
+            return None
+
+        return emprestimo
 
     def buscar_ativos_por_aluno(
         self, aluno_id: int
@@ -100,17 +105,37 @@ class DjangoEmprestimoRepository(EmprestimoRepository):
             )
         ]
 
-    def cadastrar_emprestimo(self, emprestimo: EmprestimoEntity, user: Any):
+    def cadastrar_emprestimo(self, emprestimo: EmprestimoEntity, user: User):
         return EmprestimoMapper.from_model(
             Emprestimo.objects.create(
-                **emprestimo.to_dict(["timestamps", "id"]),
+                **emprestimo.to_dict(
+                    [
+                        "bem_patrimonio",
+                        "bem_descricao",
+                        "aluno_nome",
+                        "aluno_matricula",
+                        "timestamps",
+                        "id",
+                    ]
+                ),
+                criado_por=user,
             )
         )
 
     def editar_emprestimo(self, emprestimo: EmprestimoEntity, user: Any):
         try:
             Emprestimo.objects.filter(pk=emprestimo.id).update(
-                **emprestimo.to_dict(["timestamps", "id"]), alterado_por=user
+                **emprestimo.to_dict(
+                    [
+                        "bem_patrimonio",
+                        "bem_descricao",
+                        "aluno_nome",
+                        "aluno_matricula",
+                        "timestamps",
+                        "id",
+                    ]
+                ),
+                alterado_por=user,
             )
         except Emprestimo.DoesNotExist as e:
             e.add_note(f"Emprestimo com id '{emprestimo.id}' não encontrado.")
