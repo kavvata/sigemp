@@ -42,3 +42,6 @@ class Bem(Timestampable, models.Model):
     grau_fragilidade = models.ForeignKey(GrauFragilidade, on_delete=models.CASCADE)
     estado_conservacao = models.ForeignKey(EstadoConservacao, on_delete=models.CASCADE)
     marca_modelo = models.ForeignKey(MarcaModelo, on_delete=models.CASCADE)
+
+    def __str__(self) -> str:
+        return f"{self.descricao} ({self.patrimonio})"
