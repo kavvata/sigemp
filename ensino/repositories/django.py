@@ -45,7 +45,7 @@ class DjangoCampusRepository(CampusRepository):
         return CampusMapper.from_model(
             Campus.objects.create(
                 **campus.to_dict(["timestamps", "id"]),
-                alterado_por=user,
+                criado_por=user,
             )
         )
 
@@ -93,7 +93,7 @@ class DjangoCursoRepository(CursoRepository):
         return CursoMapper.from_model(
             Curso.objects.create(
                 **curso.to_dict(["timestamps", "id", "campus_sigla"]),
-                alterado_por=user,
+                criado_por=user,
             )
         )
 
@@ -143,7 +143,7 @@ class DjangoFormaSelecaoRepository(FormaSelecaoRepository):
         return FormaSelecaoMapper.from_model(
             FormaSelecao.objects.create(
                 **forma_selecao.to_dict(["timestamps", "id", "campus_sigla"]),
-                alterado_por=user,
+                criado_por=user,
             )
         )
 

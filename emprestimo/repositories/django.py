@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.utils import timezone
 
 from typing import Any, Optional
@@ -30,11 +31,11 @@ class DjangoTipoOcorrenciaRepository(TipoOcorrenciaRepository):
             return TipoOcorrenciaMapper.from_model(tipo)
 
     def cadastrar_tipo_ocorrencia(
-        self, tipo_ocorrencia: TipoOcorrenciaEntity, user: Any
+        self, tipo_ocorrencia: TipoOcorrenciaEntity, user: User
     ):
         return TipoOcorrenciaMapper.from_model(
             TipoOcorrencia.objects.create(
-                **tipo_ocorrencia.to_dict(["timestamps", "id"]),
+                **tipo_ocorrencia.to_dict(["timestamps", "id"]), criado_por=user
             )
         )
 
