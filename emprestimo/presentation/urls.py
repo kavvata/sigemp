@@ -31,6 +31,11 @@ urlpatterns = [
         name="listar_emprestimos",
     ),
     path(
+        "emprestimo/<int:pk>",
+        views.VisualizarEmprestimoView.as_view(),
+        name="visualizar_emprestimo",
+    ),
+    path(
         "emprestimo/add",
         views.CriarEmprestimoView.as_view(),
         name="criar_emprestimo",

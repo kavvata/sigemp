@@ -4,7 +4,7 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, ListView, UpdateView
+from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from emprestimo.domain.entities import TipoOcorrenciaEntity, EmprestimoEntity
 from emprestimo.domain.types import EmprestimoEstadoEnum
@@ -223,6 +223,12 @@ class CriarEmprestimoView(CreateView):
             raise PermissionDenied(result.mensagem)
 
         return redirect(self.success_url)
+
+
+class VisualizarEmprestimoView(DetailView):
+    model = Emprestimo
+    template_name = "emprestimo/emprestimo/emprestimo_detail.html"
+    context_object_name = "emprestimo"
 
 
 class EditarEmprestimoView(UpdateView):

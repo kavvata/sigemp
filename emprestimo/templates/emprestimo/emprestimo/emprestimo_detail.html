@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block page_title %}Detalhes do Empréstimo #{{ emprestimo.id }}{% endblock %}
+{% block actions %}
+    {% if emprestimo.estado == 1 %}
+        <a href="#"
+           class="cursor-pointer flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700 transition-all duration-300 ease-in-out hover:bg-blue-100 hover:shadow-sm hover:border-blue-300 dark:border-blue-800 dark:bg-blue-900/20 dark:text-blue-300 dark:hover:bg-blue-900/30 dark:hover:border-blue-700">
+            <i class="material-symbols-outlined align-middle text-base">picture_as_pdf</i>
+            <span>Gerar termo de responsabilidade</span>
+        </a>
+    {% endif %}
+    {% if emprestimo.estado == 2 %}
+        <a href="#"
+           class="cursor-pointer flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-4 py-2 text-sm font-medium text-green-700 transition-all duration-300 ease-in-out hover:bg-green-100 hover:shadow-sm hover:border-green-300 dark:border-green-800 dark:bg-green-900/20 dark:text-green-300 dark:hover:bg-green-900/30 dark:hover:border-green-700">
+            <i class="material-symbols-outlined align-middle text-base">picture_as_pdf</i>
+            <span>Gerar termo de devolução</span>
+        </a>
+    {% endif %}
+    {% if emprestimo.id %}
+        <a href="{% url 'emprestimo:remover_emprestimo' emprestimo.id %}"
+           class="cursor-pointer flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 transition-all duration-300 ease-in-out hover:bg-red-100 hover:shadow-md hover:ring-2 hover:ring-red-300 dark:border-red-400 dark:bg-gray-800 dark:text-red-300 dark:hover:bg-gray-700 dark:hover:ring-red-500/40">
+            <i class="material-symbols-outlined align-middle">delete</i>
+            <span>Remover</span>
+        </a>
+    {% endif %}
+{% endblock actions %}
+{% block content %}
+    <section class="mx-auto max-w-4xl space-y-6 rounded-lg bg-white p-6 shadow-md dark:bg-gray-900">
+        <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Aluno</label>
+                <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-600 dark:bg-gray-700">
+                    <p class="text-sm text-gray-900 dark:text-white">
+                        {{ emprestimo.aluno.nome }}
+                        <span class="text-gray-600 dark:text-gray-400">({{ emprestimo.aluno.matricula }})</span>
+                    </p>
+                </div>
+            </div>
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Curso</label>
+                <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-600 dark:bg-gray-700">
+                    <p class="text-sm text-gray-900 dark:text-white">{{ emprestimo.aluno.curso.nome }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Bem Patrimonial</label>
+            <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-600 dark:bg-gray-700">
+                <p class="text-sm font-medium text-gray-900 dark:text-white">{{ emprestimo.bem.descricao }}</p>
+                <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">Patrimônio: {{ emprestimo.bem.patrimonio }}</p>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data de Empréstimo</label>
+                <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-600 dark:bg-gray-700">
+                    <p class="text-sm text-gray-900 dark:text-white">{{ emprestimo.data_emprestimo|date:"d/m/Y" }}</p>
+                </div>
+            </div>
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Previsão de Devolução</label>
+                <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-600 dark:bg-gray-700">
+                    <p class="text-sm text-gray-900 dark:text-white">{{ emprestimo.data_devolucao_prevista|date:"d/m/Y" }}</p>
+                </div>
+            </div>
+            {% if emprestimo.data_devolucao %}
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data de Devolução</label>
+                    <div class="rounded-lg border border-green-200 bg-green-50 px-4 py-3 dark:border-green-800 dark:bg-green-900/20">
+                        <p class="text-sm text-green-800 dark:text-green-300">{{ emprestimo.data_devolucao|date:"d/m/Y" }}</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+                <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-600 dark:bg-gray-700">
+                    <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {% if emprestimo.get_estado_display == 'Ativo' %} bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 {% else %} bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 {% endif %}">
+                        {{ emprestimo.get_estado_display }}
+                    </span>
+                </div>
+            </div>
+            {% if emprestimo.devolucao_ciente_por %}
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Devolução confirmada por</label>
+                    <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-600 dark:bg-gray-700">
+                        <p class="text-sm text-gray-900 dark:text-white">
+                            {{ emprestimo.devolucao_ciente_por.get_full_name|default:emprestimo.devolucao_ciente_por.username }}
+                        </p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        {% if emprestimo.observacoes %}
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Observações</label>
+                <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-600 dark:bg-gray-700">
+                    <p class="text-sm text-gray-900 dark:text-white whitespace-pre-line">{{ emprestimo.observacoes }}</p>
+                </div>
+            </div>
+        {% endif %}
+    </section>
+{% endblock %}
