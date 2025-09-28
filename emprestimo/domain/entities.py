@@ -21,8 +21,21 @@ class EmprestimoEntity(TimeStampableEntity):
     data_devolucao: Optional[date] = None
     devolucao_ciente_por_id: Optional[int] = None
     bem_descricao: Optional[str] = None
+    bem_patrimonio: Optional[str] = None
     aluno_nome: Optional[str] = None
     aluno_matricula: Optional[str] = None
     estado: EmprestimoEstadoEnum
     id: Optional[int] = None
     observacoes: str = ""
+
+    def to_dict(
+        self,
+        exclude=[
+            "bem_patrimonio",
+            "bem_descricao",
+            "aluno_nome",
+            "aluno_matricula",
+            "timestamps",
+        ],
+    ):
+        return super().to_dict(exclude)
