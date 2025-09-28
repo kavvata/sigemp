@@ -24,15 +24,15 @@ class Emprestimo(Timestampable, models.Model):
         User,
         null=True,
         blank=True,
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
     )
     bem = models.ForeignKey(
         Bem,
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
     )
     aluno = models.ForeignKey(
         Aluno,
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
     )
     estado = models.CharField(
         choices=EmprestimoEstadoEnum.choices(),

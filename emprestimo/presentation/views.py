@@ -215,6 +215,7 @@ class CriarEmprestimoView(CreateView):
             data_emprestimo=form.cleaned_data["data_emprestimo"],
             data_devolucao_prevista=form.cleaned_data["data_devolucao_prevista"],
             estado=EmprestimoEstadoEnum.ATIVO,
+            observacoes=form.cleaned_data["observacoes"],
         )
         result = usecase.execute(novo_emprestimo)
 
@@ -257,6 +258,7 @@ class EditarEmprestimoView(UpdateView):
             bem_id=form.cleaned_data["bem"].id,
             data_emprestimo=form.cleaned_data["data_emprestimo"],
             data_devolucao_prevista=form.cleaned_data["data_devolucao_prevista"],
+            observacoes=form.cleaned_data["observacoes"],
             estado=EmprestimoEstadoEnum.ATIVO,
         )
         result = usecase.execute(emprestimo)

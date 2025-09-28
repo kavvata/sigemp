@@ -10,6 +10,7 @@ from pytest_django.asserts import (
 )
 
 from emprestimo.domain.types import EmprestimoEstadoEnum
+from emprestimo.infrastructure.mappers import EmprestimoMapper
 from ensino.domain.entities import (
     AlunoEntity,
     CampusEntity,
@@ -306,28 +307,7 @@ def lista_alunos(curso, forma_selecao):
 
 
 @pytest.fixture
-def emprestimo(aluno, bem):
-    entity = EmprestimoEntity(
-        id=1,
-        aluno_id=aluno.id,
-        bem_id=bem.id,
-        data_emprestimo=datetime.now().date(),
-        data_devolucao_prevista=datetime.now().date() + timedelta(days=7),
-        estado=EmprestimoEstadoEnum.ATIVO,
-        bem_descricao=bem.descricao,
-        bem_patrimonio=bem.patrimonio,
-        aluno_nome=aluno.nome,
-        aluno_matricula=aluno.matricula,
-        observacoes="Empréstimo para aula de programação",
-    )
-    model, _criado = Emprestimo.objects.get_or_create(entity.to_dict())
-    yield model
-
-    model.delete()
-
-
-@pytest.fixture
-def lista_emprestimos_em_andamento(lista_alunos, bens):
+def lista_emprestimos_em_andamento(db, lista_alunos, bens):
     entities = []
     for i, (aluno, bem) in enumerate(zip(lista_alunos[:3], bens)):
         entity = EmprestimoEntity(
@@ -354,7 +334,28 @@ def lista_emprestimos_em_andamento(lista_alunos, bens):
 
 
 @pytest.fixture
-def emprestimo_devolvido(aluno, bem):
+def emprestimo(db, aluno, bem):
+    entity = EmprestimoEntity(
+        id=1,
+        aluno_id=aluno.id,
+        bem_id=bem.id,
+        data_emprestimo=datetime.now().date(),
+        data_devolucao_prevista=datetime.now().date() + timedelta(days=7),
+        estado=EmprestimoEstadoEnum.ATIVO,
+        bem_descricao=bem.descricao,
+        bem_patrimonio=bem.patrimonio,
+        aluno_nome=aluno.nome,
+        aluno_matricula=aluno.matricula,
+        observacoes="Empréstimo para aula de programação",
+    )
+    model, _criado = Emprestimo.objects.get_or_create(entity.to_dict())
+    yield model
+
+    model.delete()
+
+
+@pytest.fixture
+def emprestimo_devolvido(db, aluno, bem):
     entity = EmprestimoEntity(
         id=10,
         aluno_id=aluno.id,
@@ -488,29 +489,27 @@ def test_nao_pode_registrar_devolucao_emprestimo_ja_devolvido(
 
 
 @pytest.mark.django_db
-def test_editar_emprestimo(admin_client, emprestimo, lista_alunos, bens):
+def test_editar_emprestimo(admin_client, emprestimo, lista_alunos):
     url = reverse_lazy("emprestimo:editar_emprestimo", args=[emprestimo.id])
 
     response = admin_client.get(url)
     assertTemplateUsed(response, "emprestimo/emprestimo/emprestimo_form.html")
     assert response.status_code == 200
 
+    existente = emprestimo
+
     novo_aluno = lista_alunos[1]
-    data = {
-        "id": emprestimo.id,
-        "aluno": novo_aluno.id,
-        "bem": emprestimo.bem.id,
-        "data_emprestimo": emprestimo.data_emprestimo,
-        "data_devolucao_prevista": emprestimo.data_devolucao_prevista
-        + timedelta(days=2),
-        "observacoes": "Observações atualizadas",
-    }
+    data = EmprestimoMapper.from_model(existente).to_dict()
+    del data["data_devolucao"]
+    del data["devolucao_ciente_por_id"]
+    data["aluno"] = novo_aluno.id
+    data["bem"] = data.pop("bem_id")
 
     response = admin_client.post(url, data, follow=True)
 
-    emprestimo.refresh_from_db()
+    existente.refresh_from_db()
     assert response.status_code == 200
-    assert emprestimo.aluno.id == novo_aluno.id
+    assert existente.aluno.id == novo_aluno.id
     assertTemplateUsed(response, "emprestimo/emprestimo/emprestimo_list.html")
 
 
