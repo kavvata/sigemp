@@ -50,4 +50,9 @@ urlpatterns = [
         views.remover_emprestimo,
         name="remover_emprestimo",
     ),
+    path(
+        "emprestimo/registrar_devolucao/<int:pk>/",
+        views.registrar_devolucao_view,
+        name="registrar_devolucao",
+    ),
 ]

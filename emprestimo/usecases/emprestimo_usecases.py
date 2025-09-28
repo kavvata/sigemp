@@ -73,7 +73,7 @@ class RegistrarDevolucaoEmprestimoUsecase:
         return self.policy.pode_editar()
 
     def execute(self, emprestimo: EmprestimoEntity):
-        if not self.policy.pode_editar():
+        if not self.policy.pode_editar(emprestimo):
             return ResultError(
                 "Você não tem permissão para registrar devolução de empréstimo"
             )

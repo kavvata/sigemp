@@ -309,11 +309,21 @@ def remover_emprestimo(request, pk):
     return redirect(reverse_lazy("emprestimo:listar_emprestimos"))
 
 
-def registrar_devolucao_view(request, emprestimo_id):
+def registrar_devolucao_view(request, pk):
     repo = DjangoEmprestimoRepository()
     policy = DjangoEmprestimoPolicy(request.user)
 
-    emprestimo = repo.buscar_por_id(emprestimo_id)
+    emprestimo = repo.buscar_por_id(pk)
 
     usecase = RegistrarDevolucaoEmprestimoUsecase(repo, policy)
     resultado = usecase.execute(emprestimo)
+
+    if not resultado:
+        messages.error(request, resultado.mensagem)
+    return redirect(
+        reverse_lazy("emprestimo:visualizar_emprestimo", args=[emprestimo.id])
+    )
+
+    return redirect(
+        reverse_lazy("emprestimo:visualizar_emprestimo", args=[emprestimo.id])
+    )

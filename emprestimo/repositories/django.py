@@ -152,3 +152,17 @@ class DjangoEmprestimoRepository(EmprestimoRepository):
         emprestimo.alterado_por = user
         emprestimo.save()
         return EmprestimoMapper.from_model(emprestimo)
+
+    def registrar_devolucao(self, emprestimo: EmprestimoEntity, user: Any):
+        try:
+            model = Emprestimo.objects.get(pk=emprestimo.id)
+        except Emprestimo.DoesNotExist as e:
+            e.add_note(f"Emprestimo com id '{id}' não encontrado.")
+            raise e
+
+        model.data_devolucao = timezone.now()
+        model.estado = EmprestimoEstadoEnum.FINALIZADO
+        model.alterado_por = user
+        model.save()
+
+        return EmprestimoMapper.from_model(model)
