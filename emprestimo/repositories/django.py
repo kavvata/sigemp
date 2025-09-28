@@ -141,7 +141,7 @@ class DjangoEmprestimoRepository(EmprestimoRepository):
             e.add_note(f"Emprestimo com id '{emprestimo.id}' não encontrado.")
             raise e
 
-        return EmprestimoEntity.from_model(Emprestimo.objects.get(pk=emprestimo.id))
+        return EmprestimoMapper.from_model(Emprestimo.objects.get(pk=emprestimo.id))
 
     def remover_emprestimo(self, id: int, user: Any):
         try:
@@ -153,4 +153,4 @@ class DjangoEmprestimoRepository(EmprestimoRepository):
         emprestimo.removido_em = timezone.now()
         emprestimo.alterado_por = user
         emprestimo.save()
-        return TipoOcorrenciaMapper.from_model(emprestimo)
+        return EmprestimoMapper.from_model(emprestimo)
