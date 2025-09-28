@@ -459,7 +459,7 @@ def test_nao_pode_cadastrar_emprestimo_quando_aluno_tem_ativo(
 
     response = admin_client.post(url, data)
 
-    assert response.status_code == 403
+    assert response.status_code == 302
     assert (
         Emprestimo.objects.filter(aluno=aluno, data_devolucao__isnull=True).count() == 1
     )
@@ -534,7 +534,7 @@ def test_nao_pode_registrar_devolucao_emprestimo_ja_devolvido(
 
     response = admin_client.post(url, follow=True)
 
-    assert response.status_code == 403
+    assert response.status_code == 302
 
 
 @pytest.mark.django_db
@@ -640,7 +640,7 @@ def test_nao_pode_gerar_termo_responsabilidade_emprestimo_finalizado(
 
     response = admin_client.get(url)
 
-    assert response.status_code == 403
+    assert response.status_code == 302
 
 
 @pytest.mark.django_db

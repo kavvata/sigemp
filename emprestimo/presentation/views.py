@@ -1,5 +1,6 @@
 from typing import Any
 
+from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
@@ -28,6 +29,7 @@ from emprestimo.usecases import (
     EditarEmprestimoUsecase,
     RemoverEmprestimoUsecase,
 )
+from emprestimo.usecases.emprestimo_usecases import RegistrarDevolucaoEmprestimoUsecase
 
 
 # Create your views here.
@@ -50,7 +52,8 @@ class ListarTipoOcorrenciaView(ListView):
         result = usecase.execute()
 
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(reverse_lazy("emprestimo:listar_tipos_ocorrencia"))
 
         return result.value
 
@@ -95,7 +98,8 @@ class CriarTipoOcorrenciaView(CreateView):
         result = usecase.execute(novo_tipo_ocorrencia)
 
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(reverse_lazy("emprestimo:criar_tipo_ocorrencia"))
 
         return redirect(self.success_url)
 
@@ -127,7 +131,12 @@ class EditarTipoOcorrenciaView(UpdateView):
 
         result = usecase.get_tipo_ocorrencia(form.instance.id)
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(
+                reverse_lazy(
+                    "emprestimo:editar_tipo_ocorrencia", args=[form.instance.id]
+                ),
+            )
 
         tipo_ocorrencia = TipoOcorrenciaEntity(
             id=form.instance.id,
@@ -136,7 +145,12 @@ class EditarTipoOcorrenciaView(UpdateView):
         result = usecase.execute(tipo_ocorrencia)
 
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(
+                reverse_lazy(
+                    "emprestimo:editar_tipo_ocorrencia", args=[form.instance.id]
+                ),
+            )
 
         return redirect(self.success_url)
 
@@ -148,7 +162,10 @@ def remover_tipo_ocorrencia(request, pk):
     usecase = RemoverTipoOcorrenciaUsecase(repo, policy)
     result = usecase.execute(pk)
     if not result:
-        raise PermissionDenied(result.mensagem)
+        messages.error(request, result.mensagem)
+        return redirect(
+            reverse_lazy("emprestimo:editar_tipo_ocorrencia", args=[pk]),
+        )
 
     return redirect(reverse_lazy("emprestimo:listar_tipos_ocorrencia"))
 
@@ -170,7 +187,8 @@ class ListarEmprestimoView(ListView):
         result = usecase.execute()
 
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(reverse_lazy("emprestimo:listar_emprestimos"))
 
         return result.value
 
@@ -220,7 +238,8 @@ class CriarEmprestimoView(CreateView):
         result = usecase.execute(novo_emprestimo)
 
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(reverse_lazy("emprestimo:criar_emprestimo"))
 
         return redirect(self.success_url)
 
@@ -256,7 +275,8 @@ class EditarEmprestimoView(UpdateView):
 
         result = usecase.get_emprestimo(form.instance.id)
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(reverse_lazy("emprestimo:listar_emprestimos"))
 
         emprestimo = EmprestimoEntity(
             id=form.instance.id,
@@ -270,7 +290,8 @@ class EditarEmprestimoView(UpdateView):
         result = usecase.execute(emprestimo)
 
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(reverse_lazy("emprestimo:editar_emprestimo"))
 
         return redirect(self.success_url)
 
@@ -282,6 +303,17 @@ def remover_emprestimo(request, pk):
     usecase = RemoverEmprestimoUsecase(repo, policy)
     result = usecase.execute(pk)
     if not result:
-        raise PermissionDenied(result.mensagem)
+        messages.error(request, result.mensagem)
+        return redirect(reverse_lazy("emprestimo:visualizar_emprestimo"))
 
     return redirect(reverse_lazy("emprestimo:listar_emprestimos"))
+
+
+def registrar_devolucao_view(request, emprestimo_id):
+    repo = DjangoEmprestimoRepository()
+    policy = DjangoEmprestimoPolicy(request.user)
+
+    emprestimo = repo.buscar_por_id(emprestimo_id)
+
+    usecase = RegistrarDevolucaoEmprestimoUsecase(repo, policy)
+    resultado = usecase.execute(emprestimo)

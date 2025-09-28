@@ -69,7 +69,7 @@ class RegistrarDevolucaoEmprestimoUsecase:
         self.repo = repo
         self.policy = policy
 
-    def pode_criar(self):
+    def pode_editar(self):
         return self.policy.pode_editar()
 
     def execute(self, emprestimo: EmprestimoEntity):
