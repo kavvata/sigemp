@@ -31,7 +31,7 @@ class CadastrarEmprestimoUsecase:
         self.repo = repo
         self.policy = policy
 
-    def pode_editar(self):
+    def pode_criar(self):
         return self.policy.pode_criar()
 
     def execute(self, novo_emprestimo: EmprestimoEntity):
