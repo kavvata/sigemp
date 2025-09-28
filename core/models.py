@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils import timezone
 
 
 # Create your models here.
@@ -21,6 +22,13 @@ class Timestampable(models.Model):
     )
 
     removido_em = models.DateTimeField(null=True)
+
+    def soft_delete(self):
+        self.removido_em = timezone.now()
+        self.save()
+        self.refresh_from_db()
+
+        return self
 
     class Meta:
         abstract = True
