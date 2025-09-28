@@ -2,6 +2,8 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 
+from core.managers import DeletedManager, SoftDeleteManager
+
 
 # Create your models here.
 class Timestampable(models.Model):
@@ -23,12 +25,29 @@ class Timestampable(models.Model):
 
     removido_em = models.DateTimeField(null=True)
 
+    objects = SoftDeleteManager()
+    deleted_objects = DeletedManager()
+    all_objects = models.Manager()
+
     def soft_delete(self):
         self.removido_em = timezone.now()
         self.save()
         self.refresh_from_db()
 
         return self
+
+    def restore(self):
+        self.removido_em = None
+        self.save()
+        self.refresh_from_db()
+        return self
+
+    def hard_delete(self):
+        super().delete()
+
+    @property
+    def is_deleted(self):
+        return self.removido_em is not None
 
     class Meta:
         abstract = True
