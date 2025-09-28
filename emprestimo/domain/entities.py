@@ -16,10 +16,13 @@ class TipoOcorrenciaEntity(TimeStampableEntity):
 class EmprestimoEntity(TimeStampableEntity):
     data_emprestimo: date
     data_devolucao_prevista: date
-    data_devolucao: Optional[date]
+    aluno_id: int
+    bem_id: int
+    data_devolucao: Optional[date] = None
     devolucao_ciente_por_id: Optional[int] = None
-    bem_id: Optional[int] = None
-    aluno_id: Optional[int] = None
+    bem_descricao: Optional[str] = None
+    aluno_nome: Optional[str] = None
+    aluno_matricula: Optional[str] = None
     estado: EmprestimoEstadoEnum
     id: Optional[int] = None
     observacoes: str = ""

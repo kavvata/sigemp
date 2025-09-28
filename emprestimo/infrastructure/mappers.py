@@ -26,9 +26,13 @@ class EmprestimoMapper:
         del model_dict["devolucao_ciente_por"]
 
         model_dict["bem_id"] = model_dict["bem"].id
+        model_dict["bem_descricao"] = model_dict["bem"].descricao
+        model_dict["bem_patrimonio"] = model_dict["bem"].patrimonio
         del model_dict["bem"]
 
         model_dict["aluno_id"] = model_dict["aluno"].id
+        model_dict["aluno_nome"] = model_dict["aluno"].nome
+        model_dict["aluno_matricula"] = model_dict["aluno"].matricula
         del model_dict["aluno"]
 
         return EmprestimoMapper.from_dict(model_dict)
