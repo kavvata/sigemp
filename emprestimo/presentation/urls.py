@@ -25,4 +25,24 @@ urlpatterns = [
         views.remover_tipo_ocorrencia,
         name="remover_tipo_ocorrencia",
     ),
+    path(
+        "emprestimo/",
+        views.ListarEmprestimoView.as_view(),
+        name="listar_emprestimos",
+    ),
+    path(
+        "emprestimo/add",
+        views.CriarEmprestimoView.as_view(),
+        name="criar_emprestimo",
+    ),
+    path(
+        "emprestimo/change/<int:pk>/",
+        views.EditarEmprestimoView.as_view(),
+        name="editar_emprestimo",
+    ),
+    path(
+        "emprestimo/delete/<int:pk>/",
+        views.remover_emprestimo,
+        name="remover_emprestimo",
+    ),
 ]
