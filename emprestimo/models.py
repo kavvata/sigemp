@@ -34,7 +34,7 @@ class Emprestimo(Timestampable, models.Model):
         Aluno,
         on_delete=models.CASCADE,
     )
-    estado = models.CharField(
+    estado = models.IntegerField(
         choices=EmprestimoEstadoEnum.choices(),
         max_length=50,
     )
