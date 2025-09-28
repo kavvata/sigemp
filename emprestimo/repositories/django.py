@@ -71,9 +71,7 @@ class DjangoEmprestimoRepository(EmprestimoRepository):
     def listar_emprestimos(self):
         return [
             EmprestimoMapper.from_model(emprestimo)
-            for emprestimo in Emprestimo.objects.filter(
-                removido_em__isnull=True
-            ).order_by("-data_emprestimo")
+            for emprestimo in Emprestimo.objects.order_by("-data_emprestimo")
         ]
 
     def buscar_por_id(self, id: int):
@@ -150,7 +148,7 @@ class DjangoEmprestimoRepository(EmprestimoRepository):
             e.add_note(f"Emprestimo com id '{id}' não encontrado.")
             raise e
 
-        emprestimo.removido_em = timezone.now()
+        emprestimo.soft_delete()
         emprestimo.alterado_por = user
         emprestimo.save()
         return EmprestimoMapper.from_model(emprestimo)
