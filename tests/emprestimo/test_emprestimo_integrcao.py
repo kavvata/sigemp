@@ -373,7 +373,7 @@ def test_listar_emprestimos(admin_client, lista_emprestimos_em_andamento):
         assertContains(response, emprestimo.aluno.nome)
         assertContains(response, emprestimo.bem.descricao)
 
-    assertTemplateUsed(response, "emprestimo/emprestimo_list.html")
+    assertTemplateUsed(response, "emprestimo/emprestimo/emprestimo_list.html")
     assert response.status_code == 200
 
 
@@ -386,19 +386,17 @@ def test_nao_pode_listar_emprestimos_usecase(
     response = client.get(url)
 
     assert response.status_code == 403
-    assertTemplateNotUsed(response, "emprestimo/emprestimo_list.html")
+    assertTemplateNotUsed(response, "emprestimo/emprestimo/emprestimo_list.html")
 
 
 @pytest.mark.django_db
 def test_cadastrar_emprestimo_usecase(admin_client, aluno, bem):
     url = reverse_lazy("emprestimo:criar_emprestimo")
 
-    # Test GET request
     response = admin_client.get(url)
-    assertTemplateUsed(response, "emprestimo/emprestimo_form.html")
+    assertTemplateUsed(response, "emprestimo/emprestimo/emprestimo_form.html")
     assert response.status_code == 200
 
-    # Test POST request
     data = {
         "aluno": aluno.id,
         "bem": bem.id,
@@ -412,7 +410,7 @@ def test_cadastrar_emprestimo_usecase(admin_client, aluno, bem):
     assert response.status_code == 200
     assert Emprestimo.objects.filter(aluno=aluno, bem=bem).exists()
     assertContains(response, "Empréstimo cadastrado com sucesso")
-    assertTemplateUsed(response, "emprestimo/emprestimo_list.html")
+    assertTemplateUsed(response, "emprestimo/emprestimo/emprestimo_list.html")
 
 
 @pytest.mark.django_db
@@ -420,11 +418,9 @@ def test_nao_pode_cadastrar_emprestimo_usecase(client, test_user, aluno, bem):
     client.force_login(test_user)
     url = reverse_lazy("emprestimo:criar_emprestimo")
 
-    # Test GET request
     response = client.get(url)
     assert response.status_code == 403
 
-    # Test POST request
     data = {
         "aluno": aluno.id,
         "bem": bem.id,
@@ -472,7 +468,7 @@ def test_registrar_devolucao_emprestimo_usecase(admin_client, emprestimo):
     assert response.status_code == 200
     assert emprestimo.data_devolucao_real is not None
     assertContains(response, "Devolução registrada com sucesso")
-    assertTemplateUsed(response, "emprestimo/emprestimo_list.html")
+    assertTemplateUsed(response, "emprestimo/emprestimo/emprestimo_list.html")
 
 
 @pytest.mark.django_db
@@ -491,12 +487,10 @@ def test_nao_pode_registrar_devolucao_emprestimo_ja_devolvido_usecase(
 def test_editar_emprestimo_usecase(admin_client, emprestimo, lista_alunos, bens):
     url = reverse_lazy("emprestimo:editar_emprestimo", args=[emprestimo.id])
 
-    # Test GET request
     response = admin_client.get(url)
-    assertTemplateUsed(response, "emprestimo/emprestimo_form.html")
+    assertTemplateUsed(response, "emprestimo/emprestimo/emprestimo_form.html")
     assert response.status_code == 200
 
-    # Test POST request
     novo_aluno = lista_alunos[1]
     data = {
         "aluno": novo_aluno.id,
@@ -513,7 +507,7 @@ def test_editar_emprestimo_usecase(admin_client, emprestimo, lista_alunos, bens)
     assert response.status_code == 200
     assert emprestimo.aluno.id == novo_aluno.id
     assertContains(response, "Empréstimo atualizado com sucesso")
-    assertTemplateUsed(response, "emprestimo/emprestimo_list.html")
+    assertTemplateUsed(response, "emprestimo/emprestimo/emprestimo_list.html")
 
 
 @pytest.mark.django_db
@@ -521,11 +515,9 @@ def test_nao_pode_editar_emprestimo_usecase(client, test_user, emprestimo):
     client.force_login(test_user)
     url = reverse_lazy("emprestimo:editar_emprestimo", args=[emprestimo.id])
 
-    # Test GET request
     response = client.get(url)
     assert response.status_code == 403
 
-    # Test POST request
     data = {
         "aluno": emprestimo.aluno.id,
         "bem": emprestimo.bem.id,
@@ -547,7 +539,7 @@ def test_remover_emprestimo_usecase(admin_client, emprestimo):
     assert response.status_code == 200
     assert not Emprestimo.objects.filter(id=emprestimo.id).exists()
     assertContains(response, "Empréstimo removido com sucesso")
-    assertTemplateUsed(response, "emprestimo/emprestimo_list.html")
+    assertTemplateUsed(response, "emprestimo/emprestimo/emprestimo_list.html")
 
 
 @pytest.mark.django_db
