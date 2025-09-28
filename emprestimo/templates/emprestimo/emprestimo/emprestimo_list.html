@@ -49,7 +49,11 @@
                         </td>
                         <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{{ emprestimo.data_devolucao_prevista }}</td>
                         <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
-                            {{ emprestimo.data_devolucao if emprestimo.data_devolucao else '-' }}
+                            {% if emprestimo.data_devolucao %}
+                                {{ emprestimo.data_devolucao }}
+                            {% else %}
+                                -
+                            {% endif %}
                         </td>
                     </tr>
                 {% empty %}
