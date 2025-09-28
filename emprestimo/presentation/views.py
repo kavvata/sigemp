@@ -253,7 +253,11 @@ class EditarEmprestimoView(UpdateView):
 
         emprestimo = EmprestimoEntity(
             id=form.instance.id,
-            descricao=form.cleaned_data["descricao"],
+            aluno_id=form.cleaned_data["aluno"].id,
+            bem_id=form.cleaned_data["bem"].id,
+            data_emprestimo=form.cleaned_data["data_emprestimo"],
+            data_devolucao_prevista=form.cleaned_data["data_devolucao_prevista"],
+            estado=EmprestimoEstadoEnum.ATIVO,
         )
         result = usecase.execute(emprestimo)
 
