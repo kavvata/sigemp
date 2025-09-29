@@ -151,7 +151,7 @@ def bens(db, lista_grau_fragilidade, tipos_de_bem, estados_conservacao, marcas_m
             marca_modelo_id=3,
         ),
     ]
-    bens_models = [Bem.objects.get_or_create(bem.to_dict())[0] for bem in bens_dict]
+    bens_models = [Bem.objects.get_or_create(**bem.to_dict())[0] for bem in bens_dict]
 
     yield bens_models
 
@@ -169,7 +169,7 @@ def bem(db):
         estado_conservacao_id=1,
         marca_modelo_id=1,
     )
-    model, _criado = Bem.objects.get_or_create(entity.to_dict())
+    model, _criado = Bem.objects.get_or_create(**entity.to_dict())
     yield model
 
     model.delete()
@@ -179,7 +179,7 @@ def bem(db):
 def campus(db):
     entity = CampusEntity(id=1, sigla="PNG", nome="Paranaguá")
     model, _criado = Campus.objects.get_or_create(
-        entity.to_dict(
+        **entity.to_dict(
             exclude=[
                 "timestamps",
                 "campus_sigla",
@@ -214,7 +214,7 @@ def forma_selecao(db):
         periodo_inicio=base_date,
         periodo_fim=base_date + timedelta(days=180),
     )
-    model, _criado = FormaSelecao.objects.get_or_create(entity.to_dict())
+    model, _criado = FormaSelecao.objects.get_or_create(**entity.to_dict())
     yield model
 
     model.delete()
@@ -325,7 +325,7 @@ def lista_emprestimos_em_andamento(db, lista_alunos, bens):
         )
         entities.append(entity)
 
-    models = [Emprestimo.objects.get_or_create(e.to_dict())[0] for e in entities]
+    models = [Emprestimo.objects.get_or_create(**e.to_dict())[0] for e in entities]
 
     yield models
 
@@ -373,7 +373,7 @@ def emprestimo_devolvido(db, aluno, bem):
 
 
 @pytest.mark.django_db
-def test_listar_emprestimos(admin_client, lista_emprestimos_em_andamento):
+def test_listar_emprestimos(lista_emprestimos_em_andamento, admin_client):
     url = reverse_lazy("emprestimo:listar_emprestimos")
     response = admin_client.get(url)
 
