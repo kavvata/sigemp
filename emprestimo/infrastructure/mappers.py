@@ -28,6 +28,8 @@ class EmprestimoMapper:
                 model_dict["devolucao_ciente_por_id"] = model_dict.pop(
                     "devolucao_ciente_por"
                 )
+            else:
+                del model_dict["devolucao_ciente_por"]
 
         model_dict["bem_id"] = model_dict.pop("bem")
         model_dict["bem_descricao"] = model.bem.descricao
