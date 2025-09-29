@@ -8,15 +8,27 @@
     </head>
     <body>
         <style>
-html {
-  font-size: 13px;
-}
-.Texto_Centralizado, .Tabela_Texto_Centralizado {
-  text-align: center;
-}
-table {
-  font-size: 10px;
-}
+          html {
+            font-size: 13px;
+          }
+          .Texto_Centralizado, .Tabela_Texto_Centralizado {
+            text-align: center;
+          }
+          table {
+            font-size: 10px;
+            border: 1px solid #000;
+            border-collapse: collapse;
+            width: 100%;
+          }
+          th, td {
+            border: 1px solid #000;
+            padding: 4px;
+            text-align: center;
+          }
+          th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+          }
         </style>
         <p class="Texto_Centralizado">
             <strong>TERMO DE RESPONSABILIDADE</strong>
@@ -32,7 +44,7 @@ table {
             <br />
             Matrícula: {{ emprestimo.aluno.matricula }}
             <br />
-            Telefone: {{ empresitmo.aluno.telefone }}
+            Telefone: {{ emprestimo.aluno.telefone }}
             <br />
             E-mail: {{ emprestimo.aluno.email }}
         </p>
@@ -79,7 +91,7 @@ table {
                         <p class="Tabela_Texto_Centralizado">01</p>
                     </td>
                     <td>
-                        <p class="Tabela_Texto_Centralizado">{{ emprestimo.bem.tipo_bem }}</p>
+                        <p class="Tabela_Texto_Centralizado">{{ emprestimo.bem.tipo.descricao }}</p>
                     </td>
                     <td>
                         <p class="Tabela_Texto_Centralizado">{{ emprestimo.bem.descricao }}</p>
@@ -97,10 +109,10 @@ table {
                         <p class="Tabela_Texto_Centralizado">{{ emprestimo.bem.grau_fragilidade }}</p>
                     </td>
                     <td>
-                        <p class="Tabela_Texto_Centralizado">{{ emprestimo.data_emprestimo }}</p>
+                        <p class="Tabela_Texto_Centralizado">{{ emprestimo.data_emprestimo|date:"d/m/Y" }}</p>
                     </td>
                     <td>
-                        <p class="Tabela_Texto_Centralizado">{{ emprestimo.data_devolucao_prevista }}</p>
+                        <p class="Tabela_Texto_Centralizado">{{ emprestimo.data_devolucao_prevista|date:"d/m/Y" }}</p>
                     </td>
                 </tr>
             </tbody>
