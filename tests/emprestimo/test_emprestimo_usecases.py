@@ -6,7 +6,7 @@ import pytest
 from core.types import ResultError, ResultSuccess
 from emprestimo.domain.entities import EmprestimoEntity
 from emprestimo.domain.types import EmprestimoEstadoEnum
-from emprestimo.services.contracts import PDFService
+from emprestimo.infrastructure.services.contracts import PDFService
 from emprestimo.usecases import (
     ListarEmprestimosUsecase,
     CadastrarEmprestimoUsecase,
@@ -219,7 +219,7 @@ def test_nao_pode_registrar_devolucao_emprestimo_ja_devolvido_usecase():
     usecase = RegistrarDevolucaoEmprestimoUsecase(repo, policy)
     result = usecase.execute(emprestimo)
 
-    repo.registrar_devolucao.assert_called_with(emprestimo, user)
+    repo.registrar_devolucao.assert_not_called()
     assert isinstance(result, ResultError)
 
 
