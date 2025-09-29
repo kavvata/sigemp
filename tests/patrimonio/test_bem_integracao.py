@@ -320,8 +320,8 @@ def test_nao_pode_repetir_patrimonio(admin_client, bem, bem_entity: BemEntity):
     data["marca_modelo"] = data.pop("marca_modelo_id")
 
     response = admin_client.post(url, data, follow=True)
-
-    assert response.status_code == 403
+    msg = "Já existe um bem com esse número de patrimônio."
+    assertContains(response, msg)
     assert Bem.objects.filter(patrimonio=bem_entity.patrimonio, id=bem.id).exists()
 
 

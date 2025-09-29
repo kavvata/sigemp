@@ -265,7 +265,8 @@ def test_nao_pode_cadastrar_aluno_matricula_repetida(
 
     response = admin_client.post(url, data, follow=True)
 
-    assert response.status_code == 403
+    assertContains(response, "já cadastrada.")
+
     assert Aluno.objects.filter(
         matricula=aluno.matricula,
         nome=aluno.nome,
@@ -296,7 +297,8 @@ def test_nao_pode_cadastrar_aluno_cpf_repetido(
 
     response = admin_client.post(url, data, follow=True)
 
-    assert response.status_code == 403
+    assertContains(response, "já cadastrado.")
+
     assert Aluno.objects.filter(
         cpf=aluno.cpf,
         nome=aluno.nome,
@@ -327,7 +329,8 @@ def test_nao_pode_cadastrar_aluno_email_repetido(
 
     response = admin_client.post(url, data, follow=True)
 
-    assert response.status_code == 403
+    assertContains(response, "já cadastrado.")
+
     assert Aluno.objects.filter(
         email=aluno.email,
         nome=aluno.nome,
@@ -415,7 +418,8 @@ def test_nao_pode_editar_aluno_matricula_repetida(
 
     response = admin_client.post(url, data, follow=True)
 
-    assert response.status_code == 403
+    assertContains(response, "já cadastrada.")
+
     assert (
         Aluno.objects.filter(
             matricula=lista_alunos[1].matricula,
@@ -452,7 +456,8 @@ def test_nao_pode_editar_aluno_cpf_repetido(
 
     response = admin_client.post(url, data, follow=True)
 
-    assert response.status_code == 403
+    assertContains(response, "já cadastrado.")
+
     assert (
         Aluno.objects.filter(
             cpf=lista_alunos[1].cpf,
@@ -489,7 +494,8 @@ def test_nao_pode_editar_aluno_email_repetido(
 
     response = admin_client.post(url, data, follow=True)
 
-    assert response.status_code == 403
+    assertContains(response, "já cadastrado.")
+
     assert (
         Aluno.objects.filter(
             email=lista_alunos[1].email,

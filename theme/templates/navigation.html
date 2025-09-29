@@ -8,7 +8,7 @@
                     <i class="material-symbols-outlined align-middle">home</i>
                     <span class="align-middle">Dashboard</span>
                 </a>
-                <a href="#"
+                <a href="{% url 'emprestimo:listar_emprestimos' %}"
                    class="block py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800">
                     <i class="material-symbols-outlined align-middle">contract</i>
                     <span class="align-middle">Empréstimos</span>
@@ -19,53 +19,76 @@
                     <span class="align-middle">Bens Móveis</span>
                 </a>
                 <div x-data="{ openMenu: false }" class="relative">
-                  <button @click="openMenu = !openMenu"
-                          class="w-full flex justify-between items-center py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition">
-                      <span>Patrimônio</span>
-                      <svg :class="{ 'rotate-90': openMenu }"
-                          class="w-4 h-4 transform transition-transform"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                      </svg>
-                  </button>
-                  <div x-show="openMenu"
-                      @click.away="openMenu = false"
-                      x-transition
-                      class="absolute left-full top-0 ml-2 mt-0 bg-white border dark:bg-gray-900  dark:border-gray-700 shadow-lg rounded w-48 z-50">
-                      <a href="{% url 'patrimonio:listar_tipos_bem' %}"
-                        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Tipos de Bem</a>
-                      <a href="{% url 'patrimonio:listar_estados_conservacao' %}"
-                        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Estados de Conservação</a>
-                      <a href="{% url 'patrimonio:listar_grau_fragilidade' %}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Graus de fragilidade</a>
-                  </div>
+                    <button @click="openMenu = !openMenu"
+                            class="w-full flex justify-between items-center py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                        <span>Patrimônio</span>
+                        <svg :class="{ 'rotate-90': openMenu }"
+                             class="w-4 h-4 transform transition-transform"
+                             fill="none"
+                             stroke="currentColor"
+                             viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                    <div x-show="openMenu"
+                         @click.away="openMenu = false"
+                         x-transition
+                         class="absolute left-full top-0 ml-2 mt-0 bg-white border dark:bg-gray-900  dark:border-gray-700 shadow-lg rounded w-48 z-50">
+                        <a href="{% url 'patrimonio:listar_tipos_bem' %}"
+                           class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Tipos de Bem</a>
+                        <a href="{% url 'patrimonio:listar_estados_conservacao' %}"
+                           class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Estados de Conservação</a>
+                        <a href="{% url 'patrimonio:listar_grau_fragilidade' %}"
+                           class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Graus de fragilidade</a>
+                        <a href="{% url 'patrimonio:listar_marca_modelo' %}"
+                           class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Marcas / Modelos</a>
+                    </div>
                 </div>
                 <div x-data="{ openMenu: false }" class="relative">
-                  <button @click="openMenu = !openMenu"
-                          class="w-full flex justify-between items-center py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition">
-                      <span>Ensino</span>
-                      <svg :class="{ 'rotate-90': openMenu }"
-                          class="w-4 h-4 transform transition-transform"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                      </svg>
-                  </button>
-                  <div x-show="openMenu"
-                      @click.away="openMenu = false"
-                      x-transition
-                      class="absolute left-full top-0 ml-2 mt-0 bg-white border dark:bg-gray-900  dark:border-gray-700 shadow-lg rounded w-48 z-50">
-                      <a href="{% url 'ensino:listar_alunos' %}"
-                        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Alunos</a>
-                      <a href="{% url 'ensino:listar_cursos' %}"
-                        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Cursos</a>
-                      <a href="{% url 'ensino:listar_campi' %}"
-                        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Campi</a>
-                      <a href="{% url 'ensino:listar_formas_selecao' %}"
-                        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Formas de Seleção</a>
-                  </div>
+                    <button @click="openMenu = !openMenu"
+                            class="w-full flex justify-between items-center py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                        <span>Ensino</span>
+                        <svg :class="{ 'rotate-90': openMenu }"
+                             class="w-4 h-4 transform transition-transform"
+                             fill="none"
+                             stroke="currentColor"
+                             viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                    <div x-show="openMenu"
+                         @click.away="openMenu = false"
+                         x-transition
+                         class="absolute left-full top-0 ml-2 mt-0 bg-white border dark:bg-gray-900  dark:border-gray-700 shadow-lg rounded w-48 z-50">
+                        <a href="{% url 'ensino:listar_alunos' %}"
+                           class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Alunos</a>
+                        <a href="{% url 'ensino:listar_cursos' %}"
+                           class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Cursos</a>
+                        <a href="{% url 'ensino:listar_campi' %}"
+                           class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Campi</a>
+                        <a href="{% url 'ensino:listar_formas_selecao' %}"
+                           class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Formas de Seleção</a>
+                    </div>
+                </div>
+                <div x-data="{ openMenu: false }" class="relative">
+                    <button @click="openMenu = !openMenu"
+                            class="w-full flex justify-between items-center py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                        <span>Gestão de empréstimo</span>
+                        <svg :class="{ 'rotate-90': openMenu }"
+                             class="w-4 h-4 transform transition-transform"
+                             fill="none"
+                             stroke="currentColor"
+                             viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                    <div x-show="openMenu"
+                         @click.away="openMenu = false"
+                         x-transition
+                         class="absolute left-full top-0 ml-2 mt-0 bg-white border dark:bg-gray-900  dark:border-gray-700 shadow-lg rounded w-48 z-50">
+                        <a href="{% url 'emprestimo:listar_tipos_ocorrencia' %}"
+                           class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Tipos de Ocorrência</a>
+                    </div>
                 </div>
                 <a href="{% url 'core:logout' %}"
                    class="block py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800">
