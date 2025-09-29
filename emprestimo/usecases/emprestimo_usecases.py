@@ -78,6 +78,15 @@ class RegistrarDevolucaoEmprestimoUsecase:
                 "Você não tem permissão para registrar devolução de empréstimo"
             )
 
+        if (
+            emprestimo.estado == EmprestimoEstadoEnum.FINALIZADO
+            or emprestimo.data_devolucao is not None
+            or emprestimo.devolucao_ciente_por_id is not None
+        ):
+            return ResultError(
+                "Não é possível registrar devolução de empréstimo já devolvido."
+            )
+
         try:
             resposta = self.repo.registrar_devolucao(
                 emprestimo,
