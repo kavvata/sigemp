@@ -324,9 +324,9 @@ def registrar_devolucao_view(request, pk):
 
     if not resultado:
         messages.error(request, resultado.mensagem)
-    return redirect(
-        reverse_lazy("emprestimo:visualizar_emprestimo", args=[emprestimo.id])
-    )
+        return redirect(
+            reverse_lazy("emprestimo:visualizar_emprestimo", args=[emprestimo.id])
+        )
 
     return redirect(
         reverse_lazy("emprestimo:visualizar_emprestimo", args=[emprestimo.id])
