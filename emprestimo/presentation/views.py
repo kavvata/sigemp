@@ -31,6 +31,7 @@ from emprestimo.usecases import (
     RemoverEmprestimoUsecase,
 )
 from emprestimo.usecases.emprestimo_usecases import (
+    GerarTermoDevolucaoUsecase,
     GerarTermoResponsabilidadeUsecase,
     RegistrarDevolucaoEmprestimoUsecase,
 )
@@ -335,8 +336,8 @@ def registrar_devolucao_view(request, pk):
 
 def gerar_termo_responsabilidade_view(request, pk):
     repo = DjangoEmprestimoRepository()
-    policy = DjangoEmprestimoPolicy()
-    service = DjangoWeasyPDFService()
+    policy = DjangoEmprestimoPolicy(request.user)
+    service = DjangoWeasyPDFService(request)
 
     emprestimo = repo.buscar_por_id(pk)
     usecase = GerarTermoResponsabilidadeUsecase(repo, policy, service)
@@ -349,13 +350,25 @@ def gerar_termo_responsabilidade_view(request, pk):
             reverse_lazy("emprestimo:visualizar_emprestimo", args=[emprestimo.id])
         )
 
-    pdf = result.value
-    response = HttpResponse(pdf.getvalue(), content_type="application/pdf")
-    response["Content-Disposition"] = (
-        f'attachment; filename="termo_responsabilidade_{emprestimo.id}.pdf"'
-    )
+    response = result.value
     return response
 
 
 def gerar_termo_devolucao_view(request, pk):
-    raise NotImplementedError
+    repo = DjangoEmprestimoRepository()
+    policy = DjangoEmprestimoPolicy(request.user)
+    service = DjangoWeasyPDFService(request)
+
+    emprestimo = repo.buscar_por_id(pk)
+    usecase = GerarTermoDevolucaoUsecase(repo, policy, service)
+
+    result = usecase.execute(emprestimo)
+
+    if not result:
+        messages.error(request, result.mensagem)
+        return redirect(
+            reverse_lazy("emprestimo:visualizar_emprestimo", args=[emprestimo.id])
+        )
+
+    response = result.value
+    return response
