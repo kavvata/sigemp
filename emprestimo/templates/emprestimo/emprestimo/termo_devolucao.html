@@ -31,9 +31,9 @@
           }
         </style>
         <p class="Texto_Centralizado">
-            <strong>TERMO DE RESPONSABILIDADE</strong>
+            <strong>TERMO DE DEVOLUÇÃO</strong>
         </p>
-        <p class="Texto_Centralizado">EMPRÉSTIMO DE BEM/EQUIPAMENTO AO ALUNO</p>
+        <p class="Texto_Centralizado">DEVOLUÇÃO DE EMPRÉSTIMO DE BEM/EQUIPAMENTO</p>
         <p>
             Campus/unidade:&nbsp;{{ emprestimo.aluno.curso.campus }}
             <br />
@@ -112,43 +112,57 @@
                         <p class="Tabela_Texto_Centralizado">{{ emprestimo.data_emprestimo|date:"d/m/Y" }}</p>
                     </td>
                     <td>
-                        <p class="Tabela_Texto_Centralizado">{{ emprestimo.data_devolucao_prevista|date:"d/m/Y" }}</p>
+                        <p class="Tabela_Texto_Centralizado">{{ emprestimo.data_devolucao|date:"d/m/Y" }}</p>
                     </td>
                 </tr>
             </tbody>
         </table>
         <p>&nbsp;</p>
-        <p>Declaro:</p>
-        <p>- estar ciente quanto ao disposto no edital de seleção ou projeto identificado acima.</p>
         <p>
-            - ter recebido os bens relacionados no presente termo, no estado de conservação indicado, pelo qual assumo total responsabilidade pela guarda e conservação, comprometendo-me&nbsp;a realizar a entrega do bem no prazo previsto no edital (limitado a 31/12/2020), e inclusive, a informar ao Campus/unidade, sobre todas as ocorrências relativas aos bens, e ainda, ressarcir a Administração por perdas ou danos, caso comprovada a omissão de responsabilidade de minha parte.
+            Pelo presente Termo de Devolução, o ALUNO&nbsp; acima qualificado
+            declara que devolveu o(s) o bem(ns)&nbsp;&nbsp;acima especificados.
         </p>
-        <p>- ter verificado, antes da retirada, que o equipamento se encontrava:</p>
+        <p>O servidor abaixo assinado, declara que recebeu os equipamentos em devolução:</p>
         <p>
-            (&nbsp;&nbsp; ) em perfeitas condições de uso e bom estado de conservação ou (&nbsp;&nbsp; ) com os seguintes problemas e/ou danos (descrevê-los):_______________________________________________________.
+            (&nbsp;&nbsp; )&nbsp; nas mesmas condições em o mesmo foi
+            emprestado&nbsp; ou (&nbsp;&nbsp; ) com os seguintes problemas e/ou
+            danos
+            (descrevê-los):______________________________________________________.
         </p>
         <p>&nbsp;</p>
+        <p>No caso de identificado&nbsp;dano ao bem&nbsp;deverá ser realizado os procedimentos previstos no edital.</p>
+        <p>&nbsp;</p>
         <p>
-            O presente termo será assinado eletronicamente (não sendo possível deverá imprimir, assinar - aluno ou seu responsável pelo uso -&nbsp;digitalizar e incluir no processo), na data de entrega do(s) bem(ns).
+            O presente termo será assinado eletronicamente (não sendo possível
+            deverá imprimir, assinar - aluno ou seu responsável pelo uso
+            -&nbsp;digitalizar e incluir no processo), na data de devolução do(s)
+            bem(ns).
         </p>
-        <p>Na ocasião de devolução do(s) bem(ns), o presente termo será baixado através de Termo de Devolução.</p>
+        <p>&nbsp;</p>
+        <p>&nbsp;</p>
         <p>_______________________, ________de _____________________de_______________________</p>
         <p>&nbsp;</p>
-        ________________________________________________________________________________
-        <br />
-        ( Diretor Geral )
-    </p>
-    <p>
-        <br />
-        ________________________________________________________________________________
-        <br />
-        (
-        {% if emprestimo.aluno.nome_responsavel %}
-            Responsável
-        {% else %}
-            Beneficiado
-        {% endif %}
-        )
-    </p>
-</body>
+        <p>
+            ________________________________________________________________________________
+            <br />
+            ( {{ emprestimo.devolucao_ciente_por.username }} )
+            <br />
+            ________________________________________________________________________________
+            <br />
+            ( Diretor Geral )
+            <br />
+        </p>
+        <p>&nbsp;</p>
+        <p>
+            ________________________________________________________________________________
+            <br />
+            (
+            {% if emprestimo.aluno.nome_responsavel %}
+                Responsável
+            {% else %}
+                Beneficiado
+            {% endif %}
+            )
+        </p>
+    </body>
 </html>
