@@ -2,7 +2,9 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
+from django.urls.base import reverse
 from django.views.generic import CreateView, ListView, UpdateView
+from django.contrib import messages
 
 from ensino.models import Campus, Curso, FormaSelecao, Aluno
 from ensino.policies.django import (
@@ -66,7 +68,8 @@ class ListarCampusView(ListView):
         result = usecase.execute()
 
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(reverse_lazy("core:home"))
 
         return result.value
 
@@ -112,7 +115,8 @@ class CriarCampusView(CreateView):
         result = usecase.execute(novo_campus)
 
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(reverse_lazy("ensino:criar_campus"))
 
         return redirect(self.success_url)
 
@@ -142,7 +146,10 @@ class EditarCampusView(UpdateView):
 
         result = usecase.get_campus(form.instance.id)
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(
+                reverse_lazy("ensino:editar_campus", args=[form.instance.id])
+            )
 
         campus = CampusEntity(
             id=form.instance.id,
@@ -152,7 +159,10 @@ class EditarCampusView(UpdateView):
         result = usecase.execute(campus)
 
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(
+                reverse_lazy("ensino:editar_campus", args=[form.instance.id])
+            )
 
         return redirect(self.success_url)
 
@@ -164,7 +174,8 @@ def remover_campus(request, pk):
     usecase = RemoverCampusUsecase(repo, policy)
     result = usecase.execute(pk)
     if not result:
-        raise PermissionDenied(result.mensagem)
+        messages.error(request, result.mensagem)
+        return redirect(reverse("ensino:editar_campus", args=[pk]))
 
     return redirect(reverse_lazy("ensino:listar_campi"))
 
@@ -186,7 +197,8 @@ class ListarCursoView(ListView):
         result = usecase.execute()
 
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(reverse_lazy("core:home"))
 
         return result.value
 
@@ -233,7 +245,8 @@ class CriarCursoView(CreateView):
         result = usecase.execute(novo_curso)
 
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(reverse_lazy("ensino:criar_curso"))
 
         return redirect(self.success_url)
 
@@ -263,7 +276,10 @@ class EditarCursoView(UpdateView):
 
         result = usecase.get_curso(form.instance.id)
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(
+                reverse_lazy("ensino:editar_curso", args=[form.instance.id])
+            )
 
         curso = CursoEntity(
             id=form.instance.id,
@@ -274,7 +290,10 @@ class EditarCursoView(UpdateView):
         result = usecase.execute(curso)
 
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(
+                reverse_lazy("ensino:editar_curso", args=[form.instance.id])
+            )
 
         return redirect(self.success_url)
 
@@ -286,7 +305,8 @@ def remover_curso(request, pk):
     usecase = RemoverCursoUsecase(repo, policy)
     result = usecase.execute(pk)
     if not result:
-        raise PermissionDenied(result.mensagem)
+        messages.error(request, result.mensagem)
+        return redirect(reverse_lazy("ensino:editar_curso", args=[pk]))
 
     return redirect(reverse_lazy("ensino:listar_cursos"))
 
@@ -310,7 +330,8 @@ class ListarFormaSelecaoView(ListView):
         result = usecase.execute()
 
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(reverse_lazy("core:home"))
 
         return result.value
 
@@ -357,7 +378,8 @@ class CriarFormaSelecaoView(CreateView):
         result = usecase.execute(novo_forma_selecao)
 
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(reverse_lazy("ensino:criar_forma_selecao"))
 
         return redirect(self.success_url)
 
@@ -387,7 +409,10 @@ class EditarFormaSelecaoView(UpdateView):
 
         result = usecase.get_forma_selecao(form.instance.id)
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(
+                reverse_lazy("ensino:editar_forma_selecao", args=[form.instance.id])
+            )
 
         forma_selecao = FormaSelecaoEntity(
             id=form.instance.id,
@@ -398,7 +423,10 @@ class EditarFormaSelecaoView(UpdateView):
         result = usecase.execute(forma_selecao)
 
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(
+                reverse_lazy("ensino:editar_forma_selecao", args=[form.instance.id])
+            )
 
         return redirect(self.success_url)
 
@@ -410,7 +438,8 @@ def remover_forma_selecao(request, pk):
     usecase = RemoverFormaSelecaoUsecase(repo, policy)
     result = usecase.execute(pk)
     if not result:
-        raise PermissionDenied(result.mensagem)
+        messages.error(request, result.mensagem)
+        return redirect(reverse_lazy("ensino:editar_forma_selecao", args=[pk]))
 
     return redirect(reverse_lazy("ensino:listar_formas_selecao"))
 
@@ -432,7 +461,8 @@ class ListarAlunoView(ListView):
         result = usecase.execute()
 
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(reverse_lazy("core:home"))
 
         return result.value
 
@@ -484,7 +514,8 @@ class CriarAlunoView(CreateView):
         result = usecase.execute(novo_aluno)
 
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(reverse_lazy("ensino:criar_aluno"))
 
         return redirect(self.success_url)
 
@@ -514,7 +545,10 @@ class EditarAlunoView(UpdateView):
 
         result = usecase.get_aluno(form.instance.id)
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(
+                reverse_lazy("ensino:editar_aluno", args=[form.instance.id])
+            )
 
         aluno = AlunoEntity(
             id=form.instance.id,
@@ -530,7 +564,10 @@ class EditarAlunoView(UpdateView):
         result = usecase.execute(aluno)
 
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(
+                reverse_lazy("ensino:editar_aluno", args=[form.instance.id])
+            )
 
         return redirect(self.success_url)
 
@@ -542,6 +579,7 @@ def remover_aluno(request, pk):
     usecase = RemoverAlunoUsecase(repo, policy)
     result = usecase.execute(pk)
     if not result:
-        raise PermissionDenied(result.mensagem)
+        messages.error(request, result.mensagem)
+        return redirect(reverse_lazy("ensino:editar_aluno", args=[pk]))
 
     return redirect(reverse_lazy("ensino:listar_alunos"))

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title></title>
+        <link href="css/style.css" rel="stylesheet">
+    </head>
+    <body>
+        <style>
+          html {
+            font-size: 13px;
+          }
+          .Texto_Centralizado, .Tabela_Texto_Centralizado {
+            text-align: center;
+          }
+          table {
+            font-size: 10px;
+            border: 1px solid #000;
+            border-collapse: collapse;
+            width: 100%;
+          }
+          th, td {
+            border: 1px solid #000;
+            padding: 4px;
+            text-align: center;
+          }
+          th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+          }
+        </style>
+        <p class="Texto_Centralizado">
+            <strong>TERMO DE DEVOLUÇÃO</strong>
+        </p>
+        <p class="Texto_Centralizado">DEVOLUÇÃO DE EMPRÉSTIMO DE BEM/EQUIPAMENTO</p>
+        <p>
+            Campus/unidade:&nbsp;{{ emprestimo.aluno.curso.campus }}
+            <br />
+            Aluno beneficiado:&nbsp;{{ emprestimo.aluno.nome }}
+        </p>
+        <p>
+            Curso matriculado: {{ emprestimo.aluno.curso.nome }}
+            <br />
+            Matrícula: {{ emprestimo.aluno.matricula }}
+            <br />
+            Telefone: {{ emprestimo.aluno.telefone }}
+            <br />
+            E-mail: {{ emprestimo.aluno.email }}
+        </p>
+        <p>&nbsp;</p>
+        <p>Edital/projeto de seleção: {{ emprestimo.aluno.forma_selecao.descricao }}</p>
+        <p>Informações do bem/equipamento:</p>
+        <table border="1"
+               cellpadding="0"
+               cellspacing="0"
+               style="margin-left:auto;
+                      margin-right:auto">
+            <tbody>
+                <tr>
+                    <td>
+                        <p class="Tabela_Texto_Centralizado">Item</p>
+                    </td>
+                    <td>
+                        <p class="Tabela_Texto_Centralizado">Tipo do equipamento&nbsp;</p>
+                    </td>
+                    <td>
+                        <p class="Tabela_Texto_Centralizado">Descrição do bem</p>
+                    </td>
+                    <td>
+                        <p class="Tabela_Texto_Centralizado">Nº do patrimônio</p>
+                    </td>
+                    <td>
+                        <p class="Tabela_Texto_Centralizado">Estado de Conservação</p>
+                    </td>
+                    <td>
+                        <p class="Tabela_Texto_Centralizado">Marca e Modelo</p>
+                    </td>
+                    <td>
+                        <p class="Tabela_Texto_Centralizado">Grau de fragilidade ou perecibilidade do bem&nbsp;</p>
+                    </td>
+                    <td>
+                        <p class="Tabela_Texto_Centralizado">Data de entrega</p>
+                    </td>
+                    <td>
+                        <p class="Tabela_Texto_Centralizado">Data de devolução</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <p class="Tabela_Texto_Centralizado">01</p>
+                    </td>
+                    <td>
+                        <p class="Tabela_Texto_Centralizado">{{ emprestimo.bem.tipo.descricao }}</p>
+                    </td>
+                    <td>
+                        <p class="Tabela_Texto_Centralizado">{{ emprestimo.bem.descricao }}</p>
+                    </td>
+                    <td>
+                        <p class="Tabela_Texto_Centralizado">{{ emprestimo.bem.patrimonio }}</p>
+                    </td>
+                    <td>
+                        <p class="Tabela_Texto_Centralizado">{{ emprestimo.bem.estado_conservacao }}</p>
+                    </td>
+                    <td>
+                        <p class="Tabela_Texto_Centralizado">{{ emprestimo.bem.marca_modelo }}</p>
+                    </td>
+                    <td>
+                        <p class="Tabela_Texto_Centralizado">{{ emprestimo.bem.grau_fragilidade }}</p>
+                    </td>
+                    <td>
+                        <p class="Tabela_Texto_Centralizado">{{ emprestimo.data_emprestimo|date:"d/m/Y" }}</p>
+                    </td>
+                    <td>
+                        <p class="Tabela_Texto_Centralizado">{{ emprestimo.data_devolucao|date:"d/m/Y" }}</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <p>&nbsp;</p>
+        <p>
+            Pelo presente Termo de Devolução, o ALUNO&nbsp; acima qualificado
+            declara que devolveu o(s) o bem(ns)&nbsp;&nbsp;acima especificados.
+        </p>
+        <p>O servidor abaixo assinado, declara que recebeu os equipamentos em devolução:</p>
+        <p>
+            (&nbsp;&nbsp; )&nbsp; nas mesmas condições em o mesmo foi
+            emprestado&nbsp; ou (&nbsp;&nbsp; ) com os seguintes problemas e/ou
+            danos
+            (descrevê-los):______________________________________________________.
+        </p>
+        <p>&nbsp;</p>
+        <p>No caso de identificado&nbsp;dano ao bem&nbsp;deverá ser realizado os procedimentos previstos no edital.</p>
+        <p>&nbsp;</p>
+        <p>
+            O presente termo será assinado eletronicamente (não sendo possível
+            deverá imprimir, assinar - aluno ou seu responsável pelo uso
+            -&nbsp;digitalizar e incluir no processo), na data de devolução do(s)
+            bem(ns).
+        </p>
+        <p>&nbsp;</p>
+        <p>&nbsp;</p>
+        <p>_______________________, ________de _____________________de_______________________</p>
+        <p>&nbsp;</p>
+        <p>
+            ________________________________________________________________________________
+            <br />
+            ( {{ emprestimo.devolucao_ciente_por.username }} )
+            <br />
+            ________________________________________________________________________________
+            <br />
+            ( Diretor Geral )
+            <br />
+        </p>
+        <p>&nbsp;</p>
+        <p>
+            ________________________________________________________________________________
+            <br />
+            (
+            {% if emprestimo.aluno.nome_responsavel %}
+                Responsável
+            {% else %}
+                Beneficiado
+            {% endif %}
+            )
+        </p>
+    </body>
+</html>

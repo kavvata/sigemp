@@ -1,5 +1,6 @@
 from typing import Any
 
+from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
@@ -76,7 +77,8 @@ class ListarTiposBemView(ListView):
             )
         result = usecase.execute()
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(reverse_lazy("core:home"))
 
         return result.value
 
@@ -118,7 +120,8 @@ class CriarTipoBemView(CreateView):
         result = usecase.execute(form.cleaned_data["descricao"])
 
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(reverse_lazy("patrimonio:criar_tipo_bem"))
 
         return redirect(self.success_url)
 
@@ -148,12 +151,18 @@ class EditarTipoBemView(UpdateView):
 
         result = usecase.get_tipo_bem(form.instance.id)
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(
+                reverse_lazy("patrimonio:editar_tipo_bem", args=[form.instance.id])
+            )
 
         result = usecase.execute(form.instance.id, form.cleaned_data["descricao"])
 
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(
+                reverse_lazy("patrimonio:editar_tipo_bem", args=[form.instance.id])
+            )
 
         return redirect(self.success_url)
 
@@ -165,7 +174,8 @@ def remover_tipobem(request, pk):
 
     result = usecase.execute(pk)
     if not result:
-        raise PermissionDenied(result.mensagem)
+        messages.error(request, result.mensagem)
+        return redirect(reverse_lazy("patrimonio:editar_tipo_bem", args=[pk]))
 
     return redirect(reverse_lazy("patrimonio:listar_tipos_bem"))
 
@@ -189,7 +199,8 @@ class ListarEstadosConservacaoView(ListView):
         result = usecase.execute()
 
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(reverse_lazy("core:home"))
 
         return result.value
 
@@ -236,7 +247,8 @@ class CriarEstadoConservacaoView(CreateView):
         )
 
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(reverse_lazy("patrimonio:criar_estado_conservacao"))
 
         return redirect(self.success_url)
 
@@ -268,14 +280,24 @@ class EditarEstadoConservacaoView(UpdateView):
 
         result = usecase.get_estado_conservacao(form.instance.id)
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(
+                reverse_lazy(
+                    "patrimonio:editar_estado_conservacao", args=[form.instance.id]
+                )
+            )
 
         result = usecase.execute(
             form.instance.id, form.cleaned_data["descricao"], form.cleaned_data["nivel"]
         )
 
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(
+                reverse_lazy(
+                    "patrimonio:editar_estado_conservacao", args=[form.instance.id]
+                )
+            )
 
         return redirect(self.success_url)
 
@@ -287,7 +309,8 @@ def remover_estado_conservacao(request, pk):
 
     result = usecase.execute(pk)
     if not result:
-        raise PermissionDenied(result.mensagem)
+        messages.error(request, result.mensagem)
+        return redirect(reverse_lazy("patrimonio:editar_estado_conservacao", args=[pk]))
 
     return redirect(reverse_lazy("patrimonio:listar_estados_conservacao"))
 
@@ -311,7 +334,8 @@ class ListarGrauFragilidadeView(ListView):
         result = usecase.execute()
 
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(reverse_lazy("core:home"))
 
         return result.value
 
@@ -358,7 +382,8 @@ class CriarGrauFragilidadeView(CreateView):
         )
 
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(reverse_lazy("patrimonio:criar_grau_fragilidade"))
 
         return redirect(self.success_url)
 
@@ -390,14 +415,24 @@ class EditarGrauFragilidadeView(UpdateView):
 
         result = usecase.get_grau_fragilidade(form.instance.id)
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(
+                reverse_lazy(
+                    "patrimonio:editar_grau_fragilidade", args=[form.instance.id]
+                )
+            )
 
         result = usecase.execute(
             form.instance.id, form.cleaned_data["descricao"], form.cleaned_data["nivel"]
         )
 
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(
+                reverse_lazy(
+                    "patrimonio:editar_grau_fragilidade", args=[form.instance.id]
+                )
+            )
 
         return redirect(self.success_url)
 
@@ -409,7 +444,8 @@ def remover_grau_fragilidade(request, pk):
 
     result = usecase.execute(pk)
     if not result:
-        raise PermissionDenied(result.mensagem)
+        messages.error(request, result.mensagem)
+        return redirect(reverse_lazy("patrimonio:editar_grau_fragilidade", args=[pk]))
 
     return redirect(reverse_lazy("patrimonio:listar_grau_fragilidade"))
 
@@ -433,7 +469,8 @@ class ListarMarcaModeloView(ListView):
         result = usecase.execute()
 
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(reverse_lazy("core:home"))
 
         return result.value
 
@@ -476,7 +513,8 @@ class CriarMarcaModeloView(CreateView):
         )
 
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(reverse_lazy("patrimonio:criar_marca_modelo"))
 
         return redirect(self.success_url)
 
@@ -506,14 +544,20 @@ class EditarMarcaModeloView(UpdateView):
 
         result = usecase.get_marca_modelo(form.instance.id)
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(
+                reverse_lazy("patrimonio:editar_marca_modelo", args=[form.instance.id])
+            )
 
         result = usecase.execute(
             form.instance.id, form.cleaned_data["marca"], form.cleaned_data["modelo"]
         )
 
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(
+                reverse_lazy("patrimonio:editar_marca_modelo", args=[form.instance.id])
+            )
 
         return redirect(self.success_url)
 
@@ -525,7 +569,8 @@ def remover_marca_modelo(request, pk):
     usecase = RemoverMarcaModeloUsecase(repo, policy)
     result = usecase.execute(pk)
     if not result:
-        raise PermissionDenied(result.mensagem)
+        messages.error(request, result.mensagem)
+        return redirect(reverse_lazy("patrimonio:editar_marca_modelo", args=[pk]))
 
     return redirect(reverse_lazy("patrimonio:listar_marca_modelo"))
 
@@ -547,7 +592,8 @@ class ListarBemView(ListView):
         result = usecase.execute()
 
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(reverse_lazy("core:home"))
 
         return result.value
 
@@ -597,7 +643,8 @@ class CriarBemView(CreateView):
         result = usecase.execute(novo_bem)
 
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(reverse_lazy("patrimonio:criar_bem"))
 
         return redirect(self.success_url)
 
@@ -627,7 +674,10 @@ class EditarBemView(UpdateView):
 
         result = usecase.get_bem(form.instance.id)
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(
+                reverse_lazy("patrimonio:editar_bem", args=[form.instance.id])
+            )
 
         bem = BemEntity(
             id=form.instance.id,
@@ -641,7 +691,10 @@ class EditarBemView(UpdateView):
         result = usecase.execute(bem)
 
         if not result:
-            raise PermissionDenied(result.mensagem)
+            messages.error(self.request, result.mensagem)
+            return redirect(
+                reverse_lazy("patrimonio:editar_bem", args=[form.instance.id])
+            )
 
         return redirect(self.success_url)
 
@@ -653,6 +706,7 @@ def remover_bem(request, pk):
     usecase = RemoverBemUsecase(repo, policy)
     result = usecase.execute(pk)
     if not result:
-        raise PermissionDenied(result.mensagem)
+        messages.error(request, result.mensagem)
+        return redirect(reverse_lazy("patrimonio:editar_bem", args=[pk]))
 
     return redirect(reverse_lazy("patrimonio:listar_bens"))

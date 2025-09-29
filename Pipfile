@@ -11,11 +11,13 @@ defusedxml = "*"
 django-tailwind = {extras = ["reload"], version = "*"}
 django-widget-tweaks = "*"
 psycopg2-binary = "*"
+django-weasyprint = "*"
 
 [dev-packages]
 django-stubs = "*"
 pytest = "*"
 pytest-django = "*"
+pytest-cov = "*"
 
 [requires]
 python_version = "3.13"
