@@ -29,8 +29,6 @@ class EmprestimoMapper:
                     "devolucao_ciente_por"
                 )
 
-            del model_dict["devolucao_ciente_por"]
-
         model_dict["bem_id"] = model_dict.pop("bem")
         model_dict["bem_descricao"] = model.bem.descricao
         model_dict["bem_patrimonio"] = model.bem.patrimonio
@@ -40,10 +38,8 @@ class EmprestimoMapper:
         model_dict["aluno_matricula"] = model.aluno.matricula
 
         # NOTE: hacky solution
-        model_dict["estado"] = [
-            choice
-            for choice in EmprestimoEstadoEnum.choices()
-            if choice[0] == model_dict.get("estado")
-        ][0]
+        estado_value = model_dict.get("estado")
+        if estado_value is not None:
+            model_dict["estado"] = EmprestimoEstadoEnum(estado_value)
 
         return EmprestimoEntity(**model_dict)

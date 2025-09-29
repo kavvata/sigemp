@@ -2,16 +2,22 @@ from enum import IntEnum
 
 
 class EmprestimoEstadoEnum(IntEnum):
-    ATIVO = (1, "Ativo")
-    FINALIZADO = (2, "Finalizado")
-    CANCELADO = (3, "Cancelado")
+    ATIVO = 1
+    FINALIZADO = 2
+    CANCELADO = 3
 
-    def __new__(cls, value, label):
-        obj = int.__new__(cls, value)
-        obj._value_ = value
-        obj.label = label
-        return obj
+    @property
+    def label(self):
+        labels = {
+            EmprestimoEstadoEnum.ATIVO: "Ativo",
+            EmprestimoEstadoEnum.FINALIZADO: "Finalizado",
+            EmprestimoEstadoEnum.CANCELADO: "Cancelado",
+        }
+        return labels[self]
 
     @classmethod
     def choices(cls):
         return [(member.value, member.label) for member in cls]
+
+    def __str__(self):
+        return self.label
