@@ -2,7 +2,7 @@ from typing import Any
 
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
-from django.http import HttpRequest, HttpResponse
+from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
@@ -278,6 +278,9 @@ class EditarEmprestimoView(UpdateView):
         policy = DjangoEmprestimoPolicy(self.request.user)
         usecase = EditarEmprestimoUsecase(repo, policy)
 
+        if not usecase.pode_editar(form.instance):
+            raise PermissionDenied("Voce nao tem permissao para editar emprestimo.")
+
         result = usecase.get_emprestimo(form.instance.id)
         if not result:
             messages.error(self.request, result.mensagem)
@@ -305,11 +308,14 @@ def remover_emprestimo(request, pk):
     repo = DjangoEmprestimoRepository()
     policy = DjangoEmprestimoPolicy(request.user)
 
+    if not policy.pode_remover(repo.buscar_por_id(pk)):
+        raise PermissionDenied("Voce nao tem permissao para remover emprestimo.")
+
     usecase = RemoverEmprestimoUsecase(repo, policy)
     result = usecase.execute(pk)
     if not result:
         messages.error(request, result.mensagem)
-        return redirect(reverse_lazy("emprestimo:visualizar_emprestimo"))
+        return redirect(reverse_lazy("emprestimo:visualizar_emprestimo", args=[pk]))
 
     return redirect(reverse_lazy("emprestimo:listar_emprestimos"))
 
@@ -339,7 +345,15 @@ def gerar_termo_responsabilidade_view(request, pk):
     policy = DjangoEmprestimoPolicy(request.user)
     service = DjangoWeasyPDFService(request)
 
-    emprestimo = repo.buscar_por_id(pk)
+    try:
+        emprestimo = repo.buscar_por_id(pk)
+    except Emprestimo.DoesNotExist:
+        raise Http404
+
+    if not policy.pode_gerar_termos(emprestimo):
+        raise PermissionDenied(
+            "Voce nao tem permissao para gerar termos de emprestimo."
+        )
     usecase = GerarTermoResponsabilidadeUsecase(repo, policy, service)
 
     result = usecase.execute(emprestimo)
@@ -359,7 +373,15 @@ def gerar_termo_devolucao_view(request, pk):
     policy = DjangoEmprestimoPolicy(request.user)
     service = DjangoWeasyPDFService(request)
 
-    emprestimo = repo.buscar_por_id(pk)
+    try:
+        emprestimo = repo.buscar_por_id(pk)
+    except Emprestimo.DoesNotExist:
+        raise Http404
+
+    if not policy.pode_gerar_termos(emprestimo):
+        raise PermissionDenied(
+            "Voce nao tem permissao para gerar termos de emprestimo."
+        )
     usecase = GerarTermoDevolucaoUsecase(repo, policy, service)
 
     result = usecase.execute(emprestimo)
