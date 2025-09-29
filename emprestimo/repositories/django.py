@@ -163,6 +163,7 @@ class DjangoEmprestimoRepository(EmprestimoRepository):
         model.data_devolucao = timezone.now()
         model.estado = EmprestimoEstadoEnum.FINALIZADO
         model.alterado_por = user
+        model.devolucao_ciente_por = user
         model.save()
 
         return EmprestimoMapper.from_model(model)
