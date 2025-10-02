@@ -196,7 +196,9 @@ def test_cancelar_ocorrencia_sem_permissao_usecase(mock_repo, mock_policy, ocorr
 
 
 def test_cancelar_ocorrencia_ja_cancelada_usecase(
-    mock_repo, mock_policy, ocorrencia_cancelada
+    mock_repo,
+    mock_policy,
+    ocorrencia_cancelada,
 ):
     motivo = "Novo motivo"
     mock_policy.pode_remover.return_value = True
