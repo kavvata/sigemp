@@ -1,6 +1,5 @@
 from django.contrib.auth.models import User
 from django.db import models
-from django.utils import timezone
 
 from core.models import Timestampable
 from emprestimo.domain.types import EmprestimoEstadoEnum
@@ -38,3 +37,18 @@ class Emprestimo(Timestampable, models.Model):
         choices=EmprestimoEstadoEnum.choices(),
     )
     observacoes = models.TextField(null=True, blank=True)
+
+
+class Ocorrencia(Timestampable, models.Model):
+    data_ocorrencia = models.DateField()
+    emprestimo = models.ForeignKey(Emprestimo, on_delete=models.CASCADE)
+    tipo = models.ForeignKey(TipoOcorrencia, on_delete=models.CASCADE)
+    cancelado_em = models.DateField(null=True, blank=True)
+    cancelado_por = models.ForeignKey(
+        User,
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name="ocorrencias_canceladas",
+    )
+    motivo_cancelamento = models.CharField(max_length=255, null=True, blank=True)
