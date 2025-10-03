@@ -69,6 +69,8 @@ class OcorrenciaMapper:
         model_dict["emprestimo_id"] = model_dict.pop("emprestimo")
         model_dict["tipo_id"] = model_dict.pop("tipo")
         model_dict["tipo_descricao"] = model.tipo.descricao
+        model_dict["bem_descricao"] = model.emprestimo.bem.descricao
+        model_dict["bem_patrimonio"] = model.emprestimo.bem.patrimonio
         model_dict["aluno_nome"] = model.emprestimo.aluno.nome
         model_dict["aluno_matricula"] = model.emprestimo.aluno.matricula
 

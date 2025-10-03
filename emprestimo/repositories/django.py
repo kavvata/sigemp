@@ -217,8 +217,11 @@ class DjangoOcorrenciaRepository(OcorrenciaRepository):
                 **ocorrencia.to_dict(
                     [
                         "tipo_descricao",
+                        "bem_descricao",
+                        "bem_patrimonio",
                         "aluno_nome",
                         "aluno_matricula",
+                        "timestamps",
                         "id",
                     ]
                 ),
@@ -232,8 +235,11 @@ class DjangoOcorrenciaRepository(OcorrenciaRepository):
                 **ocorrencia.to_dict(
                     [
                         "tipo_descricao",
+                        "bem_descricao",
+                        "bem_patrimonio",
                         "aluno_nome",
                         "aluno_matricula",
+                        "timestamps",
                     ]
                 ),
                 atualizado_por=user,

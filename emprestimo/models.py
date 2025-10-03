@@ -46,6 +46,7 @@ class Ocorrencia(Timestampable, models.Model):
     data_ocorrencia = models.DateField()
     emprestimo = models.ForeignKey(Emprestimo, on_delete=models.CASCADE)
     tipo = models.ForeignKey(TipoOcorrencia, on_delete=models.CASCADE)
+    descricao = models.TextField(null=True, blank=True)
     cancelado_em = models.DateField(null=True, blank=True)
     cancelado_por = models.ForeignKey(
         User,
