@@ -1,7 +1,11 @@
 from django.forms import model_to_dict
-from emprestimo.domain.entities import EmprestimoEntity, TipoOcorrenciaEntity
+from emprestimo.domain.entities import (
+    EmprestimoEntity,
+    OcorrenciaEntity,
+    TipoOcorrenciaEntity,
+)
 from emprestimo.domain.types import EmprestimoEstadoEnum
-from emprestimo.models import Emprestimo, TipoOcorrencia
+from emprestimo.models import Emprestimo, Ocorrencia, TipoOcorrencia
 
 
 class TipoOcorrenciaMapper:
@@ -45,3 +49,27 @@ class EmprestimoMapper:
             model_dict["estado"] = EmprestimoEstadoEnum(estado_value)
 
         return EmprestimoEntity(**model_dict)
+
+
+class OcorrenciaMapper:
+    @staticmethod
+    def from_dict(data: dict):
+        return OcorrenciaEntity(**data)
+
+    @staticmethod
+    def from_model(model: Ocorrencia):
+        model_dict = model_to_dict(model)
+
+        if "cancelado_por" in model_dict.keys():
+            if model_dict["cancelado_por"] is not None:
+                model_dict["cancelado_por_id"] = model_dict.pop("cancelado_por")
+            else:
+                del model_dict["cancelado_por"]
+
+        model_dict["emprestimo_id"] = model_dict.pop("emprestimo")
+        model_dict["tipo_id"] = model_dict.pop("tipo")
+        model_dict["tipo_descricao"] = model.tipo.descricao
+        model_dict["aluno_nome"] = model.emprestimo.aluno.nome
+        model_dict["aluno_matricula"] = model.emprestimo.aluno.matricula
+
+        return OcorrenciaEntity(**model_dict)
