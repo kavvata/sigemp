@@ -1,3 +1,4 @@
+from typing import Optional
 from django import forms
 from django.forms.widgets import DateInput
 
@@ -42,10 +43,16 @@ class OcorrenciaForm(forms.ModelForm):
     )
 
     def __init__(self, *args, **kwargs) -> None:
-        e = kwargs.pop("emprestimo")
+        e: Optional[Emprestimo] = None
+
+        if "emprestimo" in kwargs.keys():
+            e = kwargs.pop("emprestimo")
+
         super().__init__(*args, **kwargs)
 
-        self.fields["emprestimo"].initial = e
+        if e:
+            self.fields["emprestimo"].initial = e
+            self.fields["emprestimo"].disabled = True
 
     class Meta:
         model = Ocorrencia
