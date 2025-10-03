@@ -236,8 +236,8 @@ class DjangoOcorrenciaRepository(OcorrenciaRepository):
         )
 
     def editar_ocorrencia(self, ocorrencia: OcorrenciaEntity, user: User):
-        return OcorrenciaMapper.from_model(
-            Ocorrencia.objects.find(pk=ocorrencia.id).update(
+        try:
+            Ocorrencia.objects.filter(pk=ocorrencia.id).update(
                 **ocorrencia.to_dict(
                     [
                         "tipo_descricao",
@@ -248,9 +248,13 @@ class DjangoOcorrenciaRepository(OcorrenciaRepository):
                         "timestamps",
                     ]
                 ),
-                atualizado_por=user,
+                alterado_por=user,
             )
-        )
+        except Ocorrencia.DoesNotExist as e:
+            e.add_note(f"Ocorrencia com id '{ocorrencia.id}' não encontrado.")
+            raise e
+
+        return OcorrenciaMapper.from_model(Ocorrencia.objects.get(pk=ocorrencia.id))
 
     def remover_ocorrencia(self, id: int, user: Any):
         try:
