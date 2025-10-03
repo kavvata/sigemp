@@ -1,4 +1,5 @@
 from datetime import date, datetime, timedelta
+from pprint import pprint
 
 import pytest
 from django.contrib.auth import get_user_model
@@ -437,7 +438,7 @@ def ocorrencia(db, emprestimo, lista_tipos_ocorrencia, test_user):
 @pytest.fixture
 def ocorrencia_cancelada(db, emprestimo, lista_tipos_ocorrencia, test_user):
     entity = OcorrenciaEntity(
-        id=2,
+        id=200,
         data_ocorrencia=date(2025, 10, 1),
         emprestimo_id=emprestimo.id,
         tipo_id=lista_tipos_ocorrencia[0].id,
@@ -608,6 +609,7 @@ def test_listar_ocorrencias(admin_client, lista_ocorrencias):
         assertContains(response, ocorrencia.emprestimo.bem.descricao)
 
     assertTemplateUsed(response, "emprestimo/ocorrencia/ocorrencia_list.html")
+    assertNotContains(response, "error")
     assert response.status_code == 200
 
 
@@ -625,7 +627,7 @@ def test_listar_ocorrencias_sem_permissao(client, test_user, lista_ocorrencias):
 def test_listar_ocorrencias_do_bem(admin_client, bem, lista_ocorrencias):
     ocorrencias_do_bem = [o for o in lista_ocorrencias if o.emprestimo.bem.id == bem.id]
 
-    url = reverse_lazy("emprestimo:listar_ocorrencias_do_bem", args=[bem.id])
+    url = reverse_lazy("emprestimo:listar_ocorrencias_bem", args=[bem.id])
     response = admin_client.get(url)
 
     for ocorrencia in ocorrencias_do_bem:
@@ -638,6 +640,7 @@ def test_listar_ocorrencias_do_bem(admin_client, bem, lista_ocorrencias):
         assertNotContains(response, ocorrencia.emprestimo.aluno.nome)
 
     assertTemplateUsed(response, "emprestimo/ocorrencia/ocorrencia_list.html")
+    assertNotContains(response, "error")
     assert response.status_code == 200
 
 
@@ -647,7 +650,7 @@ def test_listar_ocorrencias_do_aluno(admin_client, aluno, lista_ocorrencias):
         o for o in lista_ocorrencias if o.emprestimo.aluno.id == aluno.id
     ]
 
-    url = reverse_lazy("emprestimo:listar_ocorrencias_do_aluno", args=[aluno.id])
+    url = reverse_lazy("emprestimo:listar_ocorrencias_aluno", args=[aluno.id])
     response = admin_client.get(url)
 
     for ocorrencia in ocorrencias_do_aluno:
@@ -662,6 +665,7 @@ def test_listar_ocorrencias_do_aluno(admin_client, aluno, lista_ocorrencias):
         assertNotContains(response, ocorrencia.emprestimo.bem.descricao)
 
     assertTemplateUsed(response, "emprestimo/ocorrencia/ocorrencia_list.html")
+    assertNotContains(response, "error")
     assert response.status_code == 200
 
 
@@ -671,9 +675,7 @@ def test_listar_ocorrencias_do_emprestimo(admin_client, emprestimo, lista_ocorre
         o for o in lista_ocorrencias if o.emprestimo.id == emprestimo.id
     ]
 
-    url = reverse_lazy(
-        "emprestimo:listar_ocorrencias_do_emprestimo", args=[emprestimo.id]
-    )
+    url = reverse_lazy("emprestimo:listar_ocorrencias_emprestimo", args=[emprestimo.id])
     response = admin_client.get(url)
 
     for ocorrencia in ocorrencias_do_emprestimo:
@@ -688,12 +690,13 @@ def test_listar_ocorrencias_do_emprestimo(admin_client, emprestimo, lista_ocorre
         assertNotContains(response, ocorrencia.tipo.descricao)
 
     assertTemplateUsed(response, "emprestimo/ocorrencia/ocorrencia_list.html")
+    assertNotContains(response, "error")
     assert response.status_code == 200
 
 
 @pytest.mark.django_db
 def test_registrar_ocorrencia(admin_client, emprestimo, lista_tipos_ocorrencia):
-    url = reverse_lazy("emprestimo:registrar_ocorrencia", args=[emprestimo.id])
+    url = reverse_lazy("emprestimo:registrar_ocorrencia")
 
     response = admin_client.get(url)
     assertTemplateUsed(response, "emprestimo/ocorrencia/ocorrencia_form.html")
@@ -710,28 +713,97 @@ def test_registrar_ocorrencia(admin_client, emprestimo, lista_tipos_ocorrencia):
     response = admin_client.post(url, data, follow=True)
 
     assert response.status_code == 200
-    from emprestimo.models import Ocorrencia
 
     assert Ocorrencia.objects.filter(
         emprestimo=emprestimo, tipo=tipo_ocorrencia, data_ocorrencia="2025-10-01"
     ).exists()
 
-    assertTemplateUsed(
-        response, "emprestimo/emprestimo/emprestimo_detail.html"
-    ) or assertTemplateUsed(response, "emprestimo/ocorrencia/ocorrencia_list.html")
+    assertTemplateUsed(response, "emprestimo/ocorrencia/ocorrencia_list.html")
+
+    assertNotContains(response, "error")
 
 
 @pytest.mark.django_db
-def test_registrar_ocorrencia_sem_permissao(client, test_user, emprestimo):
+def test_registrar_ocorrencia_ao_emprestimo(
+    admin_client, emprestimo, lista_tipos_ocorrencia
+):
+    url = reverse_lazy(
+        "emprestimo:registrar_ocorrencia_ao_emprestimo", args=[emprestimo.id]
+    )
+
+    response = admin_client.get(url)
+    assertTemplateUsed(response, "emprestimo/ocorrencia/ocorrencia_form.html")
+    assert response.status_code == 200
+
+    tipo_ocorrencia = lista_tipos_ocorrencia[0]
+    data = {
+        "data_ocorrencia": "2025-10-01",
+        "tipo": tipo_ocorrencia.id,
+        "emprestimo": emprestimo.id,
+        "descricao": "Quebra do equipamento durante uso",
+    }
+
+    response = admin_client.post(url, data, follow=True)
+
+    assert response.status_code == 200
+
+    assert Ocorrencia.objects.filter(
+        emprestimo=emprestimo, tipo=tipo_ocorrencia, data_ocorrencia="2025-10-01"
+    ).exists()
+
+    assertTemplateUsed(response, "emprestimo/emprestimo/emprestimo_detail.html")
+
+    assertNotContains(response, "error")
+
+
+@pytest.mark.django_db
+def test_registrar_ocorrencia_sem_permissao(
+    client,
+    test_user,
+    emprestimo,
+    tipo_ocorrencia,
+):
     client.force_login(test_user)
-    url = reverse_lazy("emprestimo:registrar_ocorrencia", args=[emprestimo.id])
+    url = reverse_lazy("emprestimo:registrar_ocorrencia")
 
     response = client.get(url)
     assert response.status_code == 403
 
     data = {
         "data_ocorrencia": "2025-10-01",
-        "tipo": 1,
+        "tipo": tipo_ocorrencia.id,
+        "emprestimo": emprestimo.id,
+        "descricao": "Tentativa sem permissão",
+    }
+
+    response = client.post(url, data)
+    assert response.status_code == 403
+
+    from emprestimo.models import Ocorrencia
+
+    assert not Ocorrencia.objects.filter(
+        emprestimo=emprestimo, data_ocorrencia="2025-10-01"
+    ).exists()
+
+
+@pytest.mark.django_db
+def test_registrar_ocorrencia_emprestimo_sem_permissao(
+    client,
+    test_user,
+    emprestimo,
+    tipo_ocorrencia,
+):
+    client.force_login(test_user)
+    url = reverse_lazy(
+        "emprestimo:registrar_ocorrencia_ao_emprestimo", args=[emprestimo.id]
+    )
+
+    response = client.get(url)
+    assert response.status_code == 403
+
+    data = {
+        "data_ocorrencia": "2025-10-01",
+        "tipo": tipo_ocorrencia.id,
         "emprestimo": emprestimo.id,
         "descricao": "Tentativa sem permissão",
     }
@@ -754,12 +826,12 @@ def test_cancelar_ocorrencia(admin_client, ocorrencia):
     response = admin_client.post(url, {"motivo_cancelamento": motivo}, follow=True)
 
     ocorrencia.refresh_from_db()
+    assertNotContains(response, "error")
     assert response.status_code == 200
     assert ocorrencia.cancelado_em is not None
     assert ocorrencia.motivo_cancelamento == motivo
     assert ocorrencia.cancelado_por is not None
 
-    assertContains(response, "Ocorrência cancelada com sucesso")
     assertTemplateUsed(response, "emprestimo/ocorrencia/ocorrencia_list.html")
 
 
@@ -777,18 +849,23 @@ def test_cancelar_ocorrencia_sem_permissao(client, test_user, ocorrencia):
 
 
 @pytest.mark.django_db
-def test_cancelar_ocorrencia_ja_cancelada(admin_client, ocorrencia_cancelada):
-    url = reverse_lazy("emprestimo:cancelar_ocorrencia", args=[ocorrencia_cancelada.id])
+def test_cancelar_ocorrencia_ja_cancelada(admin_client, ocorrencia, test_user):
+    ocorrencia.cancelado_em = date(2025, 10, 1)
+    ocorrencia.cancelado_por = test_user
+    ocorrencia.motivo_cancelamento = "Registro duplicado"
+    ocorrencia.save()
 
-    original_cancelamento = ocorrencia_cancelada.cancelado_em
+    url = reverse_lazy("emprestimo:cancelar_ocorrencia", args=[ocorrencia.id])
+
+    original_cancelamento = ocorrencia.cancelado_em
     response = admin_client.post(
         url, {"motivo_cancelamento": "Novo motivo"}, follow=True
     )
 
-    ocorrencia_cancelada.refresh_from_db()
-    assert response.status_code == 400
-    assert ocorrencia_cancelada.cancelado_em == original_cancelamento
-    assertContains(response, "já cancelada")
+    ocorrencia.refresh_from_db()
+    assertContains(response, "error")
+    assert ocorrencia.cancelado_em == original_cancelamento
+    assertContains(response, "já está cancelada")
 
 
 @pytest.mark.django_db
