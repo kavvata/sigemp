@@ -187,20 +187,26 @@ class DjangoOcorrenciaRepository(OcorrenciaRepository):
 
     def listar_ocorrencias_do_aluno(self, aluno_id: int):
         return [
-            OcorrenciaMapper.from_model(o).filter(emprestimo__aluno__id=aluno_id)
-            for o in Ocorrencia.objects.all().order_by("-data_ocorrencia")
+            OcorrenciaMapper.from_model(o)
+            for o in Ocorrencia.objects.all()
+            .filter(emprestimo__aluno__id=aluno_id)
+            .order_by("-data_ocorrencia")
         ]
 
     def listar_ocorrencias_do_emprestimo(self, emprestimo_id: int):
         return [
-            OcorrenciaMapper.from_model(o).filter(emprestimo_id=emprestimo_id)
-            for o in Ocorrencia.objects.all().order_by("-data_ocorrencia")
+            OcorrenciaMapper.from_model(o)
+            for o in Ocorrencia.objects.all()
+            .filter(emprestimo_id=emprestimo_id)
+            .order_by("-data_ocorrencia")
         ]
 
     def listar_ocorrencias_do_bem(self, bem_id: int):
         return [
-            OcorrenciaMapper.from_model(o).filter(emprestimo__bem_id=bem_id)
-            for o in Ocorrencia.objects.all().order_by("-data_ocorrencia")
+            OcorrenciaMapper.from_model(o)
+            for o in Ocorrencia.objects.all()
+            .filter(emprestimo__bem_id=bem_id)
+            .order_by("-data_ocorrencia")
         ]
 
     def buscar_por_id(self, id: int):
@@ -209,7 +215,7 @@ class DjangoOcorrenciaRepository(OcorrenciaRepository):
         except Ocorrencia.DoesNotExist:
             return None
         else:
-            return EmprestimoMapper.from_model(ocorrencia)
+            return OcorrenciaMapper.from_model(ocorrencia)
 
     def cadastrar_ocorrencia(self, ocorrencia: OcorrenciaEntity, user: User):
         return OcorrenciaMapper.from_model(
