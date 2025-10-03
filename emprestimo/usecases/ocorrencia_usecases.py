@@ -29,6 +29,9 @@ class ListarOcorrenciasBemUsecase:
         self.repo = repo
         self.policy = policy
 
+    def pode_listar(self):
+        return self.policy.pode_listar()
+
     def execute(self, id: int):
         if not self.policy.pode_listar():
             return ResultError("Sem permissão para listar ocorrências")
@@ -45,6 +48,9 @@ class ListarOcorrenciasAlunoUsecase:
         self.repo = repo
         self.policy = policy
 
+    def pode_listar(self):
+        return self.policy.pode_listar()
+
     def execute(self, id: int):
         if not self.policy.pode_listar():
             return ResultError("Sem permissão para listar ocorrências")
@@ -60,6 +66,9 @@ class ListarOcorrenciasEmprestimoUsecase:
     def __init__(self, repo: OcorrenciaRepository, policy: OcorrenciaPolicy):
         self.repo = repo
         self.policy = policy
+
+    def pode_listar(self):
+        return self.policy.pode_listar()
 
     def execute(self, id: int):
         if not self.policy.pode_listar():
@@ -98,6 +107,9 @@ class CancelarOcorrenciaUsecase:
 
     def pode_remover(self, ocorrencia: OcorrenciaEntity):
         return self.policy.pode_remover(ocorrencia)
+
+    def buscar_por_id(self, ocorrencia_id: int) -> OcorrenciaEntity:
+        return self.repo.buscar_por_id(ocorrencia_id)
 
     def execute(self, ocorrencia_id: int, motivo: str):
         ocorrencia = self.repo.buscar_por_id(ocorrencia_id)
