@@ -1,7 +1,7 @@
 from django import forms
 from django.forms.widgets import DateInput
 
-from emprestimo.models import Emprestimo, TipoOcorrencia
+from emprestimo.models import Emprestimo, Ocorrencia, TipoOcorrencia
 
 
 class TipoOcorrenciaForm(forms.ModelForm):
@@ -29,3 +29,30 @@ class CriarEmprestimoForm(forms.ModelForm):
             "data_devolucao_prevista",
             "observacoes",
         ]
+
+
+class OcorrenciaForm(forms.ModelForm):
+    data_ocorrencia = forms.DateField(
+        label="Data da ocorrência",
+        widget=DateInput(attrs={"type": "date"}),
+    )
+
+    emprestimo = forms.ModelChoiceField(
+        queryset=Emprestimo.objects.all().order_by("-data_emprestimo", "estado")
+    )
+
+    def __init__(self, *args, **kwargs) -> None:
+        e = kwargs.pop("emprestimo")
+        super().__init__(*args, **kwargs)
+
+        self.fields["emprestimo"].initial = e
+
+    class Meta:
+        model = Ocorrencia
+        fields = ["tipo", "emprestimo", "data_ocorrencia", "descricao"]
+
+
+class CancelarOcorrenciaForm(forms.ModelForm):
+    class Meta:
+        model = Ocorrencia
+        fields = ["motivo_cancelamento"]
