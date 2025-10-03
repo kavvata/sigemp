@@ -73,7 +73,7 @@
                 <div x-data="{ openMenu: false }" class="relative">
                     <button @click="openMenu = !openMenu"
                             class="w-full flex justify-between items-center py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition">
-                        <span>Gestão de empréstimo</span>
+                        <span>Ocorrência</span>
                         <svg :class="{ 'rotate-90': openMenu }"
                              class="w-4 h-4 transform transition-transform"
                              fill="none"
@@ -86,6 +86,8 @@
                          @click.away="openMenu = false"
                          x-transition
                          class="absolute left-full top-0 ml-2 mt-0 bg-white border dark:bg-gray-900  dark:border-gray-700 shadow-lg rounded w-48 z-50">
+                        <a href="{% url 'emprestimo:listar_ocorrencias' %}"
+                           class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Ocorrências</a>
                         <a href="{% url 'emprestimo:listar_tipos_ocorrencia' %}"
                            class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Tipos de Ocorrência</a>
                     </div>
