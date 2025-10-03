@@ -77,7 +77,7 @@ class ListarTipoOcorrenciaView(ListView):
 
         if not result:
             messages.error(self.request, result.mensagem)
-            return redirect(reverse_lazy("emprestimo:listar_tipos_ocorrencia"))
+            return []
 
         return result.value
 
@@ -212,7 +212,7 @@ class ListarEmprestimoView(ListView):
 
         if not result:
             messages.error(self.request, result.mensagem)
-            return redirect(reverse_lazy("emprestimo:listar_emprestimos"))
+            return []
 
         return result.value
 
@@ -472,7 +472,7 @@ class ListarOcorrenciasAlunoView(ListView):
 
         if not result:
             messages.error(self.request, result.mensagem)
-            return redirect(reverse_lazy("emprestimo:listar_ocorrencias"))
+            return []
 
         return result.value
 
@@ -503,7 +503,7 @@ class ListarOcorrenciasBemView(ListView):
 
         if not result:
             messages.error(self.request, result.mensagem)
-            return redirect(reverse_lazy("emprestimo:listar_ocorrencias"))
+            return []
 
         return result.value
 
@@ -534,7 +534,7 @@ class ListarOcorrenciasEmprestimoView(ListView):
 
         if not result:
             messages.error(self.request, result.mensagem)
-            return redirect(reverse_lazy("emprestimo:listar_ocorrencias"))
+            return []
 
         return result.value
 
