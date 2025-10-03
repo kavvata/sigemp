@@ -1,24 +1,41 @@
-from datetime import date
+from datetime import date, datetime, timedelta
+
 import pytest
 from django.contrib.auth import get_user_model
 from django.urls import reverse_lazy
 from pytest_django.asserts import (
     assertContains,
     assertNotContains,
-    assertTemplateUsed,
     assertTemplateNotUsed,
+    assertTemplateUsed,
 )
 
-from emprestimo.domain.entities import OcorrenciaEntity
-from emprestimo.models import Ocorrencia
-
-from tests.emprestimo.test_tipoocorrencia_integracao import lista_tipos_ocorrencia  # noqa: F401
-from tests.emprestimo.test_emprestimo_integrcao import (
-    emprestimo,  # noqa: F401  # pyright: ignore[reportUnusedImport]
-    aluno,  # noqa: F401  # pyright: ignore[reportUnusedImport]
-    lista_alunos,  # noqa: F401  # pyright: ignore[reportUnusedImport]
-    lista_emprestimos_em_andamento,  # noqa: F401  # pyright: ignore[reportUnusedImport]
+from emprestimo.domain.entities import (
+    OcorrenciaEntity,
+    EmprestimoEntity,
+    TipoOcorrenciaEntity,
 )
+from emprestimo.domain.types import EmprestimoEstadoEnum
+from emprestimo.models import Ocorrencia, Emprestimo, TipoOcorrencia
+
+from ensino.domain.entities import (
+    AlunoEntity,
+    CampusEntity,
+    CursoEntity,
+    FormaSelecaoEntity,
+)
+
+from patrimonio.models import (
+    Bem,
+    EstadoConservacao,
+    GrauFragilidade,
+    MarcaModelo,
+    TipoBem,
+)
+
+from patrimonio.domain.entities import BemEntity
+
+from ensino.models import Aluno, Campus, Curso, FormaSelecao
 
 
 @pytest.fixture
@@ -26,6 +43,369 @@ def test_user(db):
     User = get_user_model()
     user = User.objects.create_user(username="testuser", password="testpassword")
     return user
+
+
+@pytest.fixture()
+def marcas_modelos(db):
+    marcas_modelos_dict = [
+        {"marca": "Epson", "modelo": "PowerLite X49"},
+        {"marca": "Dell", "modelo": "Latitude 5420"},
+        {"marca": "Optika", "modelo": "B-150R"},
+        {"marca": "Minipa", "modelo": "ET-1002"},
+        {"marca": "Canon", "modelo": "EOS Rebel T7"},
+    ]
+    marcas_modelos_models = [
+        MarcaModelo.objects.get_or_create(marca=mm["marca"], modelo=mm["modelo"])[0]
+        for mm in marcas_modelos_dict
+    ]
+
+    yield marcas_modelos_models
+
+    MarcaModelo.objects.filter(
+        modelo__in=[mm["modelo"] for mm in marcas_modelos_dict],
+    ).delete()
+
+
+@pytest.fixture()
+def estados_conservacao(db):
+    estados_conservacao_dict = [
+        {"descricao": "Péssimo", "nivel": 1},
+        {"descricao": "Mau", "nivel": 2},
+        {"descricao": "Médio", "nivel": 3},
+        {"descricao": "Bom", "nivel": 4},
+        {"descricao": "Excelente", "nivel": 5},
+    ]
+    estados_conservacao_models = [
+        EstadoConservacao.objects.get_or_create(
+            descricao=ec["descricao"], nivel=ec["nivel"]
+        )[0]
+        for ec in estados_conservacao_dict
+    ]
+
+    yield estados_conservacao_models
+
+    EstadoConservacao.objects.filter(
+        descricao__in=[ec["descricao"] for ec in estados_conservacao_dict]
+    ).delete()
+
+
+@pytest.fixture()
+def tipos_de_bem(db):
+    tipos_de_bem = [
+        {"descricao": "Projetor"},
+        {"descricao": "Notebook Dell"},
+        {"descricao": "Frasco laboratorio"},
+    ]
+    tipos_de_bem_models = [
+        TipoBem.objects.get_or_create(descricao=tp["descricao"])[0]
+        for tp in tipos_de_bem
+    ]
+
+    yield tipos_de_bem_models
+
+    TipoBem.objects.filter(
+        descricao__in=[tp["descricao"] for tp in tipos_de_bem]
+    ).delete()
+
+
+@pytest.fixture()
+def lista_grau_fragilidade(db):
+    grau_fragilidade_dict = [
+        {"descricao": "Péssimo", "nivel": 1},
+        {"descricao": "Mau", "nivel": 2},
+        {"descricao": "Médio", "nivel": 3},
+        {"descricao": "Bom", "nivel": 4},
+        {"descricao": "Excelente", "nivel": 5},
+    ]
+    grau_fragilidade_models = [
+        GrauFragilidade.objects.get_or_create(
+            descricao=ec["descricao"], nivel=ec["nivel"]
+        )[0]
+        for ec in grau_fragilidade_dict
+    ]
+
+    yield grau_fragilidade_models
+
+    GrauFragilidade.objects.filter(
+        descricao__in=[ec["descricao"] for ec in grau_fragilidade_dict]
+    ).delete()
+
+
+@pytest.fixture()
+def bens(db, lista_grau_fragilidade, tipos_de_bem, estados_conservacao, marcas_modelos):
+    bens_dict = [
+        BemEntity(
+            patrimonio="000.000.000.000",
+            descricao="Projetor Epson X1000",
+            tipo_id=1,
+            grau_fragilidade_id=2,
+            estado_conservacao_id=1,
+            marca_modelo_id=1,
+        ),
+        BemEntity(
+            patrimonio="000.000.000.001",
+            descricao="Notebook Dell Latitude",
+            tipo_id=2,
+            grau_fragilidade_id=1,
+            estado_conservacao_id=2,
+            marca_modelo_id=2,
+        ),
+        BemEntity(
+            patrimonio="000.000.000.002",
+            descricao="Centrífuga de bancada",
+            tipo_id=3,
+            grau_fragilidade_id=3,
+            estado_conservacao_id=3,
+            marca_modelo_id=3,
+        ),
+    ]
+    bens_models = [Bem.objects.get_or_create(**bem.to_dict())[0] for bem in bens_dict]
+
+    yield bens_models
+
+    Bem.objects.filter(descricao__in=[b.descricao for b in bens_dict]).delete()
+
+
+@pytest.fixture()
+def bem(db):
+    entity = BemEntity(
+        id=1,
+        patrimonio="000.000.000.000",
+        descricao="Projetor Epson X1000",
+        tipo_id=1,
+        grau_fragilidade_id=2,
+        estado_conservacao_id=1,
+        marca_modelo_id=1,
+    )
+    model, _criado = Bem.objects.get_or_create(**entity.to_dict())
+    yield model
+
+    model.delete()
+
+
+@pytest.fixture
+def campus(db):
+    entity = CampusEntity(id=1, sigla="PNG", nome="Paranaguá")
+    model, _criado = Campus.objects.get_or_create(
+        **entity.to_dict(
+            exclude=[
+                "timestamps",
+                "campus_sigla",
+            ]
+        )
+    )
+    yield model
+
+    model.delete()
+
+
+@pytest.fixture
+def curso(campus):
+    e = CursoEntity(
+        sigla="TADS",
+        nome="Técnologo em Análise e Desenvolvimento de Sistemas",
+        campus_id=campus.id,
+    )
+    model, _criado = Curso.objects.get_or_create(
+        **e.to_dict(exclude=["timestamps", "campus_sigla"])
+    )
+    yield model
+
+    model.delete()
+
+
+@pytest.fixture
+def forma_selecao(db):
+    base_date = datetime(2020, 1, 1)
+    entity = FormaSelecaoEntity(
+        descricao="Edital N°01/2020",
+        periodo_inicio=base_date,
+        periodo_fim=base_date + timedelta(days=180),
+    )
+    model, _criado = FormaSelecao.objects.get_or_create(**entity.to_dict())
+    yield model
+
+    model.delete()
+
+
+@pytest.fixture
+def aluno(curso, forma_selecao):
+    entity = AlunoEntity(
+        id=1,
+        nome="João da Silva",
+        cpf="12345678901",
+        email="joao.silva@ifpr.edu.br",
+        matricula="2025001",
+        telefone="41999990001",
+        forma_selecao_id=forma_selecao.id,
+        curso_id=curso.id,
+    )
+
+    model, _criado = Aluno.objects.get_or_create(**entity.to_dict())
+    yield model
+
+    model.delete()
+
+
+@pytest.fixture
+def lista_alunos(curso, forma_selecao):
+    lista_entities = [
+        AlunoEntity(
+            id=1,
+            nome="João da Silva",
+            cpf="12345678901",
+            email="joao.silva@ifpr.edu.br",
+            matricula="2025001",
+            telefone="41999990001",
+            forma_selecao_id=forma_selecao.id,
+            curso_id=curso.id,
+        ),
+        AlunoEntity(
+            id=2,
+            nome="Ana Pereira",
+            nome_responsavel="Carlos Pereira",
+            cpf="98765432100",
+            email="ana.pereira@ifpr.edu.br",
+            matricula="2025002",
+            telefone="41999990002",
+            forma_selecao_id=forma_selecao.id,
+            curso_id=curso.id,
+        ),
+        AlunoEntity(
+            id=3,
+            nome="Lucas Andrade",
+            nome_responsavel="Fernanda Andrade",
+            cpf="45678912300",
+            email="lucas.andrade@ifpr.edu.br",
+            matricula="2025003",
+            telefone="41999990003",
+            forma_selecao_id=forma_selecao.id,
+            curso_id=curso.id,
+        ),
+        AlunoEntity(
+            id=4,
+            nome="Beatriz Costa",
+            cpf="32165498700",
+            email="beatriz.costa@ifpr.edu.br",
+            matricula="2025004",
+            telefone="41999990004",
+            forma_selecao_id=forma_selecao.id,
+            curso_id=curso.id,
+        ),
+        AlunoEntity(
+            id=5,
+            nome="Marcos Oliveira",
+            cpf="15975348620",
+            email="marcos.oliveira@ifpr.edu.br",
+            matricula="2025005",
+            telefone="41999990005",
+            forma_selecao_id=forma_selecao.id,
+            curso_id=curso.id,
+        ),
+    ]
+    lista_models = [
+        Aluno.objects.get_or_create(**e.to_dict(exclude=["timestamps", "id"]))[0]
+        for e in lista_entities
+    ]
+
+    yield lista_models
+
+    for model in lista_models:
+        model.delete()
+
+
+@pytest.fixture
+def lista_emprestimos_em_andamento(db, lista_alunos, bens):
+    entities = []
+    for i, (aluno, bem) in enumerate(zip(lista_alunos[:3], bens)):
+        entity = EmprestimoEntity(
+            id=i + 1,
+            aluno_id=aluno.id,
+            aluno_nome=aluno.nome,
+            aluno_matricula=aluno.matricula,
+            bem_id=bem.id,
+            bem_descricao=bem.descricao,
+            bem_patrimonio=bem.patrimonio,
+            data_emprestimo=datetime.now().date() - timedelta(days=i),
+            data_devolucao_prevista=datetime.now().date() + timedelta(days=7 - i),
+            estado=EmprestimoEstadoEnum.ATIVO,
+            observacoes=f"Empréstimo {i + 1} para atividades acadêmicas",
+        )
+        entities.append(entity)
+
+    models = [Emprestimo.objects.get_or_create(**e.to_dict())[0] for e in entities]
+
+    yield models
+
+    for model in models:
+        model.delete()
+
+
+@pytest.fixture
+def emprestimo(db, aluno, bem):
+    entity = EmprestimoEntity(
+        id=1,
+        aluno_id=aluno.id,
+        bem_id=bem.id,
+        data_emprestimo=datetime.now().date(),
+        data_devolucao_prevista=datetime.now().date() + timedelta(days=7),
+        estado=EmprestimoEstadoEnum.ATIVO,
+        bem_descricao=bem.descricao,
+        bem_patrimonio=bem.patrimonio,
+        aluno_nome=aluno.nome,
+        aluno_matricula=aluno.matricula,
+        observacoes="Empréstimo para aula de programação",
+    )
+    model, _criado = Emprestimo.objects.get_or_create(**entity.to_dict())
+    yield model
+
+    model.delete()
+
+
+@pytest.fixture
+def emprestimo_devolvido(db, aluno, bem):
+    entity = EmprestimoEntity(
+        id=10,
+        aluno_id=aluno.id,
+        bem_id=bem.id,
+        data_emprestimo=datetime.now().date() - timedelta(days=10),
+        data_devolucao_prevista=datetime.now().date() - timedelta(days=3),
+        data_devolucao=datetime.now().date() - timedelta(days=2),
+        estado=EmprestimoEstadoEnum.FINALIZADO,
+        observacoes="Empréstimo já devolvido",
+    )
+    model, _criado = Emprestimo.objects.get_or_create(**entity.to_dict())
+    yield model
+
+    model.delete()
+
+
+@pytest.fixture
+def tipo_ocorrencia(db):
+    entity = TipoOcorrenciaEntity(id=1, descricao="Perda")
+    model, _criado = TipoOcorrencia.objects.get_or_create(entity.to_dict())
+    yield model
+
+    model.delete()
+
+
+@pytest.fixture
+def lista_tipos_ocorrencia(db):
+    lista_entities = [
+        TipoOcorrenciaEntity(id=1, descricao="Perda"),
+        TipoOcorrenciaEntity(id=2, descricao="Roubo"),
+        TipoOcorrenciaEntity(id=3, descricao="Extravio"),
+        TipoOcorrenciaEntity(id=4, descricao="Dano"),
+    ]
+
+    tipos_ocorrencia_models = [
+        TipoOcorrencia.objects.get_or_create(**e.to_dict())[0] for e in lista_entities
+    ]
+    yield tipos_ocorrencia_models
+
+    TipoOcorrencia.objects.filter(
+        descricao__in=[e.descricao for e in lista_entities]
+    ).delete()
 
 
 @pytest.fixture
@@ -37,7 +417,18 @@ def ocorrencia(db, emprestimo, lista_tipos_ocorrencia, test_user):
         tipo_id=lista_tipos_ocorrencia[0].id,
         tipo_descricao=lista_tipos_ocorrencia[0].descricao,
     )
-    model, _criado = Ocorrencia.objects.get_or_create(**entity.to_dict())
+    model, _criado = Ocorrencia.objects.get_or_create(
+        **entity.to_dict(
+            exclude=[
+                "tipo_descricao",
+                "bem_descricao",
+                "bem_patrimonio",
+                "aluno_nome",
+                "aluno_matricula",
+                "timestamps",
+            ]
+        )
+    )
     yield model
 
     model.delete()
@@ -55,7 +446,18 @@ def ocorrencia_cancelada(db, emprestimo, lista_tipos_ocorrencia, test_user):
         cancelado_por_id=test_user.id,
         motivo_cancelamento="Registro duplicado",
     )
-    model, _criado = Ocorrencia.objects.get_or_create(**entity.to_dict())
+    model, _criado = Ocorrencia.objects.get_or_create(
+        **entity.to_dict(
+            exclude=[
+                "tipo_descricao",
+                "bem_descricao",
+                "bem_patrimonio",
+                "aluno_nome",
+                "aluno_matricula",
+                "timestamps",
+            ]
+        )
+    )
     yield model
 
     model.delete()
@@ -79,7 +481,18 @@ def lista_ocorrencias(
         entities.append(entity)
 
     models = [
-        Ocorrencia.objects.get_or_create(**ocorrencia.to_dict())[0]
+        Ocorrencia.objects.get_or_create(
+            **ocorrencia.to_dict(
+                exclude=[
+                    "tipo_descricao",
+                    "bem_descricao",
+                    "bem_patrimonio",
+                    "aluno_nome",
+                    "aluno_matricula",
+                    "timestamps",
+                ]
+            )
+        )[0]
         for ocorrencia in entities
     ]
 
@@ -110,7 +523,18 @@ def lista_ocorrencias_canceladas(
         entities.append(entity)
 
     models = [
-        Ocorrencia.objects.get_or_create(**ocorrencia.to_dict())[0]
+        Ocorrencia.objects.get_or_create(
+            **ocorrencia.to_dict(
+                exclude=[
+                    "tipo_descricao",
+                    "bem_descricao",
+                    "bem_patrimonio",
+                    "aluno_nome",
+                    "aluno_matricula",
+                    "timestamps",
+                ]
+            )
+        )[0]
         for ocorrencia in entities
     ]
 
@@ -151,7 +575,18 @@ def lista_ocorrencias_mescladas(
         entities.append(entity)
 
     models = [
-        Ocorrencia.objects.get_or_create(**ocorrencia.to_dict())[0]
+        Ocorrencia.objects.get_or_create(
+            **ocorrencia.to_dict(
+                exclude=[
+                    "tipo_descricao",
+                    "bem_descricao",
+                    "bem_patrimonio",
+                    "aluno_nome",
+                    "aluno_matricula",
+                    "timestamps",
+                ]
+            )
+        )[0]
         for ocorrencia in entities
     ]
 
@@ -167,7 +602,7 @@ def test_listar_ocorrencias(admin_client, lista_ocorrencias):
     response = admin_client.get(url)
 
     for ocorrencia in lista_ocorrencias:
-        assertContains(response, ocorrencia.tipo_descricao)
+        assertContains(response, ocorrencia.tipo.descricao)
         assertContains(response, ocorrencia.emprestimo.id)
         assertContains(response, ocorrencia.emprestimo.aluno.nome)
         assertContains(response, ocorrencia.emprestimo.bem.descricao)
@@ -194,7 +629,7 @@ def test_listar_ocorrencias_do_bem(admin_client, bem, lista_ocorrencias):
     response = admin_client.get(url)
 
     for ocorrencia in ocorrencias_do_bem:
-        assertContains(response, ocorrencia.tipo_descricao)
+        assertContains(response, ocorrencia.tipo.descricao)
         assertContains(response, ocorrencia.emprestimo.id)
         assertContains(response, ocorrencia.emprestimo.aluno.nome)
 
@@ -216,7 +651,7 @@ def test_listar_ocorrencias_do_aluno(admin_client, aluno, lista_ocorrencias):
     response = admin_client.get(url)
 
     for ocorrencia in ocorrencias_do_aluno:
-        assertContains(response, ocorrencia.tipo_descricao)
+        assertContains(response, ocorrencia.tipo.descricao)
         assertContains(response, ocorrencia.emprestimo.id)
         assertContains(response, ocorrencia.emprestimo.bem.descricao)
 
@@ -242,7 +677,7 @@ def test_listar_ocorrencias_do_emprestimo(admin_client, emprestimo, lista_ocorre
     response = admin_client.get(url)
 
     for ocorrencia in ocorrencias_do_emprestimo:
-        assertContains(response, ocorrencia.tipo_descricao)
+        assertContains(response, ocorrencia.tipo.descricao)
         assertContains(response, ocorrencia.emprestimo.id)
         assertContains(response, ocorrencia.data_ocorrencia.strftime("%d/%m/%Y"))
 
@@ -250,7 +685,7 @@ def test_listar_ocorrencias_do_emprestimo(admin_client, emprestimo, lista_ocorre
         o for o in lista_ocorrencias if o.emprestimo.id != emprestimo.id
     ]
     for ocorrencia in outras_ocorrencias:
-        assertNotContains(response, ocorrencia.tipo_descricao)
+        assertNotContains(response, ocorrencia.tipo.descricao)
 
     assertTemplateUsed(response, "emprestimo/ocorrencia/ocorrencia_list.html")
     assert response.status_code == 200
