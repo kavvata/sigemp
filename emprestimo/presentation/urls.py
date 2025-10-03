@@ -89,9 +89,9 @@ urlpatterns = [
         name="registrar_ocorrencia",
     ),
     path(
-        "ocorrencias/registrar/<int:emprestimo_id>/",
-        views.RegistrarOcorrenciaView.as_view(),
-        name="registrar_ocorrencia",
+        "ocorrencias/registrar/emprestimo/<int:emprestimo_id>/",
+        views.registrar_ocorrencia_ao_emprestimo,
+        name="registrar_ocorrencia_ao_emprestimo",
     ),
     path(
         "ocorrencias/cancelar/<int:pk>/",
