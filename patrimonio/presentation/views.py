@@ -78,7 +78,7 @@ class ListarTiposBemView(ListView):
         result = usecase.execute()
         if not result:
             messages.error(self.request, result.mensagem)
-            return redirect(reverse_lazy("core:home"))
+            return []
 
         return result.value
 
@@ -200,7 +200,7 @@ class ListarEstadosConservacaoView(ListView):
 
         if not result:
             messages.error(self.request, result.mensagem)
-            return redirect(reverse_lazy("core:home"))
+            return []
 
         return result.value
 
@@ -335,7 +335,7 @@ class ListarGrauFragilidadeView(ListView):
 
         if not result:
             messages.error(self.request, result.mensagem)
-            return redirect(reverse_lazy("core:home"))
+            return []
 
         return result.value
 
@@ -470,7 +470,7 @@ class ListarMarcaModeloView(ListView):
 
         if not result:
             messages.error(self.request, result.mensagem)
-            return redirect(reverse_lazy("core:home"))
+            return []
 
         return result.value
 
@@ -593,7 +593,7 @@ class ListarBemView(ListView):
 
         if not result:
             messages.error(self.request, result.mensagem)
-            return redirect(reverse_lazy("core:home"))
+            return []
 
         return result.value
 

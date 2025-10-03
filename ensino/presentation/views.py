@@ -69,7 +69,7 @@ class ListarCampusView(ListView):
 
         if not result:
             messages.error(self.request, result.mensagem)
-            return redirect(reverse_lazy("core:home"))
+            return []
 
         return result.value
 
@@ -198,7 +198,7 @@ class ListarCursoView(ListView):
 
         if not result:
             messages.error(self.request, result.mensagem)
-            return redirect(reverse_lazy("core:home"))
+            return []
 
         return result.value
 
@@ -331,7 +331,7 @@ class ListarFormaSelecaoView(ListView):
 
         if not result:
             messages.error(self.request, result.mensagem)
-            return redirect(reverse_lazy("core:home"))
+            return []
 
         return result.value
 
@@ -462,7 +462,7 @@ class ListarAlunoView(ListView):
 
         if not result:
             messages.error(self.request, result.mensagem)
-            return redirect(reverse_lazy("core:home"))
+            return []
 
         return result.value
 

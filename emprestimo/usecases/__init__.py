@@ -15,6 +15,15 @@ from .emprestimo_usecases import (
     GerarTermoDevolucaoUsecase,
 )
 
+from .ocorrencia_usecases import (
+    ListarOcorrenciasUsecase,
+    RegistrarOcorrenciaUsecase,
+    CancelarOcorrenciaUsecase,
+    ListarOcorrenciasBemUsecase,
+    ListarOcorrenciasAlunoUsecase,
+    ListarOcorrenciasEmprestimoUsecase,
+)
+
 __all__ = [
     "ListarTiposOcorrenciaUsecase",
     "CadastrarTipoOcorrenciaUsecase",
@@ -27,4 +36,10 @@ __all__ = [
     "RegistrarDevolucaoEmprestimoUsecase",
     "GerarTermoResponsabilidadeUsecase",
     "GerarTermoDevolucaoUsecase",
+    "ListarOcorrenciasUsecase",
+    "RegistrarOcorrenciaUsecase",
+    "CancelarOcorrenciaUsecase",
+    "ListarOcorrenciasBemUsecase",
+    "ListarOcorrenciasAlunoUsecase",
+    "ListarOcorrenciasEmprestimoUsecase",
 ]

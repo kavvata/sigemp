@@ -65,4 +65,37 @@ urlpatterns = [
         views.gerar_termo_devolucao_view,
         name="gerar_termo_devolucao",
     ),
+    path(
+        "ocorrencias/", views.ListarOcorrenciasView.as_view(), name="listar_ocorrencias"
+    ),
+    path(
+        "ocorrencias/aluno/<int:aluno_id>/",
+        views.ListarOcorrenciasAlunoView.as_view(),
+        name="listar_ocorrencias_aluno",
+    ),
+    path(
+        "ocorrencias/bem/<int:bem_id>/",
+        views.ListarOcorrenciasBemView.as_view(),
+        name="listar_ocorrencias_bem",
+    ),
+    path(
+        "ocorrencias/emprestimo/<int:emprestimo_id>/",
+        views.ListarOcorrenciasEmprestimoView.as_view(),
+        name="listar_ocorrencias_emprestimo",
+    ),
+    path(
+        "ocorrencias/registrar/",
+        views.RegistrarOcorrenciaView.as_view(),
+        name="registrar_ocorrencia",
+    ),
+    path(
+        "ocorrencias/registrar/emprestimo/<int:emprestimo_id>/",
+        views.registrar_ocorrencia_ao_emprestimo,
+        name="registrar_ocorrencia_ao_emprestimo",
+    ),
+    path(
+        "ocorrencias/cancelar/<int:pk>/",
+        views.CancelarOcorrenciaView.as_view(),
+        name="cancelar_ocorrencia",
+    ),
 ]

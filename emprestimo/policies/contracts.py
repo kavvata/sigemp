@@ -56,3 +56,29 @@ class EmprestimoPolicy(ABC):
     @abstractmethod
     def pode_gerar_termos(self, emprestimo) -> bool:
         pass
+
+
+class OcorrenciaPolicy(ABC):
+    def __init__(self, user) -> None:
+        super().__init__()
+        self.user = user
+
+    @abstractmethod
+    def pode_listar(self) -> bool:
+        pass
+
+    @abstractmethod
+    def pode_criar(self) -> bool:
+        pass
+
+    @abstractmethod
+    def pode_editar(self, ocorrencia) -> bool:
+        pass
+
+    @abstractmethod
+    def pode_remover(self, ocorrencia) -> bool:
+        pass
+
+    @abstractmethod
+    def pode_visualizar(self, ocorrencia) -> bool:
+        pass

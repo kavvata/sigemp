@@ -3,22 +3,33 @@ from typing import Any
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpRequest, HttpResponse
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
-from emprestimo.domain.entities import TipoOcorrenciaEntity, EmprestimoEntity
+from emprestimo.domain.entities import (
+    OcorrenciaEntity,
+    TipoOcorrenciaEntity,
+    EmprestimoEntity,
+)
 from emprestimo.domain.types import EmprestimoEstadoEnum
 from emprestimo.infrastructure.services.django import DjangoWeasyPDFService
-from emprestimo.models import TipoOcorrencia, Emprestimo
+from emprestimo.models import Ocorrencia, TipoOcorrencia, Emprestimo
 from emprestimo.policies.django import (
+    DjangoOcorrenciaPolicy,
     DjangoTipoOcorrenciaPolicy,
     DjangoEmprestimoPolicy,
 )
-from emprestimo.presentation.forms import TipoOcorrenciaForm, CriarEmprestimoForm
+from emprestimo.presentation.forms import (
+    CancelarOcorrenciaForm,
+    OcorrenciaForm,
+    TipoOcorrenciaForm,
+    CriarEmprestimoForm,
+)
 from emprestimo.repositories.django import (
     DjangoTipoOcorrenciaRepository,
     DjangoEmprestimoRepository,
+    DjangoOcorrenciaRepository,
 )
 from emprestimo.usecases import (
     CadastrarTipoOcorrenciaUsecase,
@@ -34,6 +45,14 @@ from emprestimo.usecases.emprestimo_usecases import (
     GerarTermoDevolucaoUsecase,
     GerarTermoResponsabilidadeUsecase,
     RegistrarDevolucaoEmprestimoUsecase,
+)
+from emprestimo.usecases.ocorrencia_usecases import (
+    CancelarOcorrenciaUsecase,
+    ListarOcorrenciasAlunoUsecase,
+    ListarOcorrenciasBemUsecase,
+    ListarOcorrenciasEmprestimoUsecase,
+    ListarOcorrenciasUsecase,
+    RegistrarOcorrenciaUsecase,
 )
 
 
@@ -58,7 +77,7 @@ class ListarTipoOcorrenciaView(ListView):
 
         if not result:
             messages.error(self.request, result.mensagem)
-            return redirect(reverse_lazy("emprestimo:listar_tipos_ocorrencia"))
+            return []
 
         return result.value
 
@@ -193,7 +212,7 @@ class ListarEmprestimoView(ListView):
 
         if not result:
             messages.error(self.request, result.mensagem)
-            return redirect(reverse_lazy("emprestimo:listar_emprestimos"))
+            return []
 
         return result.value
 
@@ -394,3 +413,260 @@ def gerar_termo_devolucao_view(request, pk):
 
     response = result.value
     return response
+
+
+class ListarOcorrenciasView(ListView):
+    model = Ocorrencia
+    paginate_by = 10
+    template_name = "emprestimo/ocorrencia/ocorrencia_list.html"
+    context_object_name = "ocorrencias"
+
+    def get_queryset(self):
+        policy = DjangoOcorrenciaPolicy(self.request.user)
+        repo = DjangoOcorrenciaRepository()
+        usecase = ListarOcorrenciasUsecase(repo, policy)
+
+        if not usecase.pode_listar():
+            raise PermissionDenied(
+                "Você não tem permissão para visualizar ocorrências."
+            )
+
+        result = usecase.execute()
+
+        if not result:
+            messages.error(self.request, result.mensagem)
+            return []
+
+        return result.value
+
+    def get_context_data(self, **kwargs: Any):
+        context = super().get_context_data(**kwargs)
+        policy = DjangoOcorrenciaPolicy(self.request.user)
+        repo = DjangoOcorrenciaRepository()
+
+        usecase = RegistrarOcorrenciaUsecase(repo, policy)
+
+        context["pode_criar"] = usecase.pode_criar()
+
+        return context
+
+
+class ListarOcorrenciasAlunoView(ListView):
+    model = Ocorrencia
+    paginate_by = 10
+    template_name = "emprestimo/ocorrencia/ocorrencia_list.html"
+    context_object_name = "ocorrencias"
+
+    def get_queryset(self):
+        aluno_id = self.kwargs["aluno_id"]
+        policy = DjangoOcorrenciaPolicy(self.request.user)
+        repo = DjangoOcorrenciaRepository()
+        usecase = ListarOcorrenciasAlunoUsecase(repo, policy)
+
+        if not usecase.pode_listar():
+            raise PermissionDenied(
+                "Você não tem permissão para visualizar ocorrências."
+            )
+
+        result = usecase.execute(aluno_id)
+
+        if not result:
+            messages.error(self.request, result.mensagem)
+            return []
+
+        return result.value
+
+    def get_context_data(self, **kwargs: Any):
+        context = super().get_context_data(**kwargs)
+        context["filtro_aluno"] = True
+        return context
+
+
+class ListarOcorrenciasBemView(ListView):
+    model = Ocorrencia
+    paginate_by = 10
+    template_name = "emprestimo/ocorrencia/ocorrencia_list.html"
+    context_object_name = "ocorrencias"
+
+    def get_queryset(self):
+        bem_id = self.kwargs["bem_id"]
+        policy = DjangoOcorrenciaPolicy(self.request.user)
+        repo = DjangoOcorrenciaRepository()
+        usecase = ListarOcorrenciasBemUsecase(repo, policy)
+
+        if not usecase.pode_listar():
+            raise PermissionDenied(
+                "Você não tem permissão para visualizar ocorrências."
+            )
+
+        result = usecase.execute(bem_id)
+
+        if not result:
+            messages.error(self.request, result.mensagem)
+            return []
+
+        return result.value
+
+    def get_context_data(self, **kwargs: Any):
+        context = super().get_context_data(**kwargs)
+        context["filtro_bem"] = True
+        return context
+
+
+class ListarOcorrenciasEmprestimoView(ListView):
+    model = Ocorrencia
+    paginate_by = 10
+    template_name = "emprestimo/ocorrencia/ocorrencia_list.html"
+    context_object_name = "ocorrencias"
+
+    def get_queryset(self):
+        emprestimo_id = self.kwargs["emprestimo_id"]
+        policy = DjangoOcorrenciaPolicy(self.request.user)
+        repo = DjangoOcorrenciaRepository()
+        usecase = ListarOcorrenciasEmprestimoUsecase(repo, policy)
+
+        if not usecase.pode_listar():
+            raise PermissionDenied(
+                "Você não tem permissão para visualizar ocorrências."
+            )
+
+        result = usecase.execute(emprestimo_id)
+
+        if not result:
+            messages.error(self.request, result.mensagem)
+            return []
+
+        return result.value
+
+    def get_context_data(self, **kwargs: Any):
+        context = super().get_context_data(**kwargs)
+        context["filtro_emprestimo"] = True
+        return context
+
+
+class RegistrarOcorrenciaView(CreateView):
+    template_name = "emprestimo/ocorrencia/ocorrencia_form.html"
+    form_class = OcorrenciaForm
+    success_url = reverse_lazy("emprestimo:listar_ocorrencias")
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        repo = DjangoOcorrenciaRepository()
+        policy = DjangoOcorrenciaPolicy(self.request.user)
+        usecase = RegistrarOcorrenciaUsecase(repo, policy)
+
+        if not usecase.pode_criar():
+            raise PermissionDenied("Você não tem permissão para registrar ocorrências.")
+
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        repo = DjangoOcorrenciaRepository()
+        policy = DjangoOcorrenciaPolicy(self.request.user)
+        usecase = RegistrarOcorrenciaUsecase(repo, policy)
+
+        if not usecase.pode_criar():
+            raise PermissionDenied("Você não tem permissão para registrar ocorrências.")
+
+        nova_ocorrencia = OcorrenciaEntity(
+            data_ocorrencia=form.cleaned_data["data_ocorrencia"],
+            emprestimo_id=form.cleaned_data["emprestimo"].id,
+            tipo_id=form.cleaned_data["tipo"].id,
+        )
+        result = usecase.execute(nova_ocorrencia)
+
+        if not result:
+            messages.error(self.request, result.mensagem)
+            return redirect(reverse_lazy("emprestimo:registrar_ocorrencia"))
+
+        return redirect(self.success_url)
+
+
+def registrar_ocorrencia_ao_emprestimo(request, emprestimo_id: int):
+    success_url = reverse_lazy(
+        "emprestimo:visualizar_emprestimo",
+        args=[emprestimo_id],
+    )
+
+    template_name = "emprestimo/ocorrencia/ocorrencia_form.html"
+
+    repo = DjangoOcorrenciaRepository()
+    policy = DjangoOcorrenciaPolicy(request.user)
+    usecase = RegistrarOcorrenciaUsecase(repo, policy)
+
+    if not usecase.pode_criar():
+        raise PermissionDenied("Você não tem permissão para registrar ocorrências.")
+
+    e = get_object_or_404(Emprestimo, pk=emprestimo_id)
+
+    form = OcorrenciaForm(request.POST or None, emprestimo=e)
+
+    if form.is_valid():
+        if not usecase.pode_criar():
+            raise PermissionDenied("Você não tem permissão para registrar ocorrências.")
+
+        nova_ocorrencia = OcorrenciaEntity(
+            data_ocorrencia=form.cleaned_data["data_ocorrencia"],
+            emprestimo_id=form.cleaned_data["emprestimo"].id,
+            tipo_id=form.cleaned_data["tipo"].id,
+        )
+        result = usecase.execute(nova_ocorrencia)
+
+        if not result:
+            messages.error(request, result.mensagem)
+            return redirect(
+                reverse_lazy(
+                    "emprestimo:visualizar_emprestimo",
+                    args=[emprestimo_id],
+                )
+            )
+
+        return redirect(success_url)
+
+    return render(request, template_name, {"form": form})
+
+
+class CancelarOcorrenciaView(UpdateView):
+    template_name = "emprestimo/ocorrencia/ocorrencia_form.html"
+    queryset = Emprestimo.objects
+    form_class = CancelarOcorrenciaForm
+    success_url = reverse_lazy("emprestimo:listar_ocorrencias")
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        repo = DjangoOcorrenciaRepository()
+        policy = DjangoOcorrenciaPolicy(self.request.user)
+        usecase = CancelarOcorrenciaUsecase(repo, policy)
+
+        ocorrencia = usecase.buscar_por_id(kwargs.get("pk", None))
+
+        if not ocorrencia:
+            raise Http404("Ocorrência não encontrada.")
+
+        if not usecase.pode_remover(ocorrencia):
+            raise PermissionDenied("Você não tem permissão para cancelar ocorrências.")
+
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        repo = DjangoOcorrenciaRepository()
+        policy = DjangoOcorrenciaPolicy(self.request.user)
+        usecase = CancelarOcorrenciaUsecase(repo, policy)
+
+        ocorrencia = usecase.buscar_por_id(form.instance.id)
+
+        if not usecase.pode_remover(ocorrencia):
+            raise PermissionDenied("Você não tem permissão para cancelar ocorrências.")
+
+        result = usecase.execute(
+            form.instance.id, form.cleaned_data["motivo_cancelamento"]
+        )
+
+        if not result:
+            messages.error(self.request, result.mensagem)
+            return redirect(
+                reverse_lazy(
+                    "emprestimo:cancelar_ocorrencia",
+                    args=[ocorrencia.id],
+                )
+            )
+
+        return redirect(self.success_url)

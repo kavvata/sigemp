@@ -2,14 +2,23 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 
 from typing import Any, Optional
-from emprestimo.domain.entities import TipoOcorrenciaEntity, EmprestimoEntity
+from emprestimo.domain.entities import (
+    OcorrenciaEntity,
+    TipoOcorrenciaEntity,
+    EmprestimoEntity,
+)
 from emprestimo.domain.types import EmprestimoEstadoEnum
-from emprestimo.infrastructure.mappers import TipoOcorrenciaMapper, EmprestimoMapper
+from emprestimo.infrastructure.mappers import (
+    OcorrenciaMapper,
+    TipoOcorrenciaMapper,
+    EmprestimoMapper,
+)
 from emprestimo.repositories.contracts import (
+    OcorrenciaRepository,
     TipoOcorrenciaRepository,
     EmprestimoRepository,
 )
-from emprestimo.models import TipoOcorrencia, Emprestimo
+from emprestimo.models import Ocorrencia, TipoOcorrencia, Emprestimo
 
 
 class DjangoTipoOcorrenciaRepository(TipoOcorrenciaRepository):
@@ -77,7 +86,7 @@ class DjangoEmprestimoRepository(EmprestimoRepository):
     def buscar_por_id(self, id: int):
         try:
             emprestimo = Emprestimo.objects.get(pk=id, removido_em__isnull=True)
-        except TipoOcorrencia.DoesNotExist as e:
+        except Emprestimo.DoesNotExist as e:
             e.add_note(f"Emprestimo com id '{id}' não encontrado.")
             raise e
         else:
@@ -167,3 +176,90 @@ class DjangoEmprestimoRepository(EmprestimoRepository):
         model.save()
 
         return EmprestimoMapper.from_model(model)
+
+
+class DjangoOcorrenciaRepository(OcorrenciaRepository):
+    def listar_ocorrencias(self):
+        return [
+            OcorrenciaMapper.from_model(o)
+            for o in Ocorrencia.objects.all().order_by("-data_ocorrencia")
+        ]
+
+    def listar_ocorrencias_do_aluno(self, aluno_id: int):
+        return [
+            OcorrenciaMapper.from_model(o)
+            for o in Ocorrencia.objects.all()
+            .filter(emprestimo__aluno__id=aluno_id)
+            .order_by("-data_ocorrencia")
+        ]
+
+    def listar_ocorrencias_do_emprestimo(self, emprestimo_id: int):
+        return [
+            OcorrenciaMapper.from_model(o)
+            for o in Ocorrencia.objects.all()
+            .filter(emprestimo_id=emprestimo_id)
+            .order_by("-data_ocorrencia")
+        ]
+
+    def listar_ocorrencias_do_bem(self, bem_id: int):
+        return [
+            OcorrenciaMapper.from_model(o)
+            for o in Ocorrencia.objects.all()
+            .filter(emprestimo__bem_id=bem_id)
+            .order_by("-data_ocorrencia")
+        ]
+
+    def buscar_por_id(self, id: int):
+        try:
+            ocorrencia = Ocorrencia.objects.get(pk=id)
+        except Ocorrencia.DoesNotExist:
+            return None
+        else:
+            return OcorrenciaMapper.from_model(ocorrencia)
+
+    def cadastrar_ocorrencia(self, ocorrencia: OcorrenciaEntity, user: User):
+        return OcorrenciaMapper.from_model(
+            Ocorrencia.objects.create(
+                **ocorrencia.to_dict(
+                    [
+                        "tipo_descricao",
+                        "bem_descricao",
+                        "bem_patrimonio",
+                        "aluno_nome",
+                        "aluno_matricula",
+                        "timestamps",
+                        "id",
+                    ]
+                ),
+                criado_por=user,
+            )
+        )
+
+    def editar_ocorrencia(self, ocorrencia: OcorrenciaEntity, user: User):
+        try:
+            Ocorrencia.objects.filter(pk=ocorrencia.id).update(
+                **ocorrencia.to_dict(
+                    [
+                        "tipo_descricao",
+                        "bem_descricao",
+                        "bem_patrimonio",
+                        "aluno_nome",
+                        "aluno_matricula",
+                        "timestamps",
+                    ]
+                ),
+                alterado_por=user,
+            )
+        except Ocorrencia.DoesNotExist as e:
+            e.add_note(f"Ocorrencia com id '{ocorrencia.id}' não encontrado.")
+            raise e
+
+        return OcorrenciaMapper.from_model(Ocorrencia.objects.get(pk=ocorrencia.id))
+
+    def remover_ocorrencia(self, id: int, user: Any):
+        try:
+            ocorrencia = Ocorrencia.objects.get(pk=id)
+        except Ocorrencia.DoesNotExist:
+            return None
+
+        return OcorrenciaMapper.from_model(ocorrencia.soft_delete())

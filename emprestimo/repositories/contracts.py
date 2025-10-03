@@ -1,7 +1,11 @@
 from abc import ABC, abstractmethod
 from typing import Any, Optional
 
-from emprestimo.domain.entities import TipoOcorrenciaEntity, EmprestimoEntity
+from emprestimo.domain.entities import (
+    OcorrenciaEntity,
+    TipoOcorrenciaEntity,
+    EmprestimoEntity,
+)
 
 
 class TipoOcorrenciaRepository(ABC):
@@ -65,4 +69,38 @@ class EmprestimoRepository(ABC):
 
     @abstractmethod
     def registrar_devolucao(self, emprestimo: EmprestimoEntity, user: Any):
+        pass
+
+
+class OcorrenciaRepository(ABC):
+    @abstractmethod
+    def listar_ocorrencias(self):
+        pass
+
+    @abstractmethod
+    def listar_ocorrencias_do_aluno(self, aluno_id: int):
+        pass
+
+    @abstractmethod
+    def listar_ocorrencias_do_bem(self, bem_id: int):
+        pass
+
+    @abstractmethod
+    def listar_ocorrencias_do_emprestimo(self, emprestimo_id: int):
+        pass
+
+    @abstractmethod
+    def buscar_por_id(self, id: int):
+        pass
+
+    @abstractmethod
+    def cadastrar_ocorrencia(self, ocorrencia: OcorrenciaEntity, user: Any):
+        pass
+
+    @abstractmethod
+    def editar_ocorrencia(self, ocorrencia: OcorrenciaEntity, user: Any):
+        pass
+
+    @abstractmethod
+    def remover_ocorrencia(self, id: int, user: Any):
         pass
