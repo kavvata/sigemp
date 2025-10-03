@@ -670,12 +670,13 @@ def test_listar_ocorrencias_do_aluno(admin_client, aluno, lista_ocorrencias):
 
 
 @pytest.mark.django_db
-def test_listar_ocorrencias_do_emprestimo(admin_client, emprestimo, lista_ocorrencias):
+def test_listar_ocorrencias_do_emprestimo(admin_client, lista_ocorrencias):
+    emprestimo_id = lista_ocorrencias[0].emprestimo.id
     ocorrencias_do_emprestimo = [
-        o for o in lista_ocorrencias if o.emprestimo.id == emprestimo.id
+        o for o in lista_ocorrencias if o.emprestimo.id == emprestimo_id
     ]
 
-    url = reverse_lazy("emprestimo:listar_ocorrencias_emprestimo", args=[emprestimo.id])
+    url = reverse_lazy("emprestimo:listar_ocorrencias_emprestimo", args=[emprestimo_id])
     response = admin_client.get(url)
 
     for ocorrencia in ocorrencias_do_emprestimo:
@@ -684,7 +685,7 @@ def test_listar_ocorrencias_do_emprestimo(admin_client, emprestimo, lista_ocorre
         assertContains(response, ocorrencia.data_ocorrencia.strftime("%d/%m/%Y"))
 
     outras_ocorrencias = [
-        o for o in lista_ocorrencias if o.emprestimo.id != emprestimo.id
+        o for o in lista_ocorrencias if o.emprestimo.id != emprestimo_id
     ]
     for ocorrencia in outras_ocorrencias:
         assertNotContains(response, ocorrencia.tipo.descricao)
