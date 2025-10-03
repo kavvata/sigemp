@@ -39,3 +39,20 @@ class EmprestimoEntity(TimeStampableEntity):
         ],
     ):
         return super().to_dict(exclude)
+
+
+@dataclass(kw_only=True)
+class OcorrenciaEntity(TimeStampableEntity):
+    data_ocorrencia: date
+    emprestimo_id: int
+    tipo_id: int
+    tipo_descricao: Optional[str] = None
+    bem_descricao: Optional[str] = None
+    bem_patrimonio: Optional[str] = None
+    id: Optional[int] = None
+    cancelado_em: Optional[date] = None
+    cancelado_por_id: Optional[int] = None
+    motivo_cancelamento: Optional[str] = None
+    aluno_nome: Optional[str] = None
+    aluno_matricula: Optional[str] = None
+    descricao: Optional[str] = None
