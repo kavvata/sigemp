@@ -3,7 +3,7 @@ from typing import Any
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpRequest, HttpResponse
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
@@ -582,17 +582,25 @@ class RegistrarOcorrenciaView(CreateView):
 
 
 def registrar_ocorrencia_ao_emprestimo(request, emprestimo_id: int):
-    success_url = reverse_lazy("emprestimo:listar_ocorrencias")
+    success_url = reverse_lazy(
+        "emprestimo:visualizar_emprestimo",
+        args=[emprestimo_id],
+    )
+
+    template_name = "emprestimo/ocorrencia/ocorrencia_form.html"
+
+    repo = DjangoOcorrenciaRepository()
+    policy = DjangoOcorrenciaPolicy(request.user)
+    usecase = RegistrarOcorrenciaUsecase(repo, policy)
+
+    if not usecase.pode_criar():
+        raise PermissionDenied("Você não tem permissão para registrar ocorrências.")
 
     e = get_object_or_404(Emprestimo, pk=emprestimo_id)
 
     form = OcorrenciaForm(request.POST or None, emprestimo=e)
 
     if form.is_valid():
-        repo = DjangoOcorrenciaRepository()
-        policy = DjangoOcorrenciaPolicy(request.user)
-        usecase = RegistrarOcorrenciaUsecase(repo, policy)
-
         if not usecase.pode_criar():
             raise PermissionDenied("Você não tem permissão para registrar ocorrências.")
 
@@ -605,9 +613,16 @@ def registrar_ocorrencia_ao_emprestimo(request, emprestimo_id: int):
 
         if not result:
             messages.error(request, result.mensagem)
-            return redirect(reverse_lazy("emprestimo:registrar_ocorrencia"))
+            return redirect(
+                reverse_lazy(
+                    "emprestimo:visualizar_emprestimo",
+                    args=[emprestimo_id],
+                )
+            )
 
         return redirect(success_url)
+
+    return render(request, template_name, {"form": form})
 
 
 class CancelarOcorrenciaView(UpdateView):
