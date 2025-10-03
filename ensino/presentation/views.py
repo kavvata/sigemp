@@ -6,6 +6,9 @@ from django.urls.base import reverse
 from django.views.generic import CreateView, ListView, UpdateView
 from django.contrib import messages
 
+from emprestimo.policies.django import DjangoOcorrenciaPolicy
+from emprestimo.repositories.django import DjangoOcorrenciaRepository
+from emprestimo.usecases.ocorrencia_usecases import ListarOcorrenciasAlunoUsecase
 from ensino.models import Campus, Curso, FormaSelecao, Aluno
 from ensino.policies.django import (
     DjangoCampusPolicy,
@@ -537,6 +540,24 @@ class EditarAlunoView(UpdateView):
             raise PermissionDenied("Voce nao tem permissao para editar aluno.")
 
         return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        aluno: Aluno = context["form"].instance
+
+        ocorrencia_policy = DjangoOcorrenciaPolicy(self.request.user)
+        ocorrencia_repo = DjangoOcorrenciaRepository()
+
+        usecase = ListarOcorrenciasAlunoUsecase(ocorrencia_repo, ocorrencia_policy)
+        resultado = usecase.execute(aluno.id)
+
+        if not resultado:
+            messages.error(resultado.mensagem)
+            return context
+
+        context["lista_ocorrencias"] = resultado.value
+
+        return context
 
     def form_valid(self, form):
         repo = DjangoAlunoRepository()
