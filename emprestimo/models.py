@@ -38,6 +38,9 @@ class Emprestimo(Timestampable, models.Model):
     )
     observacoes = models.TextField(null=True, blank=True)
 
+    def __str__(self):
+        return f"#{self.id} ({self.get_estado_display()}): {self.aluno.nome} ({self.aluno.matricula}) - {self.bem.descricao} ({self.bem.patrimonio})"
+
 
 class Ocorrencia(Timestampable, models.Model):
     data_ocorrencia = models.DateField()
