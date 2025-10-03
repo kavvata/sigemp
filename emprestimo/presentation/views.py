@@ -635,28 +635,38 @@ class CancelarOcorrenciaView(UpdateView):
         repo = DjangoOcorrenciaRepository()
         policy = DjangoOcorrenciaPolicy(self.request.user)
         usecase = CancelarOcorrenciaUsecase(repo, policy)
-        if not usecase.pode_remover():
-            raise PermissionDenied("Você não tem permissão para registrar ocorrências.")
+
+        ocorrencia = usecase.buscar_por_id(kwargs.get("pk", None))
+
+        if not ocorrencia:
+            raise Http404("Ocorrência não encontrada.")
+
+        if not usecase.pode_remover(ocorrencia):
+            raise PermissionDenied("Você não tem permissão para cancelar ocorrências.")
 
         return super().get(request, *args, **kwargs)
 
     def form_valid(self, form):
         repo = DjangoOcorrenciaRepository()
         policy = DjangoOcorrenciaPolicy(self.request.user)
-        usecase = RegistrarOcorrenciaUsecase(repo, policy)
+        usecase = CancelarOcorrenciaUsecase(repo, policy)
 
-        if not usecase.pode_criar():
-            raise PermissionDenied("Você não tem permissão para registrar ocorrências.")
+        ocorrencia = usecase.buscar_por_id(form.instance.id)
 
-        nova_ocorrencia = OcorrenciaEntity(
-            data_ocorrencia=form.cleaned_data["data_ocorrencia"],
-            emprestimo_id=form.cleaned_data["emprestimo"].id,
-            tipo_id=form.cleaned_data["tipo"].id,
+        if not usecase.pode_remover(ocorrencia):
+            raise PermissionDenied("Você não tem permissão para cancelar ocorrências.")
+
+        result = usecase.execute(
+            form.instance.id, form.cleaned_data["motivo_cancelamento"]
         )
-        result = usecase.execute(nova_ocorrencia)
 
         if not result:
             messages.error(self.request, result.mensagem)
-            return redirect(reverse_lazy("emprestimo:registrar_ocorrencia"))
+            return redirect(
+                reverse_lazy(
+                    "emprestimo:cancelar_ocorrencia",
+                    args=[ocorrencia.id],
+                )
+            )
 
         return redirect(self.success_url)
