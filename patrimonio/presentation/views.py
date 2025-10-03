@@ -7,6 +7,9 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, UpdateView
 
+from emprestimo.policies.django import DjangoOcorrenciaPolicy
+from emprestimo.repositories.django import DjangoOcorrenciaRepository
+from emprestimo.usecases.ocorrencia_usecases import ListarOcorrenciasBemUsecase
 from patrimonio.domain.entities import BemEntity
 from patrimonio.models import (
     EstadoConservacao,
@@ -666,6 +669,24 @@ class EditarBemView(UpdateView):
             raise PermissionDenied("Voce nao tem permissao para editar bens móveis.")
 
         return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        bem: Bem = context["form"].instance
+
+        ocorrencia_policy = DjangoOcorrenciaPolicy(self.request.user)
+        ocorrencia_repo = DjangoOcorrenciaRepository()
+
+        usecase = ListarOcorrenciasBemUsecase(ocorrencia_repo, ocorrencia_policy)
+        resultado = usecase.execute(bem.id)
+
+        if not resultado:
+            messages.error(resultado.mensagem)
+            return context
+
+        context["lista_ocorrencias"] = resultado.value
+
+        return context
 
     def form_valid(self, form):
         repo = DjangoBemRepository()
