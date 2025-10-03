@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block page_title %}
+    <div class="flex flex-row gap-2">
+        Detalhes da Ocorrência #{{ ocorrencia.id }}
+        {% if ocorrencia.cancelado_em %}
+            <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 italic">
+                <i class="material-symbols-outlined text-xs mr-1">cancel</i>
+                Cancelado
+            </span>
+        {% else %}
+            <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+                <i class="material-symbols-outlined text-xs mr-1">check_circle</i>
+                Registrado
+            </span>
+        {% endif %}
+    </div>
+{% endblock %}
+{% block actions %}
+{% endblock actions %}
+{% block content %}
+    <section class="mx-auto max-w-4xl space-y-6 rounded-lg bg-white p-6 shadow-md dark:bg-gray-900">
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tipo</label>
+                <div class="rounded-lg flex flex-row gap-2 border border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-600 dark:bg-gray-700">
+                    <p class="text-sm text-gray-900 dark:text-white">{{ ocorrencia.tipo }}</p>
+                </div>
+            </div>
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data da Ocorrência</label>
+                <div class="rounded-lg flex flex-row gap-2 border border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-600 dark:bg-gray-700">
+                    <p class="text-sm text-gray-900 dark:text-white">{{ ocorrencia.data_ocorrencia|date:"d/m/Y" }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Empréstimo</label>
+            <div class="rounded-lg flex flex-row gap-2 border border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-600 dark:bg-gray-700">
+                <a href="{% url 'emprestimo:visualizar_emprestimo' ocorrencia.emprestimo.id %}"
+                   class="group text-sm text-gray-900 dark:text-white hover:text-blue-500 dark:hover:text-blue-400">
+                    <span class="font-medium group-hover:text-blue-500 dark:group-hover:text-blue-400">#{{ ocorrencia.emprestimo.id }}:</span>
+                    {{ ocorrencia.emprestimo.aluno.nome }}
+                    <span class="text-gray-600 dark:text-gray-400 group-hover:text-blue-500 dark:group-hover:text-blue-400">({{ ocorrencia.emprestimo.aluno.matricula }})</span>
+                    {{ ocorrencia.emprestimo.bem.descricao }}
+                    <span class="text-gray-600 dark:text-gray-400 group-hover:text-blue-500 dark:group-hover:text-blue-400">({{ ocorrencia.emprestimo.bem.patrimonio }})</span>
+                    <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {% if emprestimo.get_estado_display == 'Ativo' %} bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 {% else %} bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 {% endif %}">
+                        {{ ocorrencia.emprestimo.get_estado_display }}
+                    </span>
+                </a>
+            </div>
+        </div>
+        {% if ocorrencia.descricao %}
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Descrição da Ocorrência</label>
+                <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-600 dark:bg-gray-700">
+                    <p class="text-sm text-gray-900 dark:text-white whitespace-pre-line">{{ ocorrencia.descricao }}</p>
+                </div>
+            </div>
+        {% endif %}
+        <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Aluno</label>
+            <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-600 dark:bg-gray-700">
+                <p class="text-sm text-gray-900 dark:text-white">
+                    {{ ocorrencia.emprestimo.aluno.nome }}
+                    <span class="text-gray-600 dark:text-gray-400">({{ ocorrencia.emprestimo.aluno.matricula }})</span>
+                </p>
+            </div>
+        </div>
+        <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Bem Patrimonial</label>
+            <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-600 dark:bg-gray-700">
+                <p class="text-sm font-medium text-gray-900 dark:text-white">{{ ocorrencia.emprestimo.bem.descricao }}</p>
+                <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">Patrimônio: {{ ocorrencia.emprestimo.bem.patrimonio }}</p>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data de Empréstimo</label>
+                <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-600 dark:bg-gray-700">
+                    <p class="text-sm text-gray-900 dark:text-white">{{ ocorrencia.emprestimo.data_emprestimo|date:"d/m/Y" }}</p>
+                </div>
+            </div>
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Previsão de Devolução</label>
+                <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-600 dark:bg-gray-700">
+                    <p class="text-sm text-gray-900 dark:text-white">{{ ocorrencia.emprestimo.data_devolucao_prevista|date:"d/m/Y" }}</p>
+                </div>
+            </div>
+            {% if ocorrencia.emprestimo.data_devolucao %}
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data de Devolução</label>
+                    <div class="rounded-lg border border-green-200 bg-green-50 px-4 py-3 dark:border-green-800 dark:bg-green-900/20">
+                        <p class="text-sm text-green-800 dark:text-green-300">{{ ocorrencia.emprestimo.data_devolucao|date:"d/m/Y" }}</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        {% if ocorrencia.cancelado_em %}
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Cancelado por</label>
+                    <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-600 dark:bg-gray-700">
+                        <p class="text-sm text-gray-900 dark:text-white">{{ ocorrencia.cancelado_por }}</p>
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data de cancelamento</label>
+                    <div class="rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3 dark:border-yellow-800 dark:bg-yellow-900/20">
+                        <p class="text-sm text-yellow-800 dark:text-yellow-300">{{ ocorrencia.cancelado_em|date:"d/m/Y" }}</p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        <div class="flex flex-row items-center justify-center gap-2">
+            {% if not ocorrencia.cancelado_em %}
+                <a href="{% url 'emprestimo:cancelar_ocorrencia' ocorrencia.id %}"
+                   class="cursor-pointer flex items-center gap-2 rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-2 text-sm font-medium text-yellow-600 transition-all duration-300 ease-in-out hover:bg-yellow-100 hover:shadow-md hover:ring-2 hover:ring-yellow-300 dark:border-yellow-400 dark:bg-yellow-900/20 dark:text-yellow-300 hover:dark:bg-yellow-900/30 dark:hover:ring-yellow-500/40">
+                    <i class="material-symbols-outlined align-middle text-base">error</i>
+                    <span>Cancelar Ocorrência</span>
+                </a>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}
