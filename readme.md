@@ -8,9 +8,9 @@
 
 <h2>Imagens do projeto</h2>
 
-<img src="https://github.com/kavvata/sigemp/blob/2506495ce25fdccdaa287604f2d69bf2f31b3d99/resources/screenshots/sigemp_listar_emprestimos.png?raw=true" alt="project-screenshot" width="1670" >
+<img src="https://raw.githubusercontent.com/kavvata/sigemp/refs/heads/docs/resources/screenshots/sigemp_listar_emprestimos.png" alt="project-screenshot" width="1670" >
 
-<img src="https://github.com/kavvata/sigemp/blob/2506495ce25fdccdaa287604f2d69bf2f31b3d99/resources/screenshots/sigemp_emprestimo_detalhes.png?raw=true" alt="project-screenshot" width="1670">
+<img src="https://raw.githubusercontent.com/kavvata/sigemp/refs/heads/docs/resources/screenshots/sigemp_emprestimo_detalhes.png" alt="project-screenshot" width="1670">
 
 <h2>🧐 Funcionalidades</h2>
 
