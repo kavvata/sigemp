@@ -116,7 +116,7 @@
             {% if not ocorrencia.cancelado_em %}
                 <a href="{% url 'emprestimo:cancelar_ocorrencia' ocorrencia.id %}"
                    class="cursor-pointer flex items-center gap-2 rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-2 text-sm font-medium text-yellow-600 transition-all duration-300 ease-in-out hover:bg-yellow-100 hover:shadow-md hover:ring-2 hover:ring-yellow-300 dark:border-yellow-400 dark:bg-yellow-900/20 dark:text-yellow-300 hover:dark:bg-yellow-900/30 dark:hover:ring-yellow-500/40">
-                    <i class="material-symbols-outlined align-middle text-base">error</i>
+                    <i class="material-symbols-outlined align-middle text-base">exclamation</i>
                     <span>Cancelar Ocorrência</span>
                 </a>
             {% endif %}
