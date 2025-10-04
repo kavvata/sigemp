@@ -7,11 +7,15 @@ down:
 
 begin:
 	docker compose exec web python manage.py migrate
-	docker compose exec web python manage.py seed_2022
 	docker compose exec web python manage.py loaddata ./core/fixtures/groups_and_permissions.json
+	docker compose exec web python manage.py seed_2022
+	docker compose exec web python manage.py createsuperuser
 
 begin_dev:
-	docker compose exec web python manage.py seed_2022_fake
+	docker compose exec web python manage.py migrate
+	docker compose exec web python manage.py loaddata ./core/fixtures/groups_and_permissions.json
+	docker compose exec web python manage.py seed_2022_demo
+	docker compose exec web python manage.py createsuperuser
 
 tailwind:
 	docker compose exec web python manage.py tailwind start
