@@ -1,18 +1,15 @@
 <div class="flex h-screen text-gray-700 dark:text-gray-200">
     <aside class="w-64 bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-600 flex-col">
-        <div class="flex justify-between items-center px-6 py-4">
-            <div class="text-sm text-gray-500 font-semibold">SIGEMP</div>
+        <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex items-center gap-2">
+                <i class="material-symbols-outlined text-blue-500 text-xl">school</i>
+                <div class="text-sm font-semibold text-gray-600 dark:text-gray-300">SIGEMP</div>
+            </div>
             <div x-data="{ userMenuOpen: false }" class="relative">
                 <button @click="userMenuOpen = !userMenuOpen"
                         class="flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
                         title="Menu do usuário">
-                    <svg class="h-5 w-5 text-gray-500 dark:text-gray-400"
-                         aria-hidden="true"
-                         xmlns="http://www.w3.org/2000/svg"
-                         fill="currentColor"
-                         viewBox="0 0 20 20">
-                        <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
-                    </svg>
+                    <i class="material-symbols-outlined text-xl text-gray-500 dark:text-gray-400">person</i>
                 </button>
                 <div x-show="userMenuOpen"
                      @click.away="userMenuOpen = false"
@@ -26,7 +23,7 @@
                     <div class="py-1">
                         <a href="#"
                            class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
-                            <i class="material-symbols-outlined text-lg mr-3">settings</i>
+                            <i class="material-symbols-outlined  text-lg mr-3">settings</i>
                             <span>Configurações</span>
                         </a>
                         <a href="{% url 'core:logout' %}"
@@ -38,96 +35,154 @@
                 </div>
             </div>
         </div>
-        <nav class="flex-1 px-6 py-4 text-sm font-semibold">
-            <div class="relative">
-                <a href="{% url 'core:home' %}"
-                   class="block py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800">
-                    <i class="material-symbols-outlined align-middle">home</i>
-                    <span class="align-middle">Dashboard</span>
-                </a>
-                <a href="{% url 'emprestimo:listar_emprestimos' %}"
-                   class="block py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800">
-                    <i class="material-symbols-outlined align-middle">contract</i>
-                    <span class="align-middle">Empréstimos</span>
-                </a>
-                <a href="{% url 'patrimonio:listar_bens' %}"
-                   class="block py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800">
-                    <i class="material-symbols-outlined align-middle">package_2</i>
-                    <span class="align-middle">Bens Móveis</span>
-                </a>
-                <div x-data="{ openMenu: false }" class="relative">
-                    <button @click="openMenu = !openMenu"
-                            class="w-full flex justify-between items-center py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition">
-                        <span>Ocorrência</span>
-                        <svg :class="{ 'rotate-90': openMenu }"
-                             class="w-4 h-4 transform transition-transform"
-                             fill="none"
-                             stroke="currentColor"
-                             viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                        </svg>
-                    </button>
-                    <div x-show="openMenu"
-                         @click.away="openMenu = false"
-                         x-transition
-                         class="absolute left-full top-0 ml-2 mt-0 bg-white border dark:bg-gray-900  dark:border-gray-700 shadow-lg rounded w-48 z-50">
-                        <a href="{% url 'emprestimo:listar_ocorrencias' %}"
-                           class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Ocorrências</a>
-                        <a href="{% url 'emprestimo:listar_tipos_ocorrencia' %}"
-                           class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Tipos de Ocorrência</a>
+        <nav class="flex-1 px-4 py-4 space-y-1">
+            <!-- Dashboard -->
+            <a href="{% url 'core:home' %}"
+               class="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors duration-200 group {% if request.path == '/' or 'home' in request.path %}bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800{% else %}text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800{% endif %}">
+                <i class="material-symbols-outlined text-sm transition-colors {% if request.path == '/' %}text-blue-500{% else %}text-gray-400 group-hover:text-blue-500{% endif %}">dashboard</i>
+                <span class="font-medium">Dashboard</span>
+            </a>
+            <!-- Empréstimos -->
+            <a href="{% url 'emprestimo:listar_emprestimos' %}"
+               class="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors duration-200 group {% if 'emprestimo' in request.path and 'ocorrencia' not in request.path %}bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border border-green-200 dark:border-green-800{% else %}text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800{% endif %}">
+                <i class="material-symbols-outlined text-sm transition-colors {% if 'emprestimo' in request.path and 'ocorrencia' not in request.path %}text-green-500{% else %}text-gray-400 group-hover:text-green-500{% endif %}">contract</i>
+                <span class="font-medium">Empréstimos</span>
+            </a>
+            <!-- Bens Móveis -->
+            <a href="{% url 'patrimonio:listar_bens' %}"
+               class="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors duration-200 group {% if 'patrimonio' in request.path and 'bem' in request.path and 'tipo' not in request.path and 'estado' not in request.path and 'grau' not in request.path and 'marca' not in request.path %}bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-800{% else %}text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800{% endif %}">
+                <i class="material-symbols-outlined text-sm transition-colors {% if 'patrimonio' in request.path and 'tipo' not in request.path and 'estado' not in request.path and 'grau' not in request.path and 'marca' not in request.path %}text-purple-500{% else %}text-gray-400 group-hover:text-purple-500{% endif %}">inventory_2</i>
+                <span class="font-medium">Bens Móveis</span>
+            </a>
+            <!-- Ocorrências Section -->
+            <div x-data="{ open:
+                {% if 'ocorrencia' in request.path %}
+                    true
+                {% else %}
+                    false
+                {% endif %}
+                }" class="relative">
+                <button @click="open = !open"
+                        class="flex items-center justify-between w-full px-3 py-2 rounded-lg transition-colors duration-200 group {% if 'ocorrencia' in request.path %}bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-800{% else %}text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800{% endif %}">
+                    <div class="flex items-center gap-3">
+                        <i class="material-symbols-outlined text-sm transition-colors {% if 'ocorrencia' in request.path %}text-orange-500{% else %}text-gray-400 group-hover:text-orange-500{% endif %}">warning</i>
+                        <span class="font-medium">Ocorrências</span>
                     </div>
+                    <i class="material-symbols-outlined text-sm transform transition-transform duration-200 {% if 'ocorrencia' in request.path %}text-orange-500{% else %}text-gray-400{% endif %}"
+                       :class="{ 'rotate-180': open }">expand_more</i>
+                </button>
+                <div x-show="open"
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 transform -translate-y-2"
+                     x-transition:enter-end="opacity-100 transform translate-y-0"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100 transform translate-y-0"
+                     x-transition:leave-end="opacity-0 transform -translate-y-2"
+                     class="ml-8 mt-1 space-y-1">
+                    <a href="{% url 'emprestimo:listar_ocorrencias' %}"
+                       class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors duration-200 group {% if request.path == '/emprestimo/ocorrencias/' %}bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-800{% else %}text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800{% endif %}">
+                        <i class="material-symbols-outlined text-sm  transition-colors {% if request.path == '/emprestimo/ocorrencias/' %}text-orange-500{% else %}text-gray-400 group-hover:text-orange-500{% endif %}">list</i>
+                        <span>Lista de Ocorrências</span>
+                    </a>
+                    <a href="{% url 'emprestimo:listar_tipos_ocorrencia' %}"
+                       class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors duration-200 group {% if 'tipo_ocorrencia' in request.path %}bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-800{% else %}text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800{% endif %}">
+                        <i class="material-symbols-outlined text-sm  transition-colors {% if 'tipo_ocorrencia' in request.path %}text-orange-500{% else %}text-gray-400 group-hover:text-orange-500{% endif %}">category</i>
+                        <span>Tipos de Ocorrência</span>
+                    </a>
                 </div>
-                <div x-data="{ openMenu: false }" class="relative">
-                    <button @click="openMenu = !openMenu"
-                            class="w-full flex justify-between items-center py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition">
-                        <span>Patrimônio</span>
-                        <svg :class="{ 'rotate-90': openMenu }"
-                             class="w-4 h-4 transform transition-transform"
-                             fill="none"
-                             stroke="currentColor"
-                             viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                        </svg>
-                    </button>
-                    <div x-show="openMenu"
-                         @click.away="openMenu = false"
-                         x-transition
-                         class="absolute left-full top-0 ml-2 mt-0 bg-white border dark:bg-gray-900  dark:border-gray-700 shadow-lg rounded w-48 z-50">
-                        <a href="{% url 'patrimonio:listar_tipos_bem' %}"
-                           class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Tipos de Bem</a>
-                        <a href="{% url 'patrimonio:listar_estados_conservacao' %}"
-                           class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Estados de Conservação</a>
-                        <a href="{% url 'patrimonio:listar_grau_fragilidade' %}"
-                           class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Graus de fragilidade</a>
-                        <a href="{% url 'patrimonio:listar_marca_modelo' %}"
-                           class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Marcas / Modelos</a>
+            </div>
+            <!-- Patrimônio Section -->
+            <div x-data="{ open:
+                {% if 'patrimonio' in request.path and '/bem' not in request.path %}
+                    true
+                {% else %}
+                    false
+                {% endif %}
+                }" class="relative">
+                <button @click="open = !open"
+                        class="flex items-center justify-between w-full px-3 py-2 rounded-lg transition-colors duration-200 group {% if 'patrimonio' in request.path and '/bem' not in request.path %}bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800{% else %}text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800{% endif %}">
+                    <div class="flex items-center gap-3">
+                        <i class="material-symbols-outlined text-sm transition-colors {% if 'patrimonio' in request.path and '/bem' not in request.path %}text-indigo-500{% else %}text-gray-400 group-hover:text-indigo-500{% endif %}">business_center</i>
+                        <span class="font-medium">Patrimônio</span>
                     </div>
+                    <i class="material-symbols-outlined text-sm transform transition-transform duration-200 {% if 'patrimonio' in request.path and '/bem' not in request.path %}text-indigo-500{% else %}text-gray-400{% endif %}"
+                       :class="{ 'rotate-180': open }">expand_more</i>
+                </button>
+                <div x-show="open"
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 transform -translate-y-2"
+                     x-transition:enter-end="opacity-100 transform translate-y-0"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100 transform translate-y-0"
+                     x-transition:leave-end="opacity-0 transform -translate-y-2"
+                     class="ml-8 mt-1 space-y-1">
+                    <a href="{% url 'patrimonio:listar_tipos_bem' %}"
+                       class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors duration-200 group {% if 'tipo_bem' in request.path %}bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800{% else %}text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800{% endif %}">
+                        <i class="material-symbols-outlined text-sm transition-colors {% if 'tipo_bem' in request.path %}text-indigo-500{% else %}text-gray-400 group-hover:text-indigo-500{% endif %}">style</i>
+                        <span>Tipos de Bem</span>
+                    </a>
+                    <a href="{% url 'patrimonio:listar_estados_conservacao' %}"
+                       class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors duration-200 group {% if 'estado_conservacao' in request.path %}bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800{% else %}text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800{% endif %}">
+                        <i class="material-symbols-outlined text-sm transition-colors {% if 'estado_conservacao' in request.path %}text-indigo-500{% else %}text-gray-400 group-hover:text-indigo-500{% endif %}">construction</i>
+                        <span>Estados de Conservação</span>
+                    </a>
+                    <a href="{% url 'patrimonio:listar_grau_fragilidade' %}"
+                       class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors duration-200 group {% if 'grau_fragilidade' in request.path %}bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800{% else %}text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800{% endif %}">
+                        <i class="material-symbols-outlined text-sm transition-colors {% if 'grau_fragilidade' in request.path %}text-indigo-500{% else %}text-gray-400 group-hover:text-indigo-500{% endif %}">health_cross</i>
+                        <span>Graus de Fragilidade</span>
+                    </a>
+                    <a href="{% url 'patrimonio:listar_marca_modelo' %}"
+                       class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors duration-200 group {% if 'marca_modelo' in request.path %}bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800{% else %}text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800{% endif %}">
+                        <i class="material-symbols-outlined text-sm transition-colors {% if 'marca_modelo' in request.path %}text-indigo-500{% else %}text-gray-400 group-hover:text-indigo-500{% endif %}">branding_watermark</i>
+                        <span>Marcas / Modelos</span>
+                    </a>
                 </div>
-                <div x-data="{ openMenu: false }" class="relative">
-                    <button @click="openMenu = !openMenu"
-                            class="w-full flex justify-between items-center py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition">
-                        <span>Ensino</span>
-                        <svg :class="{ 'rotate-90': openMenu }"
-                             class="w-4 h-4 transform transition-transform"
-                             fill="none"
-                             stroke="currentColor"
-                             viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                        </svg>
-                    </button>
-                    <div x-show="openMenu"
-                         @click.away="openMenu = false"
-                         x-transition
-                         class="absolute left-full top-0 ml-2 mt-0 bg-white border dark:bg-gray-900  dark:border-gray-700 shadow-lg rounded w-48 z-50">
-                        <a href="{% url 'ensino:listar_alunos' %}"
-                           class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Alunos</a>
-                        <a href="{% url 'ensino:listar_cursos' %}"
-                           class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Cursos</a>
-                        <a href="{% url 'ensino:listar_campi' %}"
-                           class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Campi</a>
-                        <a href="{% url 'ensino:listar_formas_selecao' %}"
-                           class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Formas de Seleção</a>
+            </div>
+            <!-- Ensino Section -->
+            <div x-data="{ open:
+                {% if 'ensino' in request.path %}
+                    true
+                {% else %}
+                    false
+                {% endif %}
+                }" class="relative">
+                <button @click="open = !open"
+                        class="flex items-center justify-between w-full px-3 py-2 rounded-lg transition-colors duration-200 group {% if 'ensino' in request.path %}bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-800{% else %}text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800{% endif %}">
+                    <div class="flex items-center gap-3">
+                        <i class="material-symbols-outlined text-sm transition-colors {% if 'ensino' in request.path %}text-cyan-500{% else %}text-gray-400 group-hover:text-cyan-500{% endif %}">school</i>
+                        <span class="font-medium">Ensino</span>
                     </div>
+                    <i class="material-symbols-outlined text-sm transform transition-transform duration-200 {% if 'ensino' in request.path %}text-cyan-500{% else %}text-gray-400{% endif %}"
+                       :class="{ 'rotate-180': open }">expand_more</i>
+                </button>
+                <div x-show="open"
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 transform -translate-y-2"
+                     x-transition:enter-end="opacity-100 transform translate-y-0"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100 transform translate-y-0"
+                     x-transition:leave-end="opacity-0 transform -translate-y-2"
+                     class="ml-8 mt-1 space-y-1">
+                    <a href="{% url 'ensino:listar_alunos' %}"
+                       class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors duration-200 group {% if 'aluno' in request.path %}bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-800{% else %}text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800{% endif %}">
+                        <i class="material-symbols-outlined text-sm transition-colors {% if 'aluno' in request.path %}text-cyan-500{% else %}text-gray-400 group-hover:text-cyan-500{% endif %}">group</i>
+                        <span>Alunos</span>
+                    </a>
+                    <a href="{% url 'ensino:listar_cursos' %}"
+                       class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors duration-200 group {% if 'curso' in request.path %}bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-800{% else %}text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800{% endif %}">
+                        <i class="material-symbols-outlined text-sm transition-colors {% if 'curso' in request.path %}text-cyan-500{% else %}text-gray-400 group-hover:text-cyan-500{% endif %}">menu_book</i>
+                        <span>Cursos</span>
+                    </a>
+                    <a href="{% url 'ensino:listar_campi' %}"
+                       class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors duration-200 group {% if 'campus' in request.path %}bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-800{% else %}text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800{% endif %}">
+                        <i class="material-symbols-outlined text-sm transition-colors {% if 'campus' in request.path %}text-cyan-500{% else %}text-gray-400 group-hover:text-cyan-500{% endif %}">location_city</i>
+                        <span>Campi</span>
+                    </a>
+                    <a href="{% url 'ensino:listar_formas_selecao' %}"
+                       class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors duration-200 group {% if 'forma_selecao' in request.path %}bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-800{% else %}text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800{% endif %}">
+                        <i class="material-symbols-outlined text-sm transition-colors {% if 'forma-selecao' in request.path %}text-cyan-500{% else %}text-gray-400 group-hover:text-cyan-500{% endif %}">assignment_turned_in</i>
+                        <span>Formas de Seleção</span>
+                    </a>
                 </div>
             </div>
         </nav>
