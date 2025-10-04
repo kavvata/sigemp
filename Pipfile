@@ -18,6 +18,7 @@ django-stubs = "*"
 pytest = "*"
 pytest-django = "*"
 pytest-cov = "*"
+faker = "*"
 
 [requires]
 python_version = "3.13"
