@@ -1,12 +1,17 @@
 import random
+from django.contrib.auth.models import User
 from faker import Faker
 from datetime import datetime, timedelta
 from django.core.management.base import BaseCommand, CommandError, CommandParser
 from django.db import transaction
 
-from emprestimo.domain.entities import EmprestimoEntity, TipoOcorrenciaEntity
+from emprestimo.domain.entities import (
+    EmprestimoEntity,
+    OcorrenciaEntity,
+    TipoOcorrenciaEntity,
+)
 from emprestimo.domain.types import EmprestimoEstadoEnum
-from emprestimo.models import Emprestimo, TipoOcorrencia
+from emprestimo.models import Emprestimo, Ocorrencia, TipoOcorrencia
 from ensino.domain.entities import (
     AlunoEntity,
     CampusEntity,
@@ -370,8 +375,143 @@ class Command(BaseCommand):
                 _models = [
                     Emprestimo.objects.get_or_create(**e.to_dict())[0] for e in entities
                 ]
+
+                self.seed_ocorrencias(N)
         except Exception as e:
             self.stdout.write(str(e))
             self.stdout.write("Erro ao popular banco, fazendo rollback...")
 
         self.stdout.write("... Banco populado!")
+
+    def generate_ocorrencia_description(self, tipo_ocorrencia, faker):
+        """
+        Generate realistic descriptions based on ocorrência type
+        """
+        descriptions = {
+            "Quebra": [
+                f"Equipamento apresentou {faker.random_element(['quebra', 'trinca', 'fissura'])} no {faker.random_element(['visor', 'carcaça', 'suporte', 'botão', 'tela'])} durante uso normal",
+                f"{faker.random_element(['Danificação', 'Quebra'])} do componente {faker.random_element(['lente', 'cabo de força', 'adaptador', 'bateria'])} por uso inadequado",
+                f"Equipamento {faker.random_element(['quebrou', 'trincou', 'danificou'])} durante transporte entre laboratórios",
+            ],
+            "Defeito Elétrico": [
+                f"Problema no {faker.random_element(['circuito elétrico', 'fonte de alimentação', 'cabos internos'])} causando {faker.random_element(['curto-circuito', 'superaquecimento', 'falha intermitente'])}",
+                f"Equipamento apresenta {faker.random_element(['falha na alimentação', 'problema de aterramento', 'defeito na placa-mãe'])} desde {faker.date_this_year()}",
+                f"{faker.random_element(['Não liga', 'Desliga sozinho', 'Apita constantemente'])} - possível defeito no sistema elétrico",
+            ],
+            "Manutenção Preventiva": [
+                f"Manutenção preventiva programada para {faker.random_element(['calibração', 'limpeza interna', 'substituição de componentes'])}",
+                f"Revisão periódica do equipamento conforme manual do fabricante",
+                f"Manutenção de rotina para verificação de {faker.random_element(['desgaste', 'alinhamento', 'calibração'])}",
+            ],
+            "Furto/Roubo": [
+                f"Equipamento {faker.random_element(['furtado', 'roubado'])} do {faker.random_element(['laboratório', 'sala de aula', 'armário'])} em {faker.date_this_year()}",
+                f"Sumiço do equipamento durante {faker.random_element(['transporte', 'empréstimo', 'armazenamento'])}",
+                f"Relatado {faker.random_element(['furto', 'extraviou'])} pelo usuário {faker.name()}",
+            ],
+            "Uso Indevido": [
+                f"Equipamento utilizado para fins diferentes dos autorizados - {faker.sentence()}",
+                f"Uso inadequado constatado durante {faker.random_element(['aula prática', 'pesquisa', 'atividade extracurricular'])}",
+                f"Descumprimento das normas de uso do equipamento por parte do aluno",
+            ],
+        }
+
+        # Default description if tipo not found
+        default_descriptions = [
+            f"Ocorrência registrada para {tipo_ocorrencia.lower()} - {faker.sentence()}",
+            f"Problema identificado no equipamento: {faker.sentence()}",
+            f"Relatado {tipo_ocorrencia.lower()} durante uso acadêmico",
+        ]
+
+        return faker.random_element(
+            descriptions.get(tipo_ocorrencia, default_descriptions)
+        )
+
+    def generate_cancelamento_reason(self, faker):
+        """
+        Generate realistic cancellation reasons
+        """
+        reasons = [
+            "Registro em duplicidade - ocorrência já havia sido cadastrada anteriormente",
+            "Informações incorretas fornecidas pelo usuário",
+            "Equipamento verificado e não apresentou o problema relatado",
+            "Ocorrência registrada por engano - equipamento em perfeito estado",
+            "Problema resolvido antes do registro formal",
+            "Dados insuficientes para processar a ocorrência",
+            "Equipamento substituído antes do registro da ocorrência",
+            "Manutenção realizada por terceiro antes do registro",
+        ]
+        return faker.random_element(reasons)
+
+    def seed_ocorrencias(self, num_ocorrencias=20, cancel_percentage=0.3):
+        """
+        Seed ocorrências with realistic fake data
+        """
+        faker = Faker("pt-BR")
+        entities = []
+
+        for i in range(5):
+            User.objects.create_user(
+                faker.user_name(),
+                faker.email(),
+                faker.password(12),
+            )
+
+        emprestimos_disponiveis = list(Emprestimo.objects.all())
+        tipos_ocorrencia_disponiveis = list(TipoOcorrencia.objects.all())
+
+        if not emprestimos_disponiveis or not tipos_ocorrencia_disponiveis:
+            print(
+                "No empréstimos or tipos_ocorrencia available. Please seed those first."
+            )
+            return []
+
+        for i in range(num_ocorrencias):
+            # Random emprestimo and tipo_ocorrencia
+            emprestimo = random.choice(emprestimos_disponiveis)
+            tipo_ocorrencia = random.choice(tipos_ocorrencia_disponiveis)
+
+            # Random date within the last year
+            data_ocorrencia = faker.date_between(start_date="-1y", end_date="today")
+
+            # Decide if this ocorrência should be canceled
+            is_canceled = faker.boolean(chance_of_getting_true=cancel_percentage * 100)
+
+            entity_data = {
+                "data_ocorrencia": data_ocorrencia,
+                "emprestimo_id": emprestimo.id,
+                "tipo_id": tipo_ocorrencia.id,
+                "descricao": self.generate_ocorrencia_description(
+                    tipo_ocorrencia.descricao, faker
+                ),
+            }
+
+            # Add cancellation data if canceled
+            if is_canceled:
+                entity_data.update(
+                    {
+                        "cancelado_em": faker.date_between(
+                            start_date=data_ocorrencia, end_date="today"
+                        ),
+                        "cancelado_por_id": random.choice(User.objects.all()).id,
+                        "motivo_cancelamento": self.generate_cancelamento_reason(faker),
+                    }
+                )
+
+            entity = OcorrenciaEntity(**entity_data)
+            entities.append(entity)
+
+        models = [
+            Ocorrencia.objects.get_or_create(
+                **ocorrencia.to_dict(
+                    exclude=[
+                        "tipo_descricao",
+                        "bem_descricao",
+                        "bem_patrimonio",
+                        "aluno_nome",
+                        "aluno_matricula",
+                        "timestamps",
+                    ]
+                )
+            )[0]
+            for ocorrencia in entities
+        ]
