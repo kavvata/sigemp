@@ -69,6 +69,11 @@ urlpatterns = [
         "ocorrencias/", views.ListarOcorrenciasView.as_view(), name="listar_ocorrencias"
     ),
     path(
+        "ocorrencias/<int:pk>",
+        views.VisualizarOcorrenciaView.as_view(),
+        name="visualizar_ocorrencia",
+    ),
+    path(
         "ocorrencias/aluno/<int:aluno_id>/",
         views.ListarOcorrenciasAlunoView.as_view(),
         name="listar_ocorrencias_aluno",
