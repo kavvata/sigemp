@@ -16,77 +16,79 @@
 {% endblock actions %}
 {% block content %}
     <section class="bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-300 max-w-7xl mx-auto p-2 shadow-md rounded-md">
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead class="">
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Ações
-                    </th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Aluno
-                    </th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Bem</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Data Empréstimo
-                    </th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Data Devolução Prevista
-                    </th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Data Devolução
-                    </th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Status
-                    </th>
-                </tr>
-            </thead>
-            <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-                {% for emprestimo in emprestimos %}
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-3">
-                                <a href="{% url 'emprestimo:editar_emprestimo' emprestimo.id %}"
-                                   class="text-gray-500 hover:text-blue-600 transition-colors duration-200 dark:text-gray-400 dark:hover:text-blue-400"
-                                   title="Editar empréstimo">
-                                    <i class="material-symbols-outlined text-lg">edit</i>
-                                </a>
-                                <a href="{% url 'emprestimo:visualizar_emprestimo' emprestimo.id %}"
-                                   class="text-gray-500 hover:text-green-600 transition-colors duration-200 dark:text-gray-400 dark:hover:text-green-400"
-                                   title="Visualizar empréstimo">
-                                    <i class="material-symbols-outlined text-lg">visibility</i>
-                                </a>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
-                            {{ emprestimo.aluno_nome }} ({{ emprestimo.aluno_matricula }})
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
-                            {{ emprestimo.bem_descricao }} ({{ emprestimo.bem_patrimonio }})
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{{ emprestimo.data_emprestimo|date:"d/m/Y" }}</td>
-                        <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
-                            {{ emprestimo.data_devolucao_prevista|date:"d/m/Y" }}
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
-                            {% if emprestimo.data_devolucao %}
-                                {{ emprestimo.data_devolucao|date:"d/m/Y" }}
-                            {% else %}
-                                -
-                            {% endif %}
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
-                            <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {% if emprestimo.estado == 1 %} bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 {% else %} bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 {% endif %}">
-                                {{ emprestimo.estado.label }}
-                            </span>
-                        </td>
-                    </tr>
-                {% empty %}
+        <div class="overflow-y-auto max-h-[calc(100vh-250px)]">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-900 sticky top-0 border-b-2 border-solid  border-b-gray-200 dark:border-b-gray-700">
                     <tr>
-                        <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">Nenhum empréstimo encontrado.</td>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            Ações
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            Aluno
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Bem</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            Data Empréstimo
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            Data Devolução Prevista
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            Data Devolução
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            Status
+                        </th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                    {% for emprestimo in emprestimos %}
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-3">
+                                    <a href="{% url 'emprestimo:editar_emprestimo' emprestimo.id %}"
+                                       class="text-gray-500 hover:text-blue-600 transition-colors duration-200 dark:text-gray-400 dark:hover:text-blue-400"
+                                       title="Editar empréstimo">
+                                        <i class="material-symbols-outlined text-lg">edit</i>
+                                    </a>
+                                    <a href="{% url 'emprestimo:visualizar_emprestimo' emprestimo.id %}"
+                                       class="text-gray-500 hover:text-green-600 transition-colors duration-200 dark:text-gray-400 dark:hover:text-green-400"
+                                       title="Visualizar empréstimo">
+                                        <i class="material-symbols-outlined text-lg">visibility</i>
+                                    </a>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
+                                {{ emprestimo.aluno_nome }} ({{ emprestimo.aluno_matricula }})
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
+                                {{ emprestimo.bem_descricao }} ({{ emprestimo.bem_patrimonio }})
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{{ emprestimo.data_emprestimo|date:"d/m/Y" }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
+                                {{ emprestimo.data_devolucao_prevista|date:"d/m/Y" }}
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
+                                {% if emprestimo.data_devolucao %}
+                                    {{ emprestimo.data_devolucao|date:"d/m/Y" }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
+                                <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {% if emprestimo.estado == 1 %} bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 {% else %} bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 {% endif %}">
+                                    {{ emprestimo.estado.label }}
+                                </span>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">Nenhum empréstimo encontrado.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
         <div class="mt-6 mx-2 flex justify-between items-center">
             <div class="text-sm text-gray-600 dark:text-gray-400">
                 Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}

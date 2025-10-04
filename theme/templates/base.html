@@ -59,20 +59,18 @@
                     </div>
                 {% endif %}
                 <main class="p-6">
-                    <div class="mt-6 ">
-                        <section class="max-w-7xl mx-auto flex items-center justify-between mb-8">
-                            <div>
-                                <h1 class="font-bold text-2xl">
-                                    {% block page_title %}{% endblock %}
-                                </h1>
-                            </div>
-                            <div class="flex flex-row gap-x-2">
-                                {% block actions %}
-                                {% endblock actions %}
-                            </div>
-                        </section>
-                        {% block content %}{% endblock %}
-                    </div>
+                    <section class="max-w-7xl mx-auto flex items-center justify-between mb-6">
+                        <div class="">
+                            <h1 class="font-bold text-2xl">
+                                {% block page_title %}{% endblock %}
+                            </h1>
+                        </div>
+                        <div class="flex flex-row gap-x-2">
+                            {% block actions %}
+                            {% endblock actions %}
+                        </div>
+                    </section>
+                    {% block content %}{% endblock %}
                 </main>
             </section>
         </div>
