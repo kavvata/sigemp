@@ -59,10 +59,18 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
-                                {{ emprestimo.aluno_nome }} ({{ emprestimo.aluno_matricula }})
+                                <a href="{% url 'ensino:editar_aluno' emprestimo.aluno_id %}"
+                                   class="group hover:text-blue-600 dark:hover:text-blue-400">
+                                    {{ emprestimo.aluno_nome }}
+                                    <span class="text-gray-600 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400">({{ emprestimo.aluno_matricula }})</span>
+                                </a>
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
-                                {{ emprestimo.bem_descricao }} ({{ emprestimo.bem_patrimonio }})
+                                <a href="{% url 'patrimonio:editar_bem' emprestimo.bem_id %}"
+                                   class="group hover:text-blue-600 dark:hover:text-blue-400">
+                                    {{ emprestimo.bem_descricao }}
+                                    <span class="text-gray-600 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400">({{ emprestimo.bem_patrimonio }})</span>
+                                </a>
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{{ emprestimo.data_emprestimo|date:"d/m/Y" }}</td>
                             <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
