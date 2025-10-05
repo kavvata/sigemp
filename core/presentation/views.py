@@ -1,3 +1,4 @@
+from datetime import timedelta
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.http.request import HttpRequest
@@ -5,10 +6,16 @@ from django.shortcuts import redirect, render
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_not_required
 from django.urls import reverse
+from django.utils import timezone
 
 from core.presentation.forms import LoginForm
 from core.repositories.django import DjUserRepository
 from core.usecases import login_usecase
+
+from emprestimo.domain.types import EmprestimoEstadoEnum
+from emprestimo.models import Emprestimo, Ocorrencia
+from ensino.models import Aluno
+from patrimonio.models import Bem, EstadoConservacao
 
 
 # Create your views here.
@@ -37,7 +44,54 @@ def login_view(request: HttpRequest):
 
 
 def home_view(request: HttpRequest):
-    return render(request, "core/home.html")
+    count_emprestimos_ativos: int = Emprestimo.objects.filter(
+        estado=EmprestimoEstadoEnum.ATIVO
+    ).count()
+
+    count_emprestimos_vencendo: int = Emprestimo.objects.filter(
+        data_devolucao_prevista=timezone.now()
+    ).count()
+
+    emprestimos_recentes = Emprestimo.objects.filter(
+        data_emprestimo__gt=timezone.now() - timedelta(days=14),
+        estado=EmprestimoEstadoEnum.ATIVO,
+    ).order_by("-data_emprestimo")[:3]
+
+    count_alunos = Aluno.objects.all().count()
+
+    count_novos_alunos = Aluno.objects.filter(
+        criado_em__gt=timezone.now() - timedelta(days=30)
+    ).count()
+
+    count_bens_disponiveis = (
+        Bem.objects.exclude(emprestimo__estado=EmprestimoEstadoEnum.ATIVO)
+        .distinct()
+        .count()
+    )
+
+    count_bens_com_ocorrencias = (
+        Bem.objects.filter(
+            emprestimo__ocorrencia__isnull=False,
+            emprestimo__estado=EmprestimoEstadoEnum.ATIVO,
+        )
+        .distinct()
+        .count()
+    )
+
+    count_ocorrencias = Ocorrencia.objects.filter(cancelado_em__isnull=True).count()
+
+    context = {
+        "count_emprestimos_ativos": count_emprestimos_ativos,
+        "count_emprestimos_vencendo": count_emprestimos_vencendo,
+        "emprestimos_recentes": emprestimos_recentes,
+        "count_alunos": count_alunos,
+        "count_novos_alunos": count_novos_alunos,
+        "count_bens_disponiveis": count_bens_disponiveis,
+        "count_bens_com_ocorrencias": count_bens_com_ocorrencias,
+        "count_ocorrencias": count_ocorrencias,
+    }
+
+    return render(request, "core/home.html", context=context)
 
 
 def logout_view(request: HttpRequest):

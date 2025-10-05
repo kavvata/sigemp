@@ -80,7 +80,9 @@ class DjangoEmprestimoRepository(EmprestimoRepository):
     def listar_emprestimos(self):
         return [
             EmprestimoMapper.from_model(emprestimo)
-            for emprestimo in Emprestimo.objects.order_by("-data_emprestimo")
+            for emprestimo in Emprestimo.objects.order_by(
+                "-data_emprestimo", "estado", "-data_devolucao_prevista"
+            )
         ]
 
     def buscar_por_id(self, id: int):
