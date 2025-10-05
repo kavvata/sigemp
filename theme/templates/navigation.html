@@ -1,8 +1,11 @@
+{% load static %}
 <div class="flex h-screen text-gray-700 dark:text-gray-200">
     <aside class="w-64 bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-600 flex-col">
         <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex items-center gap-2">
-                <i class="material-symbols-outlined text-blue-500 text-xl">school</i>
+                <i class="">
+                    <img src="{% static 'images/logo.svg' %}" alt="">
+                </i>
                 <div class="text-sm font-semibold text-gray-600 dark:text-gray-300">SIGEMP</div>
             </div>
             <div x-data="{ userMenuOpen: false }" class="relative">
