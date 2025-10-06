@@ -24,4 +24,4 @@ def cron_notificar_prazo_proximo():
     if not resultado:
         print(f"[CRON] Erro ao notificar prazos: {resultado.mensagem}")
     else:
-        print(f"[CRON] Notificações de devolução enviadas: {resultado.mensagem}")
+        print(f"[CRON] Notificações de devolução enviadas: {resultado.value}")
