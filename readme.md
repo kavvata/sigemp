@@ -8,6 +8,12 @@
 
 <h2>Imagens do projeto</h2>
 
+<img src="https://raw.githubusercontent.com/kavvata/sigemp/refs/heads/docs/resources/screenshots/sigemp_login.png" alt="project-screenshot" width="1670" >
+
+<img src="https://raw.githubusercontent.com/kavvata/sigemp/refs/heads/docs/resources/screenshots/sigemp_painel.png" alt="project-screenshot" width="1670" >
+
+<img src="https://raw.githubusercontent.com/kavvata/sigemp/refs/heads/docs/resources/screenshots/sigemp_painel_modo_escuro.png" alt="project-screenshot" width="1670" >
+
 <img src="https://raw.githubusercontent.com/kavvata/sigemp/refs/heads/docs/resources/screenshots/sigemp_listar_emprestimos.png" alt="project-screenshot" width="1670" >
 
 <img src="https://raw.githubusercontent.com/kavvata/sigemp/refs/heads/docs/resources/screenshots/sigemp_emprestimo_detalhes.png" alt="project-screenshot" width="1670">
