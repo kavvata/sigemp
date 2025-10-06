@@ -39,25 +39,21 @@
             </div>
         </div>
         <nav class="flex-1 px-4 py-4 space-y-1">
-            <!-- Dashboard -->
             <a href="{% url 'core:home' %}"
                class="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors duration-200 group {% if request.path == '/' or 'home' in request.path %}bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 {% else %}text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800{% endif %}">
                 <i class="material-symbols-outlined text-sm transition-colors {% if request.path == '/' %}text-blue-500{% else %}text-gray-400 group-hover:text-blue-500{% endif %}">dashboard</i>
                 <span class="font-medium">Dashboard</span>
             </a>
-            <!-- Empréstimos -->
             <a href="{% url 'emprestimo:listar_emprestimos' %}"
                class="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors duration-200 group {% if 'emprestimo' in request.path and 'ocorrencia' not in request.path %}bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 {% else %}text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800{% endif %}">
                 <i class="material-symbols-outlined text-sm transition-colors {% if 'emprestimo' in request.path and 'ocorrencia' not in request.path %}text-green-500{% else %}text-gray-400 group-hover:text-green-500{% endif %}">contract</i>
                 <span class="font-medium">Empréstimos</span>
             </a>
-            <!-- Bens Móveis -->
             <a href="{% url 'patrimonio:listar_bens' %}"
                class="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors duration-200 group {% if 'patrimonio' in request.path and 'bem' in request.path and 'tipo' not in request.path and 'estado' not in request.path and 'grau' not in request.path and 'marca' not in request.path %}bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 {% else %}text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800{% endif %}">
                 <i class="material-symbols-outlined text-sm transition-colors {% if 'patrimonio' in request.path and 'tipo' not in request.path and 'estado' not in request.path and 'grau' not in request.path and 'marca' not in request.path %}text-purple-500{% else %}text-gray-400 group-hover:text-purple-500{% endif %}">inventory_2</i>
                 <span class="font-medium">Bens Móveis</span>
             </a>
-            <!-- Ocorrências Section -->
             <div x-data="{ open:
                 {% if 'ocorrencia' in request.path %}
                     true
@@ -94,7 +90,6 @@
                     </a>
                 </div>
             </div>
-            <!-- Patrimônio Section -->
             <div x-data="{ open:
                 {% if 'patrimonio' in request.path and '/bem' not in request.path %}
                     true
@@ -141,7 +136,6 @@
                     </a>
                 </div>
             </div>
-            <!-- Ensino Section -->
             <div x-data="{ open:
                 {% if 'ensino' in request.path %}
                     true
