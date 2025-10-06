@@ -1,10 +1,14 @@
+from datetime import date
 from typing import Optional
 from core.types import ResultError, ResultSuccess
+from emprestimo.domain.contracts.mail import MailService
 from emprestimo.domain.entities import EmprestimoEntity
 from emprestimo.domain.types import EmprestimoEstadoEnum
 from emprestimo.policies.contracts import EmprestimoPolicy
 from emprestimo.repositories.contracts import EmprestimoRepository
 from emprestimo.infrastructure.services.contracts import PDFService
+from ensino.repositories.contracts import AlunoRepository
+from sigemp import settings
 
 
 class ListarEmprestimosUsecase:
@@ -215,3 +219,49 @@ class GerarTermoDevolucaoUsecase:
             return ResultError(f"Erro ao gerar PDF: {e}")
 
         return ResultSuccess(resposta)
+
+
+class NotificarDevolucaoUsecase:
+    def __init__(
+        self,
+        emprestimo_repo: EmprestimoRepository,
+        aluno_repo: AlunoRepository,
+        service: MailService,
+    ):
+        self.emprestimo_repo = emprestimo_repo
+        self.aluno_repo = aluno_repo
+        self.service = service
+
+    def execute(self, data_devolucao: date):
+        emprestimos = self.emprestimo_repo.listar_emprestimos_devolucao_proxima(
+            data_devolucao
+        )
+
+        map_sucesso: dict[str, int] = {}
+
+        for e in emprestimos:
+            destinatario = self.aluno_repo.buscar_por_id(e.aluno_id).email
+
+            if destinatario not in map_sucesso.keys():
+                map_sucesso[destinatario] = 0
+
+            assunto = f"[SIGEMP] - Lembrete: prazo de devolução do bem '{e.bem_descricao} ({e.bem_patrimonio})'"
+            mensagem = (
+                f"Prezado {e.aluno_nome},\n\n"
+                f"A devolução do bem ''{e.bem_descricao} ({e.bem_patrimonio})'' "
+                f"deve ser feita no dia {e.data_devolucao_prevista.strftime('%d/%m/%Y')}. "
+                f"Não esqueça de assinar o termo de devolução ao realizar a entrega.\n\n"
+                f"Atenciosamente,\n Comissão de Empréstimo de Bens Móveis."
+            )
+
+            retorno = self.service.enviar_email(
+                mensagem, [destinatario], assunto=assunto
+            )
+
+            map_sucesso[destinatario] += retorno
+
+        if sum(map_sucesso.values()) == 0:
+            return ResultError(
+                f"Erro ao notificar: Nenhum e-mail notificado: {map_sucesso.keys()}"
+            )
+        return ResultSuccess(map_sucesso)
