@@ -14,6 +14,7 @@ from core.usecases import login_usecase
 
 from emprestimo.domain.types import EmprestimoEstadoEnum
 from emprestimo.models import Emprestimo, Ocorrencia
+from emprestimo.policies.django import DjangoEmprestimoPolicy
 from ensino.models import Aluno
 from patrimonio.models import Bem, EstadoConservacao
 
@@ -80,6 +81,10 @@ def home_view(request: HttpRequest):
 
     count_ocorrencias = Ocorrencia.objects.filter(cancelado_em__isnull=True).count()
 
+    emprestimo_policy = DjangoEmprestimoPolicy(request.user)
+
+    pode_criar_emprestimo = emprestimo_policy.pode_criar()
+
     context = {
         "count_emprestimos_ativos": count_emprestimos_ativos,
         "count_emprestimos_vencendo": count_emprestimos_vencendo,
@@ -89,6 +94,7 @@ def home_view(request: HttpRequest):
         "count_bens_disponiveis": count_bens_disponiveis,
         "count_bens_com_ocorrencias": count_bens_com_ocorrencias,
         "count_ocorrencias": count_ocorrencias,
+        "pode_criar_emprestimo": pode_criar_emprestimo,
     }
 
     return render(request, "core/home.html", context=context)

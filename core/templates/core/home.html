@@ -2,6 +2,18 @@
 {% block page_title %}
     Painel
 {% endblock page_title %}
+{% block actions %}
+    {% if pode_criar_emprestimo %}
+        <div>
+            <a href="{% url 'emprestimo:criar_emprestimo' %}">
+                <div class="rounded-md py-2 gap-2 flex px-4 border border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-300 bg-blue-50 dark:bg-gray-800 items-center font-semibold text-sm transition-all duration-300 ease-in-out hover:bg-blue-100 dark:hover:bg-gray-700 hover:ring-2 hover:ring-blue-300 dark:hover:ring-blue-500/40 hover:shadow-md cursor-pointer">
+                    <i class="material-symbols-outlined transition-transform duration-300 group-hover:rotate-6">add</i>
+                    <span>Novo Empréstimo</span>
+                </div>
+            </a>
+        </div>
+    {% endif %}
+{% endblock actions %}
 {% block content %}
     <section class="mx-auto mb-6 grid max-w-7xl grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         <a href="{% url 'emprestimo:listar_emprestimos' %}"
