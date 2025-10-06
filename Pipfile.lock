@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "0afa3c50b8dca856707f982f724fbf96aee1a031bc0c0df32a52c943a6a0170e"
+            "sha256": "0dc0adf9cd2d20c53e0bd89fadbb359a9b3d039e9fb01e1ea69365c522c24c06"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -18,11 +18,11 @@
     "default": {
         "asgiref": {
             "hashes": [
-                "sha256:0b61526596219d70396548fc003635056856dba5d0d086f86476f10b33c75960",
-                "sha256:a0249afacb66688ef258ffe503528360443e2b9a8d8c4581b6ebefa58c841ef1"
+                "sha256:aef8a81283a34d0ab31630c9b7dfe70c812c95eba78171367ca8745e88124734",
+                "sha256:d89f2d8cd8b56dada7d52fa7dc8075baa08fb836560710d38c292a7a3f78c04e"
             ],
             "markers": "python_version >= '3.9'",
-            "version": "==3.9.2"
+            "version": "==3.10.0"
         },
         "brotli": {
             "hashes": [
@@ -276,6 +276,13 @@
             ],
             "markers": "python_version >= '3.9'",
             "version": "==1.21.0"
+        },
+        "django-crontab": {
+            "hashes": [
+                "sha256:1201810a212460aaaa48eb6a766738740daf42c1a4f6aafecfb1525036929236"
+            ],
+            "index": "pypi",
+            "version": "==0.7.1"
         },
         "django-filter": {
             "hashes": [
