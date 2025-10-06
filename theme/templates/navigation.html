@@ -2,12 +2,12 @@
 <div class="flex h-screen text-gray-700 dark:text-gray-200">
     <aside class="w-64 bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-600 flex-col">
         <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <div class="flex items-center gap-2">
+            <a href="{% url 'core:home' %}" class="flex items-center gap-2">
                 <i class="">
                     <img src="{% static 'images/logo.svg' %}" alt="">
                 </i>
                 <div class="text-sm font-semibold text-gray-600 dark:text-gray-300">SIGEMP</div>
-            </div>
+            </a>
             <div x-data="{ userMenuOpen: false }" class="relative">
                 <button @click="userMenuOpen = !userMenuOpen"
                         class="flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
