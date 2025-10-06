@@ -99,7 +99,13 @@
                         </p>
                         <p class="flex items-center gap-1">
                             <i class="material-symbols-outlined align-middle text-base">calendar_month</i>
-                            <span>{{ emprestimo.data_emprestimo }}</span>
+                            <span>{{ emprestimo.data_emprestimo|date:"d/m/Y" }} -
+                                {% if data_devolucao %}
+                                    {{ emprestimo.data_devolucao|date:"d/m/Y" }}
+                                {% else %}
+                                    {{ emprestimo.data_devolucao_prevista|date:"d/m/Y" }}
+                                {% endif %}
+                            </span>
                         </p>
                     </div>
                 </a>
