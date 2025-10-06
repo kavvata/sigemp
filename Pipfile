@@ -12,6 +12,7 @@ django-tailwind = {extras = ["reload"], version = "*"}
 django-widget-tweaks = "*"
 psycopg2-binary = "*"
 django-weasyprint = "*"
+django-crontab = "*"
 
 [dev-packages]
 django-stubs = "*"

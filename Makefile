@@ -28,3 +28,9 @@ shell:
 
 collectstatic:
 	docker compose exec web python manage.py collectstatic
+
+crontab-add:
+	docker compose exec web python manage.py crontab add
+
+crontab-show:
+	docker compose exec web python manage.py crontab show

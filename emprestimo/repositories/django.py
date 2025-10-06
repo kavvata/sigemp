@@ -1,3 +1,4 @@
+from datetime import date
 from django.contrib.auth.models import User
 from django.utils import timezone
 
@@ -84,6 +85,13 @@ class DjangoEmprestimoRepository(EmprestimoRepository):
                 "-data_emprestimo", "estado", "-data_devolucao_prevista"
             )
         ]
+
+    def listar_emprestimos_devolucao_proxima(self, data_devolucao: date):
+        emprestimos = Emprestimo.objects.filter(
+            estado=EmprestimoEstadoEnum.ATIVO, data_devolucao_prevista=data_devolucao
+        )
+
+        return [EmprestimoMapper.from_model(e) for e in emprestimos]
 
     def buscar_por_id(self, id: int):
         try:

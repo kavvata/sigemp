@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import Any, Optional
+from datetime import date
+from typing import Any, Optional, Sequence
 
 from emprestimo.domain.entities import (
     OcorrenciaEntity,
@@ -35,6 +36,12 @@ class TipoOcorrenciaRepository(ABC):
 class EmprestimoRepository(ABC):
     @abstractmethod
     def listar_emprestimos(self):
+        pass
+
+    @abstractmethod
+    def listar_emprestimos_devolucao_proxima(
+        self, data_devolucao: date
+    ) -> Sequence[EmprestimoEntity]:
         pass
 
     @abstractmethod
