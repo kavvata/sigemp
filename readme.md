@@ -18,6 +18,8 @@
 
 <img src="https://raw.githubusercontent.com/kavvata/sigemp/refs/heads/docs/resources/screenshots/sigemp_emprestimo_detalhes.png" alt="project-screenshot" width="1670">
 
+<img src="https://raw.githubusercontent.com/kavvata/sigemp/refs/heads/docs/resources/screenshots/sigemp_listar_ocorrencias.png" alt="project-screenshot" width="1670" >
+
 <h2>🧐 Funcionalidades</h2>
 
 Principais recursos do sistema:
