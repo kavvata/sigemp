@@ -3,29 +3,24 @@
 package "patrimonio" {
     class TipoBem {
         +descricao: str
-        +ativo : bool
     }
 
     class GrauFragilidade {
         +descricao: str
-        +ativo: bool
     }
 
     class EstadoConservacao {
         +descricao: str
-        +ativo: bool
     }
 
     class MarcaModelo {
         +sigla: str
         +descricao: str
-        +ativo: bool
     }
 
     class Bem {
         +patrimonio: str
         +descricao: str
-        +ativo: bool
     }
 
     Bem -- TipoBem : "tipo"
@@ -84,7 +79,6 @@ package "ensino" {
         +descricao: str
         +periodo_inicio: date
         +periodo_fim: date
-        +ativo: bool
     }
 
     class Aluno {
