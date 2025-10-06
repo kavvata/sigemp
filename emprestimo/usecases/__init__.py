@@ -13,6 +13,7 @@ from .emprestimo_usecases import (
     RegistrarDevolucaoEmprestimoUsecase,
     GerarTermoResponsabilidadeUsecase,
     GerarTermoDevolucaoUsecase,
+    NotificarDevolucaoUsecase,
 )
 
 from .ocorrencia_usecases import (
@@ -33,6 +34,7 @@ __all__ = [
     "CadastrarEmprestimoUsecase",
     "EditarEmprestimoUsecase",
     "RemoverEmprestimoUsecase",
+    "NotificarDevolucaoUsecase",
     "RegistrarDevolucaoEmprestimoUsecase",
     "GerarTermoResponsabilidadeUsecase",
     "GerarTermoDevolucaoUsecase",

@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "tailwind",
     "widget_tweaks",
     "theme",
+    "django_crontab",
 ]
 
 MIDDLEWARE = [
@@ -145,6 +146,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = "static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -159,3 +161,22 @@ SESSION_COOKIE_AGE = 172800
 
 # On Browser close, expire
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+# NOTE: Email settings
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
+EMAIL_HOST = getenv("EMAIL_HOST")
+EMAIL_PORT = getenv("EMAIL_PORT")
+EMAIL_HOST_USER = getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = getenv("EMAIL_HOST_PASSWORD")
+EMAIL_USE_TLS = getenv("EMAIL_USE_TLS", True)
+DEFAULT_FROM_EMAIL = getenv("DEFAULT_FROM_EMAIL", "sigemp@teste.com")
+EMAIL_RECIPIENT_DEBUG = getenv("EMAIL_RECIPIENT_DEBUG", "sigemp@teste.com")
+
+# NOTE: Cron settings
+CRONJOBS = [
+    (
+        "0 8 * * *",
+        "emprestimo.infrastructure.crons.notificar_prazo_proximo.cron_notificar_prazo_proximo",
+    )
+]

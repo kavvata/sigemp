@@ -3,7 +3,7 @@
 {% block page_title %}
     <div class="flex flex-row gap-2">
         Detalhes do Empréstimo #{{ emprestimo.id }}
-        <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {% if emprestimo.get_estado_display == 'Ativo' %} bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 {% else %} bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 {% endif %}">
+        <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {% if emprestimo.estado == 1 %} bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 {% elif emprestimo.estado == 2 %} bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300  {% else %} bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 {% endif %}">
             {{ emprestimo.get_estado_display }}
         </span>
     </div>
@@ -37,10 +37,11 @@
             <div class="space-y-2">
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Aluno</label>
                 <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-600 dark:bg-gray-700">
-                    <p class="text-sm text-gray-900 dark:text-white">
+                    <a href="{% url 'ensino:editar_aluno' emprestimo.aluno_id %}"
+                       class="group text-sm text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400">
                         {{ emprestimo.aluno.nome }}
-                        <span class="text-gray-600 dark:text-gray-400">({{ emprestimo.aluno.matricula }})</span>
-                    </p>
+                        <span class="text-gray-600 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400">({{ emprestimo.aluno.matricula }})</span>
+                    </a>
                 </div>
             </div>
             <div class="space-y-2">
@@ -52,10 +53,17 @@
         </div>
         <div class="space-y-2">
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Bem Patrimonial</label>
-            <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-600 dark:bg-gray-700">
-                <p class="text-sm font-medium text-gray-900 dark:text-white">{{ emprestimo.bem.descricao }}</p>
-                <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">Patrimônio: {{ emprestimo.bem.patrimonio }}</p>
-            </div>
+            <a href="{% url 'patrimonio:editar_bem' emprestimo.bem_id %}"
+               class="group text-sm text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400">
+                <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-600 dark:bg-gray-700">
+                    <p class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                        {{ emprestimo.bem.descricao }}
+                    </p>
+                    <p class="text-xs text-gray-600 dark:text-gray-400 mt-1 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                        Patrimônio: {{ emprestimo.bem.patrimonio }}
+                    </p>
+                </div>
+            </a>
         </div>
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div class="space-y-2">

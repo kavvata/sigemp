@@ -1,6 +1,115 @@
 {% extends "base.html" %}
+{% block page_title %}
+    Painel
+{% endblock page_title %}
+{% block actions %}
+    {% if pode_criar_emprestimo %}
+        <div>
+            <a href="{% url 'emprestimo:criar_emprestimo' %}">
+                <div class="rounded-md py-2 gap-2 flex px-4 border border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-300 bg-blue-50 dark:bg-gray-800 items-center font-semibold text-sm transition-all duration-300 ease-in-out hover:bg-blue-100 dark:hover:bg-gray-700 hover:ring-2 hover:ring-blue-300 dark:hover:ring-blue-500/40 hover:shadow-md cursor-pointer">
+                    <i class="material-symbols-outlined transition-transform duration-300 group-hover:rotate-6">add</i>
+                    <span>Novo Empréstimo</span>
+                </div>
+            </a>
+        </div>
+    {% endif %}
+{% endblock actions %}
 {% block content %}
-    <section class="bg-gray-50 dark:bg-gray-900 max-w-7xl mx-auto flex justify-center items-center p-4 shadow-md rounded-md font-serif">
-        ola {{ request.user }}. Lorem ipsum dolor sit amet consectetur, adipisicing elit. Voluptatibus ab quos esse temporibus, commodi eos aliquam odit ipsam autem? Laudantium nam possimus veniam ducimus. Fuga nulla debitis voluptas ratione quia!
+    <section class="mx-auto mb-6 grid max-w-7xl grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <a href="{% url 'emprestimo:listar_emprestimos' %}"
+           class="group flex flex-row justify-between rounded-md bg-gray-50 p-6 text-gray-900 shadow-md transition-all duration-300 hover:scale-105 hover:shadow-xl dark:bg-gray-900 dark:text-gray-200 max-h-36 border border-transparent hover:border-green-200 dark:hover:border-green-800">
+            <div class="flex flex-col p-2">
+                <p class="text-gray-700 dark:text-gray-300 text-nowrap">Empréstimos Ativos</p>
+                <p class="text-xl">{{ count_emprestimos_ativos }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-300">{{ count_emprestimos_vencendo }} Vencendo hoje</p>
+            </div>
+            <div class="flex justify-center items-center">
+                <div class="bg-green-500 text-white rounded-full p-3 h-16 w-16 shadow-lg transition-transform group-hover:scale-110">
+                    <i class="material-symbols-outlined text-center text-4xl align-middle">contract</i>
+                </div>
+            </div>
+        </a>
+        <a href="{% url 'ensino:listar_alunos' %}"
+           class="group flex flex-row justify-between rounded-md bg-gray-50 p-6 text-gray-900 shadow-md transition-all duration-300 hover:scale-105 hover:shadow-xl dark:bg-gray-900 dark:text-gray-200 max-h-36 border border-transparent hover:border-cyan-200 dark:hover:border-cyan-800">
+            <div class="flex flex-col p-2">
+                <p class="text-gray-700 dark:text-gray-300">Total de alunos</p>
+                <p class="text-xl">{{ count_alunos }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-300">{{ count_novos_alunos }} novos esse mês</p>
+            </div>
+            <div class="flex justify-center items-center">
+                <div class="bg-cyan-500 text-white rounded-full p-3 h-16 w-16 shadow-lg transition-transform group-hover:scale-110">
+                    <i class="material-symbols-outlined text-center text-4xl align-middle">group</i>
+                </div>
+            </div>
+        </a>
+        <a href="{% url 'patrimonio:listar_bens' %}"
+           class="group flex flex-row justify-between rounded-md bg-gray-50 p-6 text-gray-900 shadow-md transition-all duration-300 hover:scale-105 hover:shadow-xl dark:bg-gray-900 dark:text-gray-200 max-h-36 border border-transparent hover:border-purple-200 dark:hover:border-purple-800">
+            <div class="flex flex-col p-2">
+                <p class="text-gray-700 dark:text-gray-300">Bens Disponíveis</p>
+                <p class="text-xl">{{ count_bens_disponiveis }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-300">{{ count_bens_com_ocorrencias }} com ocorrências</p>
+            </div>
+            <div class="flex justify-center items-center">
+                <div class="bg-purple-500 text-white rounded-full p-3 h-16 w-16 shadow-lg transition-transform group-hover:scale-110">
+                    <i class="material-symbols-outlined text-center text-4xl align-middle">package</i>
+                </div>
+            </div>
+        </a>
+        <a href="{% url 'emprestimo:listar_ocorrencias' %}"
+           class="group flex flex-row justify-between rounded-md bg-gray-50 p-6 text-gray-900 shadow-md transition-all duration-300 hover:scale-105 hover:shadow-xl dark:bg-gray-900 dark:text-gray-200 max-h-36 border border-transparent hover:border-orange-200 dark:hover:border-orange-800">
+            <div class="flex flex-col p-2">
+                <p class="text-gray-700 dark:text-gray-300">Ocorrências</p>
+                <p class="text-xl">{{ count_ocorrencias }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-300">Pendentes de resolução</p>
+            </div>
+            <div class="flex justify-center items-center">
+                <div class="bg-orange-500 text-white rounded-full p-3 h-16 w-16 shadow-lg transition-transform group-hover:scale-110">
+                    <i class="material-symbols-outlined text-center text-4xl align-middle">exclamation</i>
+                </div>
+            </div>
+        </a>
+    </section>
+    <section class="mx-auto max-w-7xl rounded-md bg-gray-50 p-4 text-gray-500 shadow-md dark:bg-gray-900 dark:text-gray-300">
+        <div class="flex flex-row justify-between items-center mb-4">
+            <div class="font-medium text-lg text-gray-900 dark:text-gray-200">Emprestimos recentes</div>
+            <a href="{% url 'emprestimo:listar_emprestimos' %}"
+               class="cursor-pointer flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-600 transition-all duration-300 ease-in-out hover:bg-gray-100 hover:shadow-md hover:ring-2 hover:ring-gray-300 dark:border-gray-400 dark:bg-gray-900/20 dark:text-gray-300 hover:dark:bg-gray-900/30 dark:hover:ring-gray-500/40">
+                <i class="material-symbols-outlined align-middle text-base">contract</i>
+                <span>Ver todos</span>
+            </a>
+        </div>
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {% for emprestimo in emprestimos_recentes %}
+                <a href="{% url 'emprestimo:visualizar_emprestimo' emprestimo.id %}"
+                   class="group flex flex-col rounded-md bg-gray-50 p-6 gap-2 border border-gray-200 text-gray-900 shadow-md transition-all duration-300 hover:scale-105 hover:shadow-lg hover:border-green-200 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200">
+                    <div class="flex flex-row justify-between">
+                        <span class="text-gray-700 group-hover:text-green-600 transition-colors duration-200 dark:text-gray-300 dark:group-hover:text-green-400 font-medium">#{{ emprestimo.id }}</span>
+                        <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {% if emprestimo.estado == 1 %} bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 {% elif emprestimo.estado == 2 %} bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300  {% else %} bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 {% endif %}">
+                            {{ emprestimo.get_estado_display }}
+                        </span>
+                    </div>
+                    <div class="text-sm text-gray-700 dark:text-gray-300">
+                        <p class="flex items-center gap-1">
+                            <i class="material-symbols-outlined align-middle text-base">person</i>
+                            <span>{{ emprestimo.aluno.nome }}</span>
+                        </p>
+                        <p class="flex items-center gap-1">
+                            <i class="material-symbols-outlined align-middle text-base">inventory_2</i>
+                            <span>{{ emprestimo.bem.descricao }}</span>
+                        </p>
+                        <p class="flex items-center gap-1">
+                            <i class="material-symbols-outlined align-middle text-base">calendar_month</i>
+                            <span>{{ emprestimo.data_emprestimo|date:"d/m/Y" }} -
+                                {% if data_devolucao %}
+                                    {{ emprestimo.data_devolucao|date:"d/m/Y" }}
+                                {% else %}
+                                    {{ emprestimo.data_devolucao_prevista|date:"d/m/Y" }}
+                                {% endif %}
+                            </span>
+                        </p>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
     </section>
 {% endblock %}

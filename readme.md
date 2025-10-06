@@ -8,9 +8,17 @@
 
 <h2>Imagens do projeto</h2>
 
-<img src="https://github.com/kavvata/sigemp/blob/2506495ce25fdccdaa287604f2d69bf2f31b3d99/resources/screenshots/sigemp_listar_emprestimos.png?raw=true" alt="project-screenshot" width="1670" >
+<img src="https://raw.githubusercontent.com/kavvata/sigemp/refs/heads/docs/resources/screenshots/sigemp_login.png" alt="project-screenshot" width="1670" >
 
-<img src="https://github.com/kavvata/sigemp/blob/2506495ce25fdccdaa287604f2d69bf2f31b3d99/resources/screenshots/sigemp_emprestimo_detalhes.png?raw=true" alt="project-screenshot" width="1670">
+<img src="https://raw.githubusercontent.com/kavvata/sigemp/refs/heads/docs/resources/screenshots/sigemp_painel.png" alt="project-screenshot" width="1670" >
+
+<img src="https://raw.githubusercontent.com/kavvata/sigemp/refs/heads/docs/resources/screenshots/sigemp_painel_modo_escuro.png" alt="project-screenshot" width="1670" >
+
+<img src="https://raw.githubusercontent.com/kavvata/sigemp/refs/heads/docs/resources/screenshots/sigemp_listar_emprestimos.png" alt="project-screenshot" width="1670" >
+
+<img src="https://raw.githubusercontent.com/kavvata/sigemp/refs/heads/docs/resources/screenshots/sigemp_emprestimo_detalhes.png" alt="project-screenshot" width="1670">
+
+<img src="https://raw.githubusercontent.com/kavvata/sigemp/refs/heads/docs/resources/screenshots/sigemp_listar_ocorrencias.png" alt="project-screenshot" width="1670" >
 
 <h2>🧐 Funcionalidades</h2>
 
@@ -19,7 +27,7 @@ Principais recursos do sistema:
 - Gestão e auditoria de empréstimos;
 - Gestão e auditoria de ocorrências;
 - Geração de termos em PDF;
-- Notificação via e-mail de prazos (TODO).
+- Notificação via e-mail de prazos.
 
 <h2>🛠️ Passos de instalação</h2>
 
@@ -47,6 +55,12 @@ make up
 
 ```
 make tailwind
+```
+
+<p>4. Coletar estáticos:</p>
+
+```
+make collectstatic
 ```
 
 <h2>🧪 Testes</h2>

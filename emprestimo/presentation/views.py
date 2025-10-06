@@ -652,7 +652,7 @@ def registrar_ocorrencia_ao_emprestimo(request, emprestimo_id: int):
 
 class CancelarOcorrenciaView(UpdateView):
     template_name = "emprestimo/ocorrencia/ocorrencia_form.html"
-    queryset = Emprestimo.objects
+    queryset = Ocorrencia.objects
     form_class = CancelarOcorrenciaForm
     success_url = reverse_lazy("emprestimo:listar_ocorrencias")
 
