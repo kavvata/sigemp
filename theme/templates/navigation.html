@@ -42,7 +42,7 @@
             <a href="{% url 'core:home' %}"
                class="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors duration-200 group {% if request.path == '/' or 'home' in request.path %}bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 {% else %}text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800{% endif %}">
                 <i class="material-symbols-outlined text-sm transition-colors {% if request.path == '/' %}text-blue-500{% else %}text-gray-400 group-hover:text-blue-500{% endif %}">dashboard</i>
-                <span class="font-medium">Dashboard</span>
+                <span class="font-medium">Painel</span>
             </a>
             <a href="{% url 'emprestimo:listar_emprestimos' %}"
                class="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors duration-200 group {% if 'emprestimo' in request.path and 'ocorrencia' not in request.path %}bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 {% else %}text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800{% endif %}">
