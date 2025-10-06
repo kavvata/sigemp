@@ -55,6 +55,12 @@ make up
 make tailwind
 ```
 
+<p>4. Coletar estáticos:</p>
+
+```
+make collectstatic
+```
+
 <h2>🧪 Testes</h2>
 
 Executar testes com `pytest` e gerar cobertura:
