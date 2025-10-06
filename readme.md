@@ -27,7 +27,7 @@ Principais recursos do sistema:
 - Gestão e auditoria de empréstimos;
 - Gestão e auditoria de ocorrências;
 - Geração de termos em PDF;
-- Notificação via e-mail de prazos (TODO).
+- Notificação via e-mail de prazos.
 
 <h2>🛠️ Passos de instalação</h2>
 
