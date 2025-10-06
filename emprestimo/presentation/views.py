@@ -273,6 +273,25 @@ class VisualizarEmprestimoView(DetailView):
     template_name = "emprestimo/emprestimo/emprestimo_detail.html"
     context_object_name = "emprestimo"
 
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+
+        emprestimo: Emprestimo = context["emprestimo"]
+
+        ocorrencia_policy = DjangoOcorrenciaPolicy(self.request.user)
+        ocorrencia_repo = DjangoOcorrenciaRepository()
+        usecase = ListarOcorrenciasEmprestimoUsecase(ocorrencia_repo, ocorrencia_policy)
+
+        resultado = usecase.execute(emprestimo.id)
+
+        if not resultado:
+            messages.error(resultado.mensagem)
+            return context
+
+        context["lista_ocorrencias"] = resultado.value
+
+        return context
+
 
 class EditarEmprestimoView(UpdateView):
     template_name = "emprestimo/emprestimo/emprestimo_form.html"
@@ -451,6 +470,12 @@ class ListarOcorrenciasView(ListView):
         return context
 
 
+class VisualizarOcorrenciaView(DetailView):
+    model = Ocorrencia
+    template_name = "emprestimo/ocorrencia/ocorrencia_detail.html"
+    context_object_name = "ocorrencia"
+
+
 class ListarOcorrenciasAlunoView(ListView):
     model = Ocorrencia
     paginate_by = 10
@@ -627,7 +652,7 @@ def registrar_ocorrencia_ao_emprestimo(request, emprestimo_id: int):
 
 class CancelarOcorrenciaView(UpdateView):
     template_name = "emprestimo/ocorrencia/ocorrencia_form.html"
-    queryset = Emprestimo.objects
+    queryset = Ocorrencia.objects
     form_class = CancelarOcorrenciaForm
     success_url = reverse_lazy("emprestimo:listar_ocorrencias")
 
