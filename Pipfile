@@ -4,15 +4,16 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+django = "*"
 djangorestframework = "*"
 markdown = "*"
-django-filter = "*"
 defusedxml = "*"
 django-tailwind = {extras = ["reload"], version = "*"}
 django-widget-tweaks = "*"
 psycopg2-binary = "*"
 django-weasyprint = "*"
 django-crontab = "*"
+django-filter = "*"
 
 [dev-packages]
 django-stubs = "*"
@@ -20,6 +21,7 @@ pytest = "*"
 pytest-django = "*"
 pytest-cov = "*"
 faker = "*"
+django-filter-stubs = "*"
 
 [requires]
 python_version = "3.13"

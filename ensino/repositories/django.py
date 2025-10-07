@@ -8,6 +8,7 @@ from ensino.infrastructure.mappers import (
     FormaSelecaoMapper,
 )
 from ensino.models import Aluno, Campus, Curso, FormaSelecao
+from ensino.infrastructure.filtersets import AlunoFilterSet
 from ensino.repositories.contracts import (
     AlunoRepository,
     CampusRepository,
@@ -192,7 +193,7 @@ class DjangoAlunoRepository(AlunoRepository):
         return AlunoMapper.from_model(aluno)
 
     def buscar(self, **filtros: Unpack[AlunoFiltro]) -> Optional[AlunoEntity]:
-        lista_alunos = Aluno.objects.filter(**filtros, removido_em__isnull=True)
+        lista_alunos = AlunoFilterSet(filtros, Aluno.objects.all()).qs
         return [AlunoMapper.from_model(aluno) for aluno in lista_alunos]
 
     def cadastrar_aluno(self, aluno: AlunoEntity, user: User):

@@ -6,6 +6,8 @@ from django.urls.base import reverse
 from django.views.generic import CreateView, ListView, UpdateView
 from django.contrib import messages
 
+from django_filters.views import FilterView
+
 from emprestimo.policies.django import DjangoOcorrenciaPolicy
 from emprestimo.repositories.django import DjangoOcorrenciaRepository
 from emprestimo.usecases.ocorrencia_usecases import ListarOcorrenciasAlunoUsecase
@@ -16,6 +18,7 @@ from ensino.policies.django import (
     DjangoFormaSelecaoPolicy,
     DjangoAlunoPolicy,
 )
+from ensino.presentation.filtersets import AlunoFilterSet
 from ensino.repositories.django import (
     DjangoCampusRepository,
     DjangoCursoRepository,
@@ -49,7 +52,13 @@ from ensino.domain.entities import (
 
 from typing import Any
 
-from ensino.presentation.forms import CampusForm, CursoForm, FormaSelecaoForm, AlunoForm
+from ensino.presentation.forms import (
+    AlunoFilterForm,
+    CampusForm,
+    CursoForm,
+    FormaSelecaoForm,
+    AlunoForm,
+)
 
 # Create your views here.
 
@@ -461,7 +470,12 @@ class ListarAlunoView(ListView):
         if not usecase.pode_listar():
             raise PermissionDenied("Voce nao tem permissao para visualizar alunos.")
 
-        result = usecase.execute()
+        self.filter = AlunoFilterForm(self.request.GET or None)
+
+        if self.filter.is_valid():
+            result = usecase.execute(self.filter.cleaned_data)
+        else:
+            result = usecase.execute()
 
         if not result:
             messages.error(self.request, result.mensagem)
@@ -474,6 +488,7 @@ class ListarAlunoView(ListView):
         policy = DjangoAlunoPolicy(self.request.user)
         repo = DjangoAlunoRepository()
 
+        context["filter"] = AlunoFilterForm(self.request.GET or None)
         usecase = CadastrarAlunoUsecase(repo, policy)
 
         context["pode_criar"] = usecase.pode_criar()

@@ -10,5 +10,5 @@ class AlunoFiltro(TypedDict, total=False):
     matricula: str
     telefone: str
     forma_selecao_id: int
-    curso_id: int
-    campus_id: int
+    curso: int
+    campus: int

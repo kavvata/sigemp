@@ -72,3 +72,11 @@ class AlunoForm(forms.ModelForm):
             "curso",
             "forma_selecao",
         ]
+
+
+class AlunoFilterForm(forms.Form):
+    nome = forms.CharField(max_length=255, label="Nome", required=False)
+    curso = forms.ModelChoiceField(
+        required=False,
+        queryset=Curso.objects,
+    )
