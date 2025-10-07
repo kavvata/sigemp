@@ -57,4 +57,4 @@ class OcorrenciaFilterSet(FilterSet):
 
     class Meta:
         model = Ocorrencia
-        fields = ["data_ocorrencia"]
+        fields = ["data_ocorrencia", "tipo"]
