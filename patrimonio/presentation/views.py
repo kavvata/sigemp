@@ -26,6 +26,7 @@ from patrimonio.policies.django import (
     DjangoBemPolicy,
 )
 from patrimonio.presentation.forms import (
+    BemFilterForm,
     EstadoConservacaoForm,
     GrauFragilidadeForm,
     MarcaModeloForm,
@@ -592,7 +593,12 @@ class ListarBemView(ListView):
         if not usecase.pode_listar():
             raise PermissionDenied("Voce nao tem permissao para visualizar bens móveis")
 
-        result = usecase.execute()
+        self.filter = BemFilterForm(self.request.GET or None)
+
+        if self.filter.is_valid():
+            result = usecase.execute(self.filter.cleaned_data)
+        else:
+            result = usecase.execute()
 
         if not result:
             messages.error(self.request, result.mensagem)
@@ -607,6 +613,7 @@ class ListarBemView(ListView):
 
         usecase = CadastrarBemUsecase(repo, policy)
 
+        context["filter"] = self.filter
         context["pode_criar"] = usecase.pode_criar()
 
         return context

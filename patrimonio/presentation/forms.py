@@ -60,3 +60,9 @@ class BemForm(forms.ModelForm):
             "estado_conservacao",
             "marca_modelo",
         ]
+
+
+class BemFilterForm(forms.Form):
+    texto = forms.CharField(max_length=255, required=False)
+    tipo = forms.ModelChoiceField(queryset=TipoBem.objects, required=False)
+    eh_disponivel = forms.BooleanField(label="Disponivel?", required=False)
