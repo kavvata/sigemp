@@ -8,7 +8,7 @@ from patrimonio.models import Bem
 
 class BemFilterSet(FilterSet):
     texto = CharFilter(method="filtrar_texto")
-    eh_disponivel = BooleanFilter(method="filtrar_disponivel")
+    eh_disponivel = CharFilter(method="filtrar_disponivel")
 
     def filtrar_texto(self, queryset: QuerySet[Bem], name, value):
         return queryset.filter(
@@ -20,12 +20,14 @@ class BemFilterSet(FilterSet):
         )
 
     def filtrar_disponivel(self, queryset: QuerySet[Bem], name, value):
-        return (
-            queryset.filter(emprestimo__estado=EmprestimoEstadoEnum.ATIVO)
-            if value
-            else queryset
-        )
+        if value == "s":
+            return queryset.exclude(emprestimo__estado=EmprestimoEstadoEnum.ATIVO)
+
+        elif value == "n":
+            return queryset.filter(emprestimo__estado=EmprestimoEstadoEnum.ATIVO)
+
+        return queryset
 
     class Meta:
         model = Bem
-        fields = ["tipo"]
+        fields = ["tipo", "estado_conservacao"]

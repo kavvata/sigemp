@@ -65,4 +65,11 @@ class BemForm(forms.ModelForm):
 class BemFilterForm(forms.Form):
     texto = forms.CharField(max_length=255, required=False)
     tipo = forms.ModelChoiceField(queryset=TipoBem.objects, required=False)
-    eh_disponivel = forms.BooleanField(label="Disponivel?", required=False)
+    estado_conservacao = forms.ModelChoiceField(
+        EstadoConservacao.objects, required=False
+    )
+    eh_disponivel = forms.ChoiceField(
+        label="Disponivel?",
+        required=False,
+        choices=[("", "---------"), ("s", "Sim"), ("n", "Não")],
+    )
