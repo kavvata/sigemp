@@ -42,4 +42,17 @@ class AlunoEntity(TimeStampableEntity):
     telefone: str
     forma_selecao_id: int
     curso_id: int
+    curso_nome: Optional[str]
+    campus_sigla: Optional[str]
+    forma_selecao_descricao: Optional[str]
     id: Optional[int] = None
+
+    def to_dict(self, exclude: list[str] = None):
+        if exclude is not None:
+            exclude.append("curso_nome")
+            exclude.append("campus_sigla")
+            exclude.append("forma_selecao_descricao")
+        else:
+            exclude = ["curso_nome", "forma_selecao_descricao", "campus_sigla"]
+
+        return super().to_dict(exclude)
