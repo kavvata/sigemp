@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Optional
 
 from core.domain.entities import TimeStampableEntity
 
@@ -38,4 +39,15 @@ class BemEntity(TimeStampableEntity):
     grau_fragilidade_id: int
     estado_conservacao_id: int
     marca_modelo_id: int
-    id: int = None
+    id: Optional[int] = None
+    estado_conservacao_descricao: Optional[str] = None
+    tipo_descricao: Optional[str] = None
+
+    def to_dict(self, exclude: list[str] = None):
+        if exclude is not None:
+            exclude.append("estado_conservacao_descricao")
+            exclude.append("tipo_descricao")
+        else:
+            exclude = ["estado_conservacao_descricao", "tipo_descricao"]
+
+        return super().to_dict(exclude)
