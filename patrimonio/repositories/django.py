@@ -310,7 +310,8 @@ class DjangoBemRepository(BemRepository):
             e.add_note(f"Bem com id {id} não encontrado.")
             raise e
 
-        bem.removido_em = timezone.now()
+        bem.soft_delete()
         bem.alterado_por = user
         bem.save()
+        bem.refresh_from_db()
         return BemMapper.from_model(bem)
