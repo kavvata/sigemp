@@ -34,7 +34,9 @@
                                 class="group rounded-md px-3 py-2 flex items-center gap-2 text-sm font-medium transition-all  text-gray-400 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                             <i class="material-symbols-outlined text-lg transition-transform duration-300 align-middle">dock_to_right</i>
                         </button>
-                        <p class="font-medium">Sistema de Gestão de Empréstimos de Bens Móveis</p>
+                        <p class="font-medium">
+                            {% block page_title %}{% endblock %}
+                        </p>
                     </div>
                     <div x-data="themeToggle()"
                          x-init="init()"
@@ -63,9 +65,7 @@
                 <main class="p-6">
                     <section class="max-w-7xl mx-auto flex items-center justify-between mb-6">
                         <div class="">
-                            <h1 class="font-bold text-2xl">
-                                {% block page_title %}{% endblock %}
-                            </h1>
+                            {% block filter_form %}{% endblock %}
                         </div>
                         <div class="flex flex-row gap-x-2">
                             {% block actions %}
