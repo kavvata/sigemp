@@ -90,7 +90,7 @@ class DjangoEmprestimoRepository(EmprestimoRepository):
     def listar(self, **filtros: Unpack[EmprestimoFiltro]) -> list[EmprestimoEntity]:
         lista_emprestimos: QuerySet[Emprestimo] = EmprestimoFilterSet(
             filtros, Emprestimo.objects.all()
-        ).qs
+        ).qs.distinct()
 
         return [EmprestimoMapper.from_model(e) for e in lista_emprestimos]
 
