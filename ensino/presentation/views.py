@@ -1,63 +1,59 @@
+from typing import Any
+
+from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.urls.base import reverse
 from django.views.generic import CreateView, ListView, UpdateView
-from django.contrib import messages
-
-from django_filters.views import FilterView
 
 from emprestimo.policies.django import DjangoOcorrenciaPolicy
 from emprestimo.repositories.django import DjangoOcorrenciaRepository
 from emprestimo.usecases.ocorrencia_usecases import ListarOcorrenciasAlunoUsecase
-from ensino.models import Campus, Curso, FormaSelecao, Aluno
-from ensino.policies.django import (
-    DjangoCampusPolicy,
-    DjangoCursoPolicy,
-    DjangoFormaSelecaoPolicy,
-    DjangoAlunoPolicy,
-)
-from ensino.presentation.filtersets import AlunoFilterSet
-from ensino.repositories.django import (
-    DjangoCampusRepository,
-    DjangoCursoRepository,
-    DjangoFormaSelecaoRepository,
-    DjangoAlunoRepository,
-)
-from ensino.usecases import (
-    ListarCampiUsecase,
-    CadastrarCampusUsecase,
-    EditarCampusUsecase,
-    RemoverCampusUsecase,
-    ListarCursosUsecase,
-    CadastrarCursoUsecase,
-    EditarCursoUsecase,
-    RemoverCursoUsecase,
-    ListarFormasSelecaoUsecase,
-    CadastrarFormaSelecaoUsecase,
-    EditarFormaSelecaoUsecase,
-    RemoverFormaSelecaoUsecase,
-    ListarAlunosUsecase,
-    CadastrarAlunoUsecase,
-    EditarAlunoUsecase,
-    RemoverAlunoUsecase,
-)
 from ensino.domain.entities import (
+    AlunoEntity,
     CampusEntity,
     CursoEntity,
     FormaSelecaoEntity,
-    AlunoEntity,
 )
-
-from typing import Any
-
+from ensino.models import Aluno, Campus, Curso, FormaSelecao
+from ensino.policies.django import (
+    DjangoAlunoPolicy,
+    DjangoCampusPolicy,
+    DjangoCursoPolicy,
+    DjangoFormaSelecaoPolicy,
+)
 from ensino.presentation.forms import (
     AlunoFilterForm,
+    AlunoForm,
     CampusForm,
     CursoForm,
     FormaSelecaoForm,
-    AlunoForm,
+)
+from ensino.repositories.django import (
+    DjangoAlunoRepository,
+    DjangoCampusRepository,
+    DjangoCursoRepository,
+    DjangoFormaSelecaoRepository,
+)
+from ensino.usecases import (
+    CadastrarAlunoUsecase,
+    CadastrarCampusUsecase,
+    CadastrarCursoUsecase,
+    CadastrarFormaSelecaoUsecase,
+    EditarAlunoUsecase,
+    EditarCampusUsecase,
+    EditarCursoUsecase,
+    EditarFormaSelecaoUsecase,
+    ListarAlunosUsecase,
+    ListarCampiUsecase,
+    ListarCursosUsecase,
+    ListarFormasSelecaoUsecase,
+    RemoverAlunoUsecase,
+    RemoverCampusUsecase,
+    RemoverCursoUsecase,
+    RemoverFormaSelecaoUsecase,
 )
 
 # Create your views here.
