@@ -9,8 +9,15 @@ from emprestimo.domain.entities import (
     TipoOcorrenciaEntity,
     EmprestimoEntity,
 )
-from emprestimo.domain.types import EmprestimoEstadoEnum, EmprestimoFiltro
-from emprestimo.infrastructure.filtersets import EmprestimoFilterSet
+from emprestimo.domain.types import (
+    EmprestimoEstadoEnum,
+    EmprestimoFiltro,
+    OcorrenciaFiltro,
+)
+from emprestimo.infrastructure.filtersets import (
+    EmprestimoFilterSet,
+    OcorrenciaFilterSet,
+)
 from emprestimo.infrastructure.mappers import (
     OcorrenciaMapper,
     TipoOcorrenciaMapper,
@@ -198,6 +205,13 @@ class DjangoEmprestimoRepository(EmprestimoRepository):
 
 
 class DjangoOcorrenciaRepository(OcorrenciaRepository):
+    def listar(self, **filtros: Unpack[OcorrenciaFiltro]) -> list[OcorrenciaEntity]:
+        lista_ocorrencias: QuerySet[Ocorrencia] = OcorrenciaFilterSet(
+            filtros, Ocorrencia.objects.all()
+        ).qs
+
+        return [OcorrenciaMapper.from_model(o) for o in lista_ocorrencias]
+
     def listar_ocorrencias(self):
         return [
             OcorrenciaMapper.from_model(o)

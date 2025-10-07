@@ -7,7 +7,7 @@ from emprestimo.domain.entities import (
     TipoOcorrenciaEntity,
     EmprestimoEntity,
 )
-from emprestimo.domain.types import EmprestimoFiltro
+from emprestimo.domain.types import EmprestimoFiltro, OcorrenciaFiltro
 
 
 class TipoOcorrenciaRepository(ABC):
@@ -85,6 +85,10 @@ class EmprestimoRepository(ABC):
 
 
 class OcorrenciaRepository(ABC):
+    @abstractmethod
+    def listar(self, **filtros: Unpack[OcorrenciaFiltro]) -> list[OcorrenciaEntity]:
+        pass
+
     @abstractmethod
     def listar_ocorrencias(self):
         pass

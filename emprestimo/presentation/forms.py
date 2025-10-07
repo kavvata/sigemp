@@ -77,3 +77,22 @@ class EmprestimoFilterForm(forms.Form):
         required=False,
         choices=[("", "---------"), ("s", "Sim"), ("n", "Não")],
     )
+
+
+class OcorrenciaFilterForm(forms.Form):
+    aluno = forms.CharField(max_length=255, required=False)
+    bem = forms.CharField(max_length=255, required=False)
+    data_ocorrencia = forms.DateField(
+        label="Data da ocorrência",
+        required=False,
+        widget=DateInput(attrs={"type": "date"}),
+    )
+    tipo = forms.ModelChoiceField(
+        queryset=TipoOcorrencia.objects,
+        required=False,
+    )
+    eh_cancelado = forms.ChoiceField(
+        label="Cancelado?",
+        required=False,
+        choices=[("", "---------"), ("s", "Sim"), ("n", "Não")],
+    )
