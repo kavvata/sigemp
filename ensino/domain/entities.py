@@ -42,9 +42,9 @@ class AlunoEntity(TimeStampableEntity):
     telefone: str
     forma_selecao_id: int
     curso_id: int
-    curso_nome: Optional[str]
-    campus_sigla: Optional[str]
-    forma_selecao_descricao: Optional[str]
+    curso_nome: Optional[str] = None
+    campus_sigla: Optional[str] = None
+    forma_selecao_descricao: Optional[str] = None
     id: Optional[int] = None
 
     def to_dict(self, exclude: list[str] = None):
