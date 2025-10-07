@@ -20,7 +20,7 @@ class ListarAlunosUsecase:
 
         try:
             resposta = (
-                self.repo.listar_alunos() if not filtro else self.repo.buscar(**filtro)
+                self.repo.listar_alunos() if not filtro else self.repo.listar(**filtro)
             )
             return ResultSuccess(resposta)
         except Exception as e:

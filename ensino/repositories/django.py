@@ -176,6 +176,10 @@ class DjangoFormaSelecaoRepository(FormaSelecaoRepository):
 
 
 class DjangoAlunoRepository(AlunoRepository):
+    def listar(self, **filtros: Unpack[AlunoFiltro]):
+        lista_alunos = AlunoFilterSet(filtros, Aluno.objects.all()).qs
+        return [AlunoMapper.from_model(aluno) for aluno in lista_alunos]
+
     def listar_alunos(self):
         lista_alunos = Aluno.objects.filter(removido_em__isnull=True).order_by(
             "curso__nome", "nome"
@@ -193,7 +197,7 @@ class DjangoAlunoRepository(AlunoRepository):
         return AlunoMapper.from_model(aluno)
 
     def buscar(self, **filtros: Unpack[AlunoFiltro]) -> Optional[AlunoEntity]:
-        lista_alunos = AlunoFilterSet(filtros, Aluno.objects.all()).qs
+        lista_alunos = Aluno.objects.filter(**filtros).order_by("curso__nome", "nome")
         return [AlunoMapper.from_model(aluno) for aluno in lista_alunos]
 
     def cadastrar_aluno(self, aluno: AlunoEntity, user: User):
