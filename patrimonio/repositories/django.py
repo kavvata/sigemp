@@ -1,9 +1,11 @@
-from typing import override
+from typing import Unpack, override
 
 from django.contrib.auth.models import User
 from django.utils import timezone
 
 from patrimonio.domain.entities import BemEntity
+from patrimonio.domain.filters import BemFiltro
+from patrimonio.infrastructure.filtersets import BemFilterSet
 from patrimonio.infrastructure.mappers import (
     BemMapper,
     EstadoConservacaoMapper,
@@ -245,6 +247,10 @@ class DjangoMarcaModeloRepository(MarcaModeloRepository):
 
 
 class DjangoBemRepository(BemRepository):
+    def listar(self, **filtro: Unpack[BemFiltro]):
+        lista_bens = BemFilterSet(filtro, Bem.objects.all()).qs
+        return [BemMapper.from_model(b) for b in lista_bens]
+
     @override
     def listar_bens(self):
         return [
@@ -304,7 +310,8 @@ class DjangoBemRepository(BemRepository):
             e.add_note(f"Bem com id {id} não encontrado.")
             raise e
 
-        bem.removido_em = timezone.now()
+        bem.soft_delete()
         bem.alterado_por = user
         bem.save()
+        bem.refresh_from_db()
         return BemMapper.from_model(bem)

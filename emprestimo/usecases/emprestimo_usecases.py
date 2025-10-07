@@ -3,7 +3,7 @@ from typing import Optional
 from core.types import ResultError, ResultSuccess
 from emprestimo.domain.contracts.mail import MailService
 from emprestimo.domain.entities import EmprestimoEntity
-from emprestimo.domain.types import EmprestimoEstadoEnum
+from emprestimo.domain.types import EmprestimoEstadoEnum, EmprestimoFiltro
 from emprestimo.policies.contracts import EmprestimoPolicy
 from emprestimo.repositories.contracts import EmprestimoRepository
 from emprestimo.infrastructure.services.contracts import PDFService
@@ -19,12 +19,16 @@ class ListarEmprestimosUsecase:
     def pode_listar(self):
         return self.policy.pode_listar()
 
-    def execute(self):
+    def execute(self, filtros: Optional[EmprestimoFiltro] = None):
         if not self.policy.pode_listar():
             return ResultError("Você não tem permissão para listar empréstimo.")
 
         try:
-            resposta = self.repo.listar_emprestimos()
+            resposta = (
+                self.repo.listar_emprestimos()
+                if not filtros
+                else self.repo.listar(**filtros)
+            )
             return ResultSuccess(resposta)
         except Exception as e:
             return ResultError(f"Erro ao listar empréstimo: {e}")

@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, Unpack
 
+from ensino.repositories.filters import AlunoFiltro
 from patrimonio.domain.entities import BemEntity
 
 
@@ -99,6 +100,10 @@ class MarcaModeloRepository(ABC):
 
 
 class BemRepository(ABC):
+    @abstractmethod
+    def listar(self, **filtros: Unpack[AlunoFiltro]) -> Any:
+        pass
+
     @abstractmethod
     def listar_bens(self) -> Any:
         pass

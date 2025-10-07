@@ -1,7 +1,9 @@
+from typing import Optional
 from core.types import ResultError, ResultSuccess
 from ensino.domain.entities import AlunoEntity
 from ensino.policies.contracts import AlunoPolicy
 from ensino.repositories.contracts import AlunoRepository
+from ensino.repositories.filters import AlunoFiltro
 
 
 class ListarAlunosUsecase:
@@ -12,12 +14,14 @@ class ListarAlunosUsecase:
     def pode_listar(self):
         return self.policy.pode_listar()
 
-    def execute(self):
+    def execute(self, filtro: Optional[AlunoFiltro] = None):
         if not self.policy.pode_listar():
             return ResultError("Você não tem permissão para listar alunos.")
 
         try:
-            resposta = self.repo.listar_alunos()
+            resposta = (
+                self.repo.listar_alunos() if not filtro else self.repo.listar(**filtro)
+            )
             return ResultSuccess(resposta)
         except Exception as e:
             return ResultError(f"Erro ao listar alunos: {e}")
