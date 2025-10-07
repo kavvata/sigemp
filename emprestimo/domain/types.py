@@ -1,4 +1,5 @@
 from enum import IntEnum
+from typing import TypedDict
 
 
 class EmprestimoEstadoEnum(IntEnum):
@@ -21,3 +22,9 @@ class EmprestimoEstadoEnum(IntEnum):
 
     def __str__(self):
         return self.label
+
+
+class EmprestimoFiltro(TypedDict, total=False):
+    texto: str
+    estado: EmprestimoEstadoEnum
+    tem_ocorrencia: str

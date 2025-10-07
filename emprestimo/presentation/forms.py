@@ -2,6 +2,7 @@ from typing import Optional
 from django import forms
 from django.forms.widgets import DateInput
 
+from emprestimo.domain.types import EmprestimoEstadoEnum
 from emprestimo.models import Emprestimo, Ocorrencia, TipoOcorrencia
 
 
@@ -63,3 +64,16 @@ class CancelarOcorrenciaForm(forms.ModelForm):
     class Meta:
         model = Ocorrencia
         fields = ["motivo_cancelamento"]
+
+
+class EmprestimoFilterForm(forms.Form):
+    texto = forms.CharField(max_length=255, required=False)
+    estado = forms.ChoiceField(
+        choices=[(None, "---------")] + EmprestimoEstadoEnum.choices(),
+        required=False,
+    )
+    tem_ocorrencia = forms.ChoiceField(
+        label="Possui ocorrência?",
+        required=False,
+        choices=[("", "---------"), ("s", "Sim"), ("n", "Não")],
+    )

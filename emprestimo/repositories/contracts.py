@@ -1,12 +1,13 @@
 from abc import ABC, abstractmethod
 from datetime import date
-from typing import Any, Optional, Sequence
+from typing import Any, Optional, Sequence, Unpack
 
 from emprestimo.domain.entities import (
     OcorrenciaEntity,
     TipoOcorrenciaEntity,
     EmprestimoEntity,
 )
+from emprestimo.domain.types import EmprestimoFiltro
 
 
 class TipoOcorrenciaRepository(ABC):
@@ -34,6 +35,10 @@ class TipoOcorrenciaRepository(ABC):
 
 
 class EmprestimoRepository(ABC):
+    @abstractmethod
+    def listar(self, **filtros: Unpack[EmprestimoFiltro]) -> list[EmprestimoEntity]:
+        pass
+
     @abstractmethod
     def listar_emprestimos(self):
         pass

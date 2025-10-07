@@ -1,14 +1,16 @@
 from datetime import date
 from django.contrib.auth.models import User
+from django.db.models import QuerySet
 from django.utils import timezone
 
-from typing import Any, Optional
+from typing import Any, Optional, Unpack
 from emprestimo.domain.entities import (
     OcorrenciaEntity,
     TipoOcorrenciaEntity,
     EmprestimoEntity,
 )
-from emprestimo.domain.types import EmprestimoEstadoEnum
+from emprestimo.domain.types import EmprestimoEstadoEnum, EmprestimoFiltro
+from emprestimo.infrastructure.filtersets import EmprestimoFilterSet
 from emprestimo.infrastructure.mappers import (
     OcorrenciaMapper,
     TipoOcorrenciaMapper,
@@ -78,6 +80,13 @@ class DjangoTipoOcorrenciaRepository(TipoOcorrenciaRepository):
 
 
 class DjangoEmprestimoRepository(EmprestimoRepository):
+    def listar(self, **filtros: Unpack[EmprestimoFiltro]) -> list[EmprestimoEntity]:
+        lista_emprestimos: QuerySet[Emprestimo] = EmprestimoFilterSet(
+            filtros, Emprestimo.objects.all()
+        ).qs
+
+        return [EmprestimoMapper.from_model(e) for e in lista_emprestimos]
+
     def listar_emprestimos(self):
         return [
             EmprestimoMapper.from_model(emprestimo)
