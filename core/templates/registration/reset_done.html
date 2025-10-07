@@ -1,0 +1,35 @@
+{% extends "no_auth_base.html" %}
+{% load i18n widget_tweaks %}
+{% block title %}{{ block.super }}{% endblock %}
+{% block content %}
+    <section class="mx-auto w-96 rounded-md bg-gray-50 dark:bg-gray-900 shadow-md">
+        <div class="p-6 flex flex-col">
+            <div class="flex justify-center mb-4">
+                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center dark:bg-green-900/30">
+                    <svg class="w-6 h-6 text-green-600 dark:text-green-400"
+                         fill="none"
+                         stroke="currentColor"
+                         viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+            </div>
+            <span class="font-semibold text-lg w-full text-center dark:text-white mb-2">Senha Redefinida!</span>
+            <p class="text-gray-600 text-sm text-center leading-relaxed dark:text-gray-300 mb-6">
+                {% translate "Your password has been set. You may go ahead and log in now." %}
+            </p>
+            <div class="mt-4">
+                <a href="{{ login_url }}"
+                   class="w-full text-center block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 transition-all duration-200 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+                    {% translate 'Log in' %}
+                </a>
+            </div>
+        </div>
+        <div class="px-6 pb-6 border-t border-gray-200 dark:border-gray-700 pt-6 text-center">
+            <a href="{% url 'core:home' %}"
+               class="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors duration-200 hover:underline">
+                Voltar para a página inicial
+            </a>
+        </div>
+    </section>
+{% endblock content %}
