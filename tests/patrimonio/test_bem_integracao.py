@@ -164,15 +164,15 @@ def bens(db, lista_grau_fragilidade, tipos_de_bem, estados_conservacao, marcas_m
 
 
 @pytest.fixture()
-def bem(db):
+def bem(db, estados_conservacao, lista_grau_fragilidade, marcas_modelos, tipos_de_bem):
     entity = BemEntity(
         id=1,
         patrimonio="000.000.000.000",
         descricao="Projetor Epson X1000",
-        tipo_id=1,
-        grau_fragilidade_id=2,
-        estado_conservacao_id=1,
-        marca_modelo_id=1,
+        tipo_id=tipos_de_bem[0].id,
+        grau_fragilidade_id=lista_grau_fragilidade[0].id,
+        estado_conservacao_id=estados_conservacao[0].id,
+        marca_modelo_id=marcas_modelos[0].id,
     )
     model, _criado = Bem.objects.get_or_create(entity.to_dict())
     yield model
@@ -334,6 +334,7 @@ def test_remover_bem(admin_client, bem):
     bem.refresh_from_db()
 
     assert response.status_code == 200
+    assertNotContains(response, "error")
     assert bem.removido_em is not None
 
     response = admin_client.get(reverse_lazy("patrimonio:listar_bens"))

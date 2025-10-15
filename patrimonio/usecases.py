@@ -1,5 +1,8 @@
+from typing import Optional
 from core.types import ResultError, ResultSuccess
+from emprestimo.policies.contracts import OcorrenciaPolicy
 from patrimonio.domain.entities import BemEntity
+from patrimonio.domain.filters import BemFiltro
 from patrimonio.policies.contracts import (
     BemPolicy,
     EstadoConservacaoPolicy,
@@ -466,12 +469,14 @@ class ListarBensUsecase:
     def pode_listar(self):
         return self.policy.pode_listar()
 
-    def execute(self):
+    def execute(self, filtro: Optional[BemFiltro] = None):
         if not self.policy.pode_listar():
             return ResultError("Você não tem permissão para realizar esta ação.")
 
         try:
-            resposta = self.repo.listar_bens()
+            resposta = (
+                self.repo.listar_bens() if not filtro else self.repo.listar(**filtro)
+            )
             return ResultSuccess(resposta)
         except Exception as e:
             return ResultError(f"Erro ao listar bens: {e}")

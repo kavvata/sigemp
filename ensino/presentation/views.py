@@ -1,55 +1,60 @@
+from typing import Any
+
+from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.urls.base import reverse
 from django.views.generic import CreateView, ListView, UpdateView
-from django.contrib import messages
 
 from emprestimo.policies.django import DjangoOcorrenciaPolicy
 from emprestimo.repositories.django import DjangoOcorrenciaRepository
 from emprestimo.usecases.ocorrencia_usecases import ListarOcorrenciasAlunoUsecase
-from ensino.models import Campus, Curso, FormaSelecao, Aluno
-from ensino.policies.django import (
-    DjangoCampusPolicy,
-    DjangoCursoPolicy,
-    DjangoFormaSelecaoPolicy,
-    DjangoAlunoPolicy,
-)
-from ensino.repositories.django import (
-    DjangoCampusRepository,
-    DjangoCursoRepository,
-    DjangoFormaSelecaoRepository,
-    DjangoAlunoRepository,
-)
-from ensino.usecases import (
-    ListarCampiUsecase,
-    CadastrarCampusUsecase,
-    EditarCampusUsecase,
-    RemoverCampusUsecase,
-    ListarCursosUsecase,
-    CadastrarCursoUsecase,
-    EditarCursoUsecase,
-    RemoverCursoUsecase,
-    ListarFormasSelecaoUsecase,
-    CadastrarFormaSelecaoUsecase,
-    EditarFormaSelecaoUsecase,
-    RemoverFormaSelecaoUsecase,
-    ListarAlunosUsecase,
-    CadastrarAlunoUsecase,
-    EditarAlunoUsecase,
-    RemoverAlunoUsecase,
-)
 from ensino.domain.entities import (
+    AlunoEntity,
     CampusEntity,
     CursoEntity,
     FormaSelecaoEntity,
-    AlunoEntity,
 )
-
-from typing import Any
-
-from ensino.presentation.forms import CampusForm, CursoForm, FormaSelecaoForm, AlunoForm
+from ensino.models import Aluno, Campus, Curso, FormaSelecao
+from ensino.policies.django import (
+    DjangoAlunoPolicy,
+    DjangoCampusPolicy,
+    DjangoCursoPolicy,
+    DjangoFormaSelecaoPolicy,
+)
+from ensino.presentation.forms import (
+    AlunoFilterForm,
+    AlunoForm,
+    CampusForm,
+    CursoForm,
+    FormaSelecaoForm,
+)
+from ensino.repositories.django import (
+    DjangoAlunoRepository,
+    DjangoCampusRepository,
+    DjangoCursoRepository,
+    DjangoFormaSelecaoRepository,
+)
+from ensino.usecases import (
+    CadastrarAlunoUsecase,
+    CadastrarCampusUsecase,
+    CadastrarCursoUsecase,
+    CadastrarFormaSelecaoUsecase,
+    EditarAlunoUsecase,
+    EditarCampusUsecase,
+    EditarCursoUsecase,
+    EditarFormaSelecaoUsecase,
+    ListarAlunosUsecase,
+    ListarCampiUsecase,
+    ListarCursosUsecase,
+    ListarFormasSelecaoUsecase,
+    RemoverAlunoUsecase,
+    RemoverCampusUsecase,
+    RemoverCursoUsecase,
+    RemoverFormaSelecaoUsecase,
+)
 
 # Create your views here.
 
@@ -461,7 +466,12 @@ class ListarAlunoView(ListView):
         if not usecase.pode_listar():
             raise PermissionDenied("Voce nao tem permissao para visualizar alunos.")
 
-        result = usecase.execute()
+        self.filter = AlunoFilterForm(self.request.GET or None)
+
+        if self.filter.is_valid():
+            result = usecase.execute(self.filter.cleaned_data)
+        else:
+            result = usecase.execute()
 
         if not result:
             messages.error(self.request, result.mensagem)
@@ -474,6 +484,7 @@ class ListarAlunoView(ListView):
         policy = DjangoAlunoPolicy(self.request.user)
         repo = DjangoAlunoRepository()
 
+        context["filter"] = AlunoFilterForm(self.request.GET or None)
         usecase = CadastrarAlunoUsecase(repo, policy)
 
         context["pode_criar"] = usecase.pode_criar()

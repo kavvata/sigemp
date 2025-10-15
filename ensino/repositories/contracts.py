@@ -79,6 +79,10 @@ class FormaSelecaoRepository(ABC):
 
 class AlunoRepository(ABC):
     @abstractmethod
+    def listar(self, **filtros: Unpack[AlunoFiltro]) -> list[AlunoEntity]:
+        pass
+
+    @abstractmethod
     def listar_alunos(self):
         pass
 

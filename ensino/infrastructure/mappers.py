@@ -48,6 +48,9 @@ class AlunoMapper:
 
         model_dict["forma_selecao_id"] = model_dict.pop("forma_selecao")
         model_dict["curso_id"] = model_dict.pop("curso")
+        model_dict["curso_nome"] = model.curso.nome
+        model_dict["campus_sigla"] = model.curso.campus.sigla
+        model_dict["forma_selecao_descricao"] = model.forma_selecao.descricao
 
         return AlunoMapper.from_dict(model_dict)
 

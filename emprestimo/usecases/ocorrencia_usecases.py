@@ -1,6 +1,8 @@
 from datetime import date
+from typing import Optional
 from core.types import ResultSuccess, ResultError
 from emprestimo.domain.entities import OcorrenciaEntity
+from emprestimo.domain.types import OcorrenciaFiltro
 from emprestimo.policies.contracts import OcorrenciaPolicy
 from emprestimo.repositories.contracts import OcorrenciaRepository
 
@@ -13,12 +15,16 @@ class ListarOcorrenciasUsecase:
     def pode_listar(self):
         return self.policy.pode_listar()
 
-    def execute(self):
+    def execute(self, filtro: Optional[OcorrenciaFiltro] = None):
         if not self.policy.pode_listar():
             return ResultError("Sem permissão para listar ocorrências")
 
         try:
-            ocorrencias = self.repo.listar_ocorrencias()
+            ocorrencias = (
+                self.repo.listar_ocorrencias()
+                if not filtro
+                else self.repo.listar(**filtro)
+            )
             return ResultSuccess(ocorrencias)
         except Exception as e:
             return ResultError(f"Erro ao listar ocorrências: {str(e)}")

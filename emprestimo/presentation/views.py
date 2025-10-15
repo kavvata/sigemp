@@ -22,6 +22,8 @@ from emprestimo.policies.django import (
 )
 from emprestimo.presentation.forms import (
     CancelarOcorrenciaForm,
+    EmprestimoFilterForm,
+    OcorrenciaFilterForm,
     OcorrenciaForm,
     TipoOcorrenciaForm,
     CriarEmprestimoForm,
@@ -208,7 +210,12 @@ class ListarEmprestimoView(ListView):
         if not usecase.pode_listar():
             raise PermissionDenied("Voce nao tem permissao para visualizar empréstimo.")
 
-        result = usecase.execute()
+        self.filter = EmprestimoFilterForm(self.request.GET or None)
+
+        if self.filter.is_valid():
+            result = usecase.execute(self.filter.cleaned_data)
+        else:
+            result = usecase.execute()
 
         if not result:
             messages.error(self.request, result.mensagem)
@@ -223,6 +230,7 @@ class ListarEmprestimoView(ListView):
 
         usecase = CadastrarEmprestimoUsecase(repo, policy)
 
+        context["filter"] = self.filter
         context["pode_criar"] = usecase.pode_criar()
 
         return context
@@ -450,7 +458,11 @@ class ListarOcorrenciasView(ListView):
                 "Você não tem permissão para visualizar ocorrências."
             )
 
-        result = usecase.execute()
+        self.filter = OcorrenciaFilterForm(self.request.GET or None)
+        if self.filter.is_valid():
+            result = usecase.execute(self.filter.cleaned_data)
+        else:
+            result = usecase.execute()
 
         if not result:
             messages.error(self.request, result.mensagem)
@@ -465,6 +477,7 @@ class ListarOcorrenciasView(ListView):
 
         usecase = RegistrarOcorrenciaUsecase(repo, policy)
 
+        context["filter"] = self.filter
         context["pode_criar"] = usecase.pode_criar()
 
         return context
