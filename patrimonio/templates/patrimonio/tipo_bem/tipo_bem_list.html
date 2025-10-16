@@ -4,11 +4,11 @@
 {% endblock page_title %}
 {% block actions %}
     {% if pode_criar %}
-        <div>
+        <div class="flex justify-end md:justify-start">
             <a href="{% url 'patrimonio:criar_tipo_bem' %}">
                 <div class="rounded-md py-2 gap-2 flex px-4 border border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-300 bg-blue-50 dark:bg-gray-800 items-center font-semibold text-sm transition-all duration-300 ease-in-out hover:bg-blue-100 dark:hover:bg-gray-700 hover:ring-2 hover:ring-blue-300 dark:hover:ring-blue-500/40 hover:shadow-md cursor-pointer">
                     <i class="material-symbols-outlined transition-transform duration-300 group-hover:rotate-6">add</i>
-                    <span>Novo Tipo de Bem</span>
+                    <span class="hidden md:block">Novo Tipo de Bem</span>
                 </div>
             </a>
         </div>

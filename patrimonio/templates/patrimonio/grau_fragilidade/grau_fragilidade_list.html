@@ -4,11 +4,11 @@
 {% endblock page_title %}
 {% block actions %}
     {% if pode_criar %}
-        <div>
+        <div class="flex justify-end md:justify-start">
             <a href="{% url 'patrimonio:criar_grau_fragilidade' %}">
                 <div class="rounded-md py-2 gap-2 flex px-4 border border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-300 bg-blue-50 dark:bg-gray-800 items-center font-semibold text-sm transition-all duration-300 ease-in-out hover:bg-blue-100 dark:hover:bg-gray-700 hover:ring-2 hover:ring-blue-300 dark:hover:ring-blue-500/40 hover:shadow-md cursor-pointer">
                     <i class="material-symbols-outlined transition-transform duration-300 group-hover:rotate-6">add</i>
-                    <span>Novo grau de fragilidade</span>
+                    <span class="hidden md:block">Novo grau de fragilidade</span>
                 </div>
             </a>
         </div>
@@ -30,9 +30,7 @@
             <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
                 {% for grau in lista_grau_fragilidade %}
                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
-                        <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
-                            {{ grau.nivel }}
-                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{{ grau.nivel }}</td>
                         <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
                             <a class="hover:text-blue-500 dark:hover:text-blue-400"
                                href="{% url 'patrimonio:editar_grau_fragilidade' grau.id %}">{{ grau.descricao }}</a>
