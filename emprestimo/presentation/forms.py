@@ -53,7 +53,8 @@ class OcorrenciaForm(forms.ModelForm):
     )
 
     emprestimo = forms.ModelChoiceField(
-        queryset=Emprestimo.objects.all().order_by("-data_emprestimo", "estado")
+        queryset=Emprestimo.objects.all().order_by("-data_emprestimo", "estado"),
+        widget=ModelAutocompleteWidget(Emprestimo),
     )
 
     def __init__(self, *args, **kwargs) -> None:
