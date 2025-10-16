@@ -20,6 +20,37 @@
     <section class="mx-auto max-w-4xl gap-y-6 rounded-md bg-gray-50 p-6 text-gray-900 shadow-md dark:bg-gray-900 dark:text-white">
         <form method="post" class="grid grid-cols-1 gap-6 md:grid-cols-2">
             {% csrf_token %}
+            <div x-data="{ query: '', selected: '', show: false}"
+                 class="relative w-64">
+                <input type="text" name="selected" x-model="selected">
+                <div class="flex flex-row">
+                    <label class="text-sm font-semibold text-gray-800 dark:text-white"
+                           for="{{ field.id_for_label }}">Aluno</label>
+                    {% if field.errors %}
+                        <div class="px-2 text-sm font-bold text-red-600 dark:text-red-400">{{ field.errors }}</div>
+                    {% endif %}
+                </div>
+                <div @blur="show = false">
+                    <input type="text"
+                           name="q"
+                           x-model="query"
+                           @input.debounce.300ms="$el.closest('div').querySelector('ul').innerHTML=''"
+                           hx-get="/search/"
+                           @keydown.enter.prevent="$dispatch('select-first')"
+                           @keyup="show = true"
+                           @focus="show = true"
+                           hx-trigger="keyup changed delay:300ms"
+                           hx-include="[name=q]"
+                           hx-target="#result"
+                           hx-swap="innerHTML"
+                           placeholder="Search..."
+                           class="w-full border rounded px-3 py-2" />
+                    <ul x-show="show"
+                        id="result"
+                        class="absolute z-10 w-full bg-white border rounded mt-1 max-h-60 overflow-auto">
+                    </ul>
+                </div>
+            </div>
             {% for field in form.visible_fields %}
                 <div class="flex flex-col gap-2">
                     <div class="flex flex-row">
