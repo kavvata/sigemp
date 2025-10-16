@@ -16,6 +16,7 @@
                @keydown.escape.prevent="show = false; $el.blur()"
                @keyup="show = true"
                @focus="show = true"
+               @blur="show = false"
                hx-trigger="focus, keyup changed delay:300ms"
                hx-include="[name=q]"
                hx-target="#result-list"
