@@ -19,10 +19,10 @@
         {% block head %}{% endblock %}
     </head>
     <body class="bg-gray-50 text-gray-900 dark:text-gray-200 dark:bg-gray-900 leading-normal tracking-normal min-w-screen min-h-screen"
-          x-data="{ sidebarOpen: JSON.parse(localStorage.getItem('sidebarOpen') ?? 'true'), toggleSidebar() { this.sidebarOpen = !this.sidebarOpen; localStorage.setItem('sidebarOpen', JSON.stringify(this.sidebarOpen)); } }">
+          x-data="{ sidebarOpen: JSON.parse(localStorage.getItem('sidebarOpen') ?? 'true'), toggleSidebar(newValue = !this.sidebarOpen) { this.sidebarOpen = newValue; localStorage.setItem('sidebarOpen', JSON.stringify(this.sidebarOpen)); } }">
         <div class="flex flex-row">
             <div x-show="sidebarOpen"
-                 @click="sidebarOpen = false"
+                 @click="toggleSidebar(false)"
                  x-transition:enter="transition-opacity ease-linear duration-300"
                  x-transition:enter-start="opacity-0"
                  x-transition:enter-end="opacity-100"
