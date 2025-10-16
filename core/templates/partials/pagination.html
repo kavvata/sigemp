@@ -1,12 +1,13 @@
-<div class="mt-6 mx-2 flex justify-between items-center">
-    <div class="text-sm text-gray-600 dark:text-gray-400">
+<div class="mt-8 md:mt-6 mx-2 w-full text-sm flex justify-center md:justify-between items-center">
+    <div class="hidden md:block text-gray-600 dark:text-gray-400">
         Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
     </div>
     <div class="flex space-x-2">
         {% if page_obj.has_previous %}
             <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}"
                class="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-800">
-                Anterior
+                <span class="material-symbols-outlined align-middle text-sm font-bold">arrow_back</span>
+                <span class="hidden md:block">Anterior</span>
             </a>
         {% endif %}
         {% for num in page_obj.paginator.page_range %}
@@ -24,7 +25,8 @@
         {% if page_obj.has_next %}
             <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}"
                class="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-800">
-                Próxima
+                <span class="material-symbols-outlined align-middle text-sm font-bold">arrow_forward</span>
+                <span class="hidden md:block">Próxima</span>
             </a>
         {% endif %}
     </div>
