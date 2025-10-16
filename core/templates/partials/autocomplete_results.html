@@ -1,6 +1,6 @@
 {% for i in items %}
     <li id="{{ i.id }}"
-        class="px-3 py-2 hover:bg-blue-200 cursor-pointer"
-        {% if forloop.first %}{% endif %}
+        class="px-3 py-2 hover:bg-blue-200 dark:hover:bg-slate-600 cursor-pointer"
+        {% if forloop.first %}@load="$el.hover()"{% endif %}
         x-on:click="selected = $event.target.id; query=$el.innerHTML; show = false">{{ i.nome }}</li>
 {% endfor %}
