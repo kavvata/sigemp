@@ -30,7 +30,8 @@
                         <div class="px-2 text-sm font-bold text-red-600 dark:text-red-400">{{ field.errors }}</div>
                     {% endif %}
                 </div>
-                <div @blur="show = false">
+                <div @blur="show = false"
+                     @select-first="selected = $el.querySelector('ul').children[0].id; query=$el.querySelector('ul').children[0].innerHTML; show = false">
                     <input type="text"
                            name="q"
                            x-model="query"
