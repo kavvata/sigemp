@@ -6,6 +6,7 @@ from core.widgets import ModelAutocompleteWidget
 from emprestimo.domain.types import EmprestimoEstadoEnum
 from emprestimo.models import Emprestimo, Ocorrencia, TipoOcorrencia
 from ensino.models import Aluno
+from patrimonio.models import Bem
 
 
 class TipoOcorrenciaForm(forms.ModelForm):
@@ -27,6 +28,11 @@ class CriarEmprestimoForm(forms.ModelForm):
     aluno = forms.ModelChoiceField(
         Aluno.objects,
         widget=ModelAutocompleteWidget(Aluno),
+    )
+
+    bem = forms.ModelChoiceField(
+        Bem.objects,
+        widget=ModelAutocompleteWidget(Bem),
     )
 
     class Meta:

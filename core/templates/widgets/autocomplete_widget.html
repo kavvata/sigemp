@@ -1,4 +1,4 @@
-<div x-data="autocompleteWidget()"
+<div x-data="autocompleteWidget('{{ config.results_id }}', '{{ config.initial_label|escapejs }}', '{{ config.initial_value|escapejs }}')"
      @submit.prevent="$el.closest('form').querySelector('.autocomplete-search').remove()"
      tabindex="0"
      @select-first="selectFirstResult()"
@@ -24,7 +24,6 @@
                @focus="handleFocus()"
                @blur="handleBlur()"
                hx-trigger="focus, keyup changed delay:{{ config.debounce }}ms"
-               hx-include="[name='q']"
                hx-target="#{{ config.results_id }}"
                hx-swap="innerHTML"
                placeholder="{{ placeholder }}" />
@@ -40,16 +39,16 @@
     </ul>
 </div>
 <script>
-function autocompleteWidget() {
+function autocompleteWidget(resultsId, initialLabel, initialValue) {
     return {
-        query: '{{ config.initial_label|escapejs }}',
-        selected: '{{ config.initial_value|escapejs }}',
-        selected_label: '{{ config.initial_label|escapejs }}',
+        query: initialLabel,
+        selected: initialValue,
+        selected_label: initialLabel,
         show: false,
         invalid: false,
         icon: 'expand_more',
-        minChars: {{ config.min_chars }},
-        resultsId: '{{ config.results_id }}',
+        minChars: 2,
+        resultsId: resultsId,
         
         selectFirstResult() {
             const firstResult = document.querySelector(`#${this.resultsId}`)?.children[0];
@@ -95,8 +94,8 @@ function autocompleteWidget() {
                 this.invalid = true;
                 this.icon = 'error';
             }
-            else if (this.selected_label != self.query) {
-              this.query = this.selected_label
+            else if (this.selected_label !== this.query && !this.invalid) {
+                this.query = this.selected_label;
             }
         }
     }
