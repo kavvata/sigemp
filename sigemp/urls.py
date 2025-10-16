@@ -19,7 +19,7 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import path, include
 
-from core.presentation.views import search
+from core.presentation.views import model_autocomplete, search
 
 urlpatterns = [
     path("", include("core.presentation.urls")),
@@ -65,5 +65,10 @@ urlpatterns = [
     path(
         "search/",
         search,
+    ),
+    path(
+        "autocomplete/",
+        model_autocomplete,
+        name="model_autocomplete",
     ),
 ]

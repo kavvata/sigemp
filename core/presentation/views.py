@@ -1,7 +1,7 @@
 from datetime import timedelta
 from django.contrib import messages
 from django.contrib.auth import login, logout
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.http.request import HttpRequest
 from django.shortcuts import redirect, render
 from django.contrib.auth.models import User
@@ -9,7 +9,8 @@ from django.contrib.auth.decorators import login_not_required
 from django.urls import reverse
 from django.utils import timezone
 from django.template.loader import render_to_string
-
+from django.views.decorators.http import require_GET
+from django.apps import apps
 from core.presentation.forms import LoginForm
 from core.repositories.django import DjUserRepository
 from core.usecases import login_usecase
@@ -116,3 +117,50 @@ def search(request):
         {"items": items},
     )
     return HttpResponse(html)
+
+
+@require_GET
+def model_autocomplete(request):
+    q = request.GET.get("q", "").strip()
+    app_label = request.GET.get("app_label")
+    model_name = request.GET.get("model_name")
+    field = request.GET.get("field", "__str__")
+    limit = int(request.GET.get("limit", 10))
+
+    if not (app_label and model_name):
+        return HttpResponseBadRequest("Missing parameters.")
+
+    Model = apps.get_model(app_label, model_name)
+    if Model is None:
+        return HttpResponseBadRequest("Invalid model.")
+
+    if not q:
+        qs = Model.objects.none()
+    elif field != "__str__":
+        if field not in [f.name for f in Model._meta.get_fields()]:
+            return HttpResponseBadRequest("Invalid field.")
+        filter_kwargs = {f"{field}__icontains": q}
+        qs = Model.objects.filter(**filter_kwargs)[:limit]
+    else:
+        all_objects = Model.objects.all()
+        qs = [obj for obj in all_objects if q.lower() in str(obj).lower()][:limit]
+
+    if request.headers.get("HX-Request"):
+        html = render_to_string(
+            "partials/autocomplete_results.html",
+            {"results": qs, "field": field},
+            request=request,
+        )
+        return HttpResponse(html)
+    else:
+        data = {
+            "results": [
+                {
+                    "id": str(obj.pk),
+                    "text": str(obj) if field == "__str__" else getattr(obj, field, ""),
+                    "value": str(obj.pk),
+                }
+                for obj in qs
+            ]
+        }
+        return JsonResponse(data)
