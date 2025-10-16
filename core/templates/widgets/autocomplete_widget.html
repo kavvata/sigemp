@@ -1,34 +1,104 @@
-<div x-data="{ query: '', selected: '', show: false}"
+<div x-data="autocompleteWidget()"
      @submit.prevent="$el.closest('form').querySelector('.autocomplete-search').remove()"
      tabindex="0"
-     @select-first="selected = document.querySelector('#result-list').children[0].id; query=document.querySelector('#result-list').children[0].innerHTML; show = false"
+     @select-first="selectFirstResult()"
      @click.outside="show = false"
      class="relative w-full">
-    <input type="text" x-model="selected" name="aluno"  hidden />
+    <input type="text"
+           x-model="selected"
+           name="{{ name }}"
+           id="{{ config.hidden_id }}"
+           hidden />
     <div class="flex flex-row w-full justify-between min-w-0 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 has-[:focus]:ring-2 has-[:focus]:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:has-[:focus]:ring-blue-500"
-         @select-first="selected = document.querySelector('#result-list').children[0].id; query=document.querySelector('#result-list').children[0].innerHTML; show = false">
+         @select-first="selectFirstResult()">
         <input type="text"
                name="q"
+               id="{{ config.visible_id }}"
                class="autocomplete-search border-none bg-transparent shadow-none p-0 text-sm focus:outline-none focus:ring-0 w-full"
                x-model="query"
-               hx-get="/search/"
-               @keydown.enter.prevent="$dispatch('select-first'); $el.blur()"
-               @keydown.escape.prevent="show = false; $el.blur()"
-               @keyup="show = true"
-               @focus="show = true"
-               @blur="show = false"
-               hx-trigger="focus, keyup changed delay:300ms"
-               hx-include="[name=q]"
-               hx-target="#result-list"
+               hx-get="{{ config.endpoint }}"
+               hx-vals='{"app_label": "{{ config.app_label }}", "model_name": "{{ config.model_name }}", "field": "{{ config.field }}", "limit": {{ config.limit }}}'
+               @keydown.enter.prevent="handleEnterKey()"
+               @keydown.escape.prevent="handleEscapeKey()"
+               @keyup="handleKeyUp()"
+               @focus="handleFocus()"
+               @blur="handleBlur()"
+               hx-trigger="focus, keyup changed delay:{{ config.debounce }}ms"
+               hx-include="[name='q']"
+               hx-target="#{{ config.results_id }}"
                hx-swap="innerHTML"
-               placeholder="Search..." />
+               placeholder="{{ placeholder }}" />
         <i class="material-symbols-outlined text-sm transform transition-transform duration-200 dark:text-gray-400"
-           :class="{ 'rotate-180': show }">expand_more</i>
+           :class="{ 'rotate-180': show && !invalid, 'text-red-500 dark:text-red-500' : invalid }"
+           x-text="icon"></i>
     </div>
     <ul x-show="show"
         x-transition.duration.300ms.origin.top
         @keyup.escape="show = !show"
-        id="result-list"
-        class="absolute shadow-lg block mt-1 w-full min-w-0 rounded-lg border border-gray-300 bg-gray-50 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 max-h-60  overflow-auto">
+        id="{{ config.results_id }}"
+        class="absolute z-10 shadow-lg block mt-1 w-full min-w-0 rounded-lg border border-gray-300 bg-gray-50 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 max-h-60 overflow-auto">
     </ul>
 </div>
+<script>
+function autocompleteWidget() {
+    return {
+        query: '{{ config.initial_label|escapejs }}',
+        selected: '{{ config.initial_value|escapejs }}',
+        selected_label: '{{ config.initial_label|escapejs }}',
+        show: false,
+        invalid: false,
+        icon: 'expand_more',
+        minChars: {{ config.min_chars }},
+        resultsId: '{{ config.results_id }}',
+        
+        selectFirstResult() {
+            const firstResult = document.querySelector(`#${this.resultsId}`)?.children[0];
+            if (firstResult && firstResult.hasAttribute('data-value')) {
+                this.selected = firstResult.dataset.value;
+                this.query = firstResult.innerText;
+                this.selected_label = firstResult.innerText;
+                this.show = false;
+                this.invalid = false;
+                this.icon = 'expand_more';
+            }
+        },
+        
+        handleEnterKey() {
+            const firstResult = document.querySelector(`#${this.resultsId}`)?.children[0];
+            if (firstResult) {
+                this.$dispatch('select-first');
+                this.$el.blur();
+            }
+        },
+        
+        handleEscapeKey() {
+            this.show = false;
+            this.$el.blur();
+        },
+        
+        handleKeyUp() {
+            this.show = this.query.length >= this.minChars;
+        },
+        
+        handleFocus() {
+            if (this.query.length >= this.minChars) {
+                this.show = true;
+            }
+        },
+        
+        handleBlur() {
+            setTimeout(() => {
+                this.show = false;
+            }, 150);
+            
+            if (!this.selected) {
+                this.invalid = true;
+                this.icon = 'error';
+            }
+            else if (this.selected_label != self.query) {
+              this.query = this.selected_label
+            }
+        }
+    }
+}
+</script>
