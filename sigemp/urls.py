@@ -19,7 +19,7 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import path, include
 
-from core.presentation.views import model_autocomplete, search
+from core.presentation.views import model_autocomplete
 
 urlpatterns = [
     path("", include("core.presentation.urls")),
@@ -61,10 +61,6 @@ urlpatterns = [
         "accounts/password_change/done/",
         auth_views.PasswordChangeDoneView.as_view(),
         name="password_change_done",
-    ),
-    path(
-        "search/",
-        search,
     ),
     path(
         "autocomplete/",

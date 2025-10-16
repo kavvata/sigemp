@@ -85,19 +85,18 @@ function autocompleteWidget(resultsId, initialLabel, initialValue) {
             }
         },
         
-        handleBlur() {
-            setTimeout(() => {
-                this.show = false;
-            }, 150);
-            
-            if (!this.selected) {
-                this.invalid = true;
-                this.icon = 'error';
-            }
-            else if (this.selected_label !== this.query && !this.invalid) {
-                this.query = this.selected_label;
-            }
-        }
+      handleBlur(event) {
+          setTimeout(() => {
+              this.show = false;
+              
+              if (!this.selected) {
+                  this.invalid = true;
+                  this.icon = 'error';
+              } else if (this.selected_label !== this.query && !this.invalid) {
+                  this.query = this.selected_label;
+              }
+          }, 300);
+      }
     }
 }
 </script>

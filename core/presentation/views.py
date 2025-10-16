@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.http.request import HttpRequest
 from django.shortcuts import redirect, render
 from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_not_required
+from django.contrib.auth.decorators import login_not_required, login_required
 from django.urls import reverse
 from django.utils import timezone
 from django.template.loader import render_to_string
@@ -106,17 +106,6 @@ def home_view(request: HttpRequest):
 def logout_view(request: HttpRequest):
     logout(request)
     return redirect(reverse("core:login"))
-
-
-def search(request):
-    q = request.GET.get("q", "")
-
-    items = Aluno.objects.filter(nome__icontains=q)[:5]
-    html = render_to_string(
-        "partials/autocomplete_results.html",
-        {"items": items},
-    )
-    return HttpResponse(html)
 
 
 @require_GET
