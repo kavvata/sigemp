@@ -111,7 +111,7 @@ def search(request):
     q = request.GET.get("q", "")
     print(request.GET)
 
-    items = Aluno.objects.filter(nome__icontains=q)
+    items = Aluno.objects.filter(nome__icontains=q)[:5]
     html = render_to_string(
         "partials/autocomplete_results.html",
         {"items": items},
