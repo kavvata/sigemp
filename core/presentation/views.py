@@ -1,12 +1,14 @@
 from datetime import timedelta
 from django.contrib import messages
 from django.contrib.auth import login, logout
+from django.http import HttpResponse
 from django.http.request import HttpRequest
 from django.shortcuts import redirect, render
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_not_required
 from django.urls import reverse
 from django.utils import timezone
+from django.template.loader import render_to_string
 
 from core.presentation.forms import LoginForm
 from core.repositories.django import DjUserRepository
@@ -103,3 +105,15 @@ def home_view(request: HttpRequest):
 def logout_view(request: HttpRequest):
     logout(request)
     return redirect(reverse("core:login"))
+
+
+def search(request):
+    q = request.GET.get("q", "")
+    print(request.GET)
+
+    items = Aluno.objects.filter(nome__icontains=q)
+    html = render_to_string(
+        "partials/autocomplete_results.html",
+        {"items": items},
+    )
+    return HttpResponse(html)
