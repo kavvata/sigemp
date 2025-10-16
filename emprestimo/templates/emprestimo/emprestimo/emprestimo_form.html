@@ -20,45 +20,7 @@
     <section class="mx-auto max-w-4xl gap-y-6 rounded-md bg-gray-50 p-6 text-gray-900 shadow-md dark:bg-gray-900 dark:text-white">
         <form method="post" class="grid grid-cols-1 gap-6 md:grid-cols-2">
             {% csrf_token %}
-            <div x-data="{ query: '', selected: '', show: false}"
-                 class="w-full flex flex-col gap-2">
-                <div class="flex flex-row">
-                    <label class="text-sm font-semibold text-gray-800 dark:text-white"
-                           for="{{ field.id_for_label }}">Aluno</label>
-                    {% if field.errors %}
-                        <div class="px-2 text-sm font-bold text-red-600 dark:text-red-400">{{ field.errors }}</div>
-                    {% endif %}
-                </div>
-                <div class="relative w-full">
-                    <div @click.outside="show = false"
-                         tabindex="0"
-                         class="flex flex-row w-full justify-between min-w-0 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 has-[:focus]:ring-2 has-[:focus]:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:has-[:focus]:ring-blue-500"
-                         @select-first="selected = document.querySelector('#result').children[0].id; query=document.querySelector('#result').children[0].innerHTML; show = false">
-                        <input type="text"
-                               name="q"
-                               class="border-none bg-transparent shadow-none p-0 text-sm focus:outline-none focus:ring-0 w-full"
-                               x-model="query"
-                               @input.debounce.300ms="document.querySelector('#result').innerHTML=''"
-                               hx-get="/search/"
-                               @keydown.enter.prevent="$dispatch('select-first'); $el.blur()"
-                               @keydown.escape.prevent="$el.blur()"
-                               @keyup="show = true"
-                               @focus="show = true"
-                               hx-trigger="keyup changed delay:300ms"
-                               hx-include="[name=q]"
-                               hx-target="#result"
-                               hx-swap="innerHTML"
-                               placeholder="Search..." />
-                        <i class="material-symbols-outlined text-sm transform transition-transform duration-200 dark:text-gray-400"
-                           :class="{ 'rotate-180': show }">expand_more</i>
-                    </div>
-                    <ul x-show="show && query"
-                        @keyup.escape="show = !show"
-                        id="result"
-                        class="absolute block mt-1 w-full min-w-0 rounded-lg border border-gray-300 bg-gray-50 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 max-h-60  overflow-auto">
-                    </ul>
-                </div>
-            </div>
+            {% include "widgets/autocomplete_widget.html" %}
             {% for field in form.visible_fields %}
                 <div class="flex flex-col gap-2">
                     <div class="flex flex-row">
