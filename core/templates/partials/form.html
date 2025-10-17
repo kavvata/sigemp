@@ -1,6 +1,14 @@
 {% load widget_tweaks %}
 <section class="mx-auto max-w-4xl gap-y-6 p-6 text-gray-900 dark:text-white">
-    <form method="post" class="grid grid-cols-1 gap-6 md:grid-cols-2">
+    <div class="mb-4">
+        <h3 class="text-lg font-bold">{{ modal_title }}</h3>
+    </div>
+    <form hx-post="{{ submit_url }}"
+          hx-swap="outerHTML"
+          hx-target="#tbody"
+          @submit="closeModal()"
+          method="post"
+          class="grid grid-cols-1 gap-6 md:grid-cols-2">
         {% csrf_token %}
         {% for field in form.visible_fields %}
             <div class="flex flex-col gap-2">
@@ -20,14 +28,6 @@
                     class="cursor-pointer flex items-center gap-2 rounded-md border border-blue-500 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-600 transition-all duration-300 ease-in-out hover:bg-blue-100 hover:shadow-md hover:ring-2 hover:ring-blue-300 dark:border-blue-400 dark:bg-gray-800 dark:text-blue-300 dark:hover:bg-gray-700 dark:hover:ring-blue-500/40">
                 Salvar
             </button>
-            {% if form.instance.id %}
-                <a hx-confirm="Tem certeza que deseja remover?"
-                   href="{% url 'emprestimo:remover_tipo_ocorrencia' form.instance.id %}"
-                   class="cursor-pointer flex items-center gap-2 rounded-md border border-red-500 bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 transition-all duration-300 ease-in-out hover:bg-red-100 hover:shadow-md hover:ring-2 hover:ring-red-300 dark:border-red-400 dark:bg-gray-800 dark:text-red-300 dark:hover:bg-gray-700 dark:hover:ring-red-500/40">
-                    <i class="material-symbols-outlined text-sm align-middle">delete</i>
-                    <span>Remover</span>
-                </a>
-            {% endif %}
         </div>
     </form>
 </section>

@@ -236,8 +236,40 @@ class ListarEmprestimoView(ListView):
         return context
 
 
+def atualizar_tabela_emprestimo_view(request: HttpRequest):
+    if not request.headers.get("HX-Request"):
+        return redirect("emprestimo:listar_emprestimos")
+
+    policy = DjangoEmprestimoPolicy(request.user)
+    repo = DjangoEmprestimoRepository()
+    usecase = ListarEmprestimosUsecase(repo, policy)
+
+    if not usecase.pode_listar():
+        raise PermissionDenied("Voce nao tem permissao para visualizar empréstimo.")
+
+    filter = EmprestimoFilterForm(request.GET or None)
+
+    if filter.is_valid():
+        result = usecase.execute(filter.cleaned_data)
+    else:
+        result = usecase.execute()
+
+    if not result:
+        messages.error(request, result.mensagem)
+        return []
+
+    emprestimos = result.value
+
+    return render(
+        request,
+        "emprestimo/emprestimo/partials/table.html",
+        {"emprestimos": emprestimos},
+    )
+
+
 class CriarEmprestimoView(CreateView):
-    template_name = "emprestimo/emprestimo/emprestimo_form.html"
+    template_name = "partials/form.html"
+
     form_class = CriarEmprestimoForm
     success_url = reverse_lazy("emprestimo:listar_emprestimos")
 
@@ -245,6 +277,9 @@ class CriarEmprestimoView(CreateView):
         repo = DjangoEmprestimoRepository()
         policy = DjangoEmprestimoPolicy(self.request.user)
         usecase = CadastrarEmprestimoUsecase(repo, policy)
+
+        if not request.headers.get("HX-Request"):
+            return redirect("emprestimo:listar_emprestimos")
 
         if not usecase.pode_criar():
             raise PermissionDenied("Voce nao tem permissao para criar emprestimo.")
@@ -302,10 +337,10 @@ class VisualizarEmprestimoView(DetailView):
 
 
 class EditarEmprestimoView(UpdateView):
-    template_name = "emprestimo/emprestimo/emprestimo_form.html"
+    template_name = "partials/form.html"
     queryset = Emprestimo.objects.filter(removido_em__isnull=True)
     form_class = CriarEmprestimoForm
-    success_url = reverse_lazy("emprestimo:listar_emprestimos")
+    success_url = reverse_lazy("emprestimo:atualizar_tabela_emprestimo")
 
     def get(
         self, request: HttpRequest, pk: int, *args: Any, **kwargs: Any
@@ -314,10 +349,24 @@ class EditarEmprestimoView(UpdateView):
         policy = DjangoEmprestimoPolicy(self.request.user)
         usecase = EditarEmprestimoUsecase(repo, policy)
 
+        if not request.headers.get("HX-Request"):
+            return redirect(self.success_url)
+
         if not usecase.pode_editar(usecase.get_emprestimo(pk)):
             raise PermissionDenied("Voce nao tem permissao para editar emprestimo.")
 
         return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs: Any):
+        context = super().get_context_data(**kwargs)
+        context["submit_url"] = reverse_lazy(
+            "emprestimo:editar_emprestimo", args=[context["form"].instance.id]
+        )
+        context["remove_url"] = reverse_lazy(
+            "emprestimo:remover_emprestimo", args=[context["form"].instance.id]
+        )
+        context["modal_title"] = f"Editar Emprestimo #{context['form'].instance.id}"
+        return context
 
     def form_valid(self, form):
         repo = DjangoEmprestimoRepository()
@@ -363,7 +412,7 @@ def remover_emprestimo(request, pk):
         messages.error(request, result.mensagem)
         return redirect(reverse_lazy("emprestimo:visualizar_emprestimo", args=[pk]))
 
-    return redirect(reverse_lazy("emprestimo:listar_emprestimos"))
+    return redirect(reverse_lazy("emprestimo:atualizar_tabela_emprestimo"))
 
 
 def registrar_devolucao_view(request, pk):

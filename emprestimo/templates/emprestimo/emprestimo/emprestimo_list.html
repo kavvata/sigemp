@@ -5,12 +5,12 @@
 {% block actions %}
     {% if pode_criar %}
         <div class="flex justify-end md:justify-start">
-            <a href="{% url 'emprestimo:criar_emprestimo' %}">
+            <button @click="$dispatch('open-modal', {url: '{% url 'emprestimo:criar_emprestimo' %}'})">
                 <div class="rounded-md w-fit py-2 gap-2 flex px-4 border border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-300 bg-blue-50 dark:bg-gray-800 items-center font-semibold text-sm transition-all duration-300 ease-in-out hover:bg-blue-100 dark:hover:bg-gray-700 hover:ring-2 hover:ring-blue-300 dark:hover:ring-blue-500/40 hover:shadow-md cursor-pointer">
                     <i class="material-symbols-outlined transition-transform duration-300 group-hover:rotate-6">add</i>
                     <span class="hidden md:block">Novo Empréstimo</span>
                 </div>
-            </a>
+            </button>
         </div>
     {% endif %}
 {% endblock actions %}
@@ -44,60 +44,7 @@
                         </th>
                     </tr>
                 </thead>
-                <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-                    {% for emprestimo in emprestimos %}
-                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
-                            <td class="px-6 py-4">
-                                <div class="flex items-center gap-3">
-                                    <a href="{% url 'emprestimo:editar_emprestimo' emprestimo.id %}"
-                                       class="text-gray-500 hover:text-blue-600 transition-colors duration-200 dark:text-gray-400 dark:hover:text-blue-400"
-                                       title="Editar empréstimo">
-                                        <i class="material-symbols-outlined text-lg">edit</i>
-                                    </a>
-                                    <a href="{% url 'emprestimo:visualizar_emprestimo' emprestimo.id %}"
-                                       class="text-gray-500 hover:text-green-600 transition-colors duration-200 dark:text-gray-400 dark:hover:text-green-400"
-                                       title="Visualizar empréstimo">
-                                        <i class="material-symbols-outlined text-lg">visibility</i>
-                                    </a>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
-                                <a href="{% url 'ensino:editar_aluno' emprestimo.aluno_id %}"
-                                   class="group hover:text-blue-600 dark:hover:text-blue-400">
-                                    {{ emprestimo.aluno_nome }}
-                                    <span class="text-gray-600 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400">({{ emprestimo.aluno_matricula }})</span>
-                                </a>
-                            </td>
-                            <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
-                                <a href="{% url 'patrimonio:editar_bem' emprestimo.bem_id %}"
-                                   class="group hover:text-blue-600 dark:hover:text-blue-400">
-                                    {{ emprestimo.bem_descricao }}
-                                    <span class="text-gray-600 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400">({{ emprestimo.bem_patrimonio }})</span>
-                                </a>
-                            </td>
-                            <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{{ emprestimo.data_emprestimo|date:"d/m/Y" }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
-                                {{ emprestimo.data_devolucao_prevista|date:"d/m/Y" }}
-                            </td>
-                            <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
-                                {% if emprestimo.data_devolucao %}
-                                    {{ emprestimo.data_devolucao|date:"d/m/Y" }}
-                                {% else %}
-                                    -
-                                {% endif %}
-                            </td>
-                            <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
-                                <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {% if emprestimo.estado == 1 %} bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 {% elif emprestimo.estado == 2 %} bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300  {% else %} bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 {% endif %}">
-                                    {{ emprestimo.estado.label }}
-                                </span>
-                            </td>
-                        </tr>
-                    {% empty %}
-                        <tr>
-                            <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">Nenhum empréstimo encontrado.</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
+                {% include "emprestimo/emprestimo/partials/table.html" %}
             </table>
         </div>
         {% include "partials/pagination.html" %}

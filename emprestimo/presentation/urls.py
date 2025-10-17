@@ -103,4 +103,9 @@ urlpatterns = [
         views.CancelarOcorrenciaView.as_view(),
         name="cancelar_ocorrencia",
     ),
+    path(
+        "emprestimo/atualizar_tabela_emprestimo/",
+        views.atualizar_tabela_emprestimo_view,
+        name="atualizar_tabela_emprestimo",
+    ),
 ]
