@@ -2,8 +2,11 @@ from typing import Optional
 from django import forms
 from django.forms.widgets import DateInput
 
+from core.widgets import ModelAutocompleteWidget
 from emprestimo.domain.types import EmprestimoEstadoEnum
 from emprestimo.models import Emprestimo, Ocorrencia, TipoOcorrencia
+from ensino.models import Aluno
+from patrimonio.models import Bem
 
 
 class TipoOcorrenciaForm(forms.ModelForm):
@@ -20,6 +23,16 @@ class CriarEmprestimoForm(forms.ModelForm):
     data_devolucao_prevista = forms.DateField(
         label="Data de devolução prevista",
         widget=DateInput(attrs={"type": "date"}),
+    )
+
+    aluno = forms.ModelChoiceField(
+        Aluno.objects,
+        widget=ModelAutocompleteWidget(Aluno),
+    )
+
+    bem = forms.ModelChoiceField(
+        Bem.objects,
+        widget=ModelAutocompleteWidget(Bem),
     )
 
     class Meta:
@@ -40,7 +53,8 @@ class OcorrenciaForm(forms.ModelForm):
     )
 
     emprestimo = forms.ModelChoiceField(
-        queryset=Emprestimo.objects.all().order_by("-data_emprestimo", "estado")
+        queryset=Emprestimo.objects.all().order_by("-data_emprestimo", "estado"),
+        widget=ModelAutocompleteWidget(Emprestimo),
     )
 
     def __init__(self, *args, **kwargs) -> None:

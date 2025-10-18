@@ -4,11 +4,11 @@
 {% endblock page_title %}
 {% block actions %}
     {% if pode_criar_emprestimo %}
-        <div>
+        <div class="flex justify-end md:justify-start">
             <a href="{% url 'emprestimo:criar_emprestimo' %}">
                 <div class="rounded-md py-2 gap-2 flex px-4 border border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-300 bg-blue-50 dark:bg-gray-800 items-center font-semibold text-sm transition-all duration-300 ease-in-out hover:bg-blue-100 dark:hover:bg-gray-700 hover:ring-2 hover:ring-blue-300 dark:hover:ring-blue-500/40 hover:shadow-md cursor-pointer">
                     <i class="material-symbols-outlined transition-transform duration-300 group-hover:rotate-6">add</i>
-                    <span>Novo Empréstimo</span>
+                    <span class="hidden md:block">Novo Empréstimo</span>
                 </div>
             </a>
         </div>
@@ -75,7 +75,7 @@
             <a href="{% url 'emprestimo:listar_emprestimos' %}"
                class="cursor-pointer flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-600 transition-all duration-300 ease-in-out hover:bg-gray-100 hover:shadow-md hover:ring-2 hover:ring-gray-300 dark:border-gray-400 dark:bg-gray-900/20 dark:text-gray-300 hover:dark:bg-gray-900/30 dark:hover:ring-gray-500/40">
                 <i class="material-symbols-outlined align-middle text-base">contract</i>
-                <span>Ver todos</span>
+                <span class="hidden md:block">Ver todos</span>
             </a>
         </div>
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">

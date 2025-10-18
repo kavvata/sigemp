@@ -22,9 +22,10 @@
             {% csrf_token %}
             {% for field in form.visible_fields %}
                 <div class="flex flex-col gap-2">
-                    <div class="flex flex-row">
+                    <div class="flex flex-row items-center">
                         <label class="text-sm font-semibold text-gray-800 dark:text-white"
                                for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {% if not field.field.required %}<span class="text-xs italic px-2 text-gray-400">(opcional)</span>{% endif %}
                         {% if field.errors %}
                             <div class="px-2 text-sm font-bold text-red-600 dark:text-red-400">{{ field.errors }}</div>
                         {% endif %}
