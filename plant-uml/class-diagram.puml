@@ -3,24 +3,56 @@
 package "patrimonio" {
     class TipoBem {
         +descricao: str
+        --
+        +criado_em: datetime
+        +criado_por: User
+        +alterado_em: datetime
+        +alterado_por: User
+        +removido_em: datetime
     }
 
     class GrauFragilidade {
         +descricao: str
+        +nivel: int
+        --
+        +criado_em: datetime
+        +criado_por: User
+        +alterado_em: datetime
+        +alterado_por: User
+        +removido_em: datetime
     }
 
     class EstadoConservacao {
         +descricao: str
+        +nivel: int
+        --
+        +criado_em: datetime
+        +criado_por: User
+        +alterado_em: datetime
+        +alterado_por: User
+        +removido_em: datetime
     }
 
     class MarcaModelo {
-        +sigla: str
-        +descricao: str
+        +marca: str
+        +modelo: str
+        --
+        +criado_em: datetime
+        +criado_por: User
+        +alterado_em: datetime
+        +alterado_por: User
+        +removido_em: datetime
     }
 
     class Bem {
         +patrimonio: str
         +descricao: str
+        --
+        +criado_em: datetime
+        +criado_por: User
+        +alterado_em: datetime
+        +alterado_por: User
+        +removido_em: datetime
     }
 
     Bem -- TipoBem : "tipo"
@@ -61,24 +93,41 @@ package "core" {
     User "0..*" -- "0..*" Group : "groups"
     User "0..*" -- "0..*" Permission : "user_permissions"
     Group "0..*" -- "0..*" Permission : "permissions"
-
 }
 
 package "ensino" {
     class Campus {
         +sigla: str
         +nome: str
+        --
+        +criado_em: datetime
+        +criado_por: User
+        +alterado_em: datetime
+        +alterado_por: User
+        +removido_em: datetime
     }
 
     class Curso {
         +sigla: str
         +nome: str
+        --
+        +criado_em: datetime
+        +criado_por: User
+        +alterado_em: datetime
+        +alterado_por: User
+        +removido_em: datetime
     }
 
     class FormaSelecao {
         +descricao: str
         +periodo_inicio: date
         +periodo_fim: date
+        --
+        +criado_em: datetime
+        +criado_por: User
+        +alterado_em: datetime
+        +alterado_por: User
+        +removido_em: datetime
     }
 
     class Aluno {
@@ -89,36 +138,63 @@ package "ensino" {
         +matricula: str
         +telefone: str
         +forma_selecao: FormaSelecao
+        --
+        +criado_em: datetime
+        +criado_por: User
+        +alterado_em: datetime
+        +alterado_por: User
+        +removido_em: datetime
     }
 
     Aluno "0..*" -- "1" FormaSelecao : "FormaSelecao"
-    Aluno "0..*" -- "1" Campus : "campus"
+    Curso "0..*" -- "1" Campus : "campus"
     Aluno "0..*" -- "1" Curso : "curso"
 }
 
 package "emprestimo" {
     class TipoOcorrencia {
         +descricao: str
+        --
+        +criado_em: datetime
+        +criado_por: User
+        +alterado_em: datetime
+        +alterado_por: User
+        +removido_em: datetime
     }
+
     class Ocorrencia {
         +data_ocorrencia: date
+        +descricao: str
+        +cancelado_em: date
         +estado: int
-        +emprestimo: Emprestimo
+        +motivo_cancelamento: str
+        --
+        +criado_em: datetime
+        +criado_por: User
+        +alterado_em: datetime
+        +alterado_por: User
+        +removido_em: datetime
     }
+
     class Emprestimo {
         +data_emprestimo: date
         +data_devolucao_prevista: date
         +data_devolucao: date
-        +devolucao_ciente_por: User
-        +bem: Bem
-        +aluno: Aluno
         +estado: int
+        +observacoes: str
+        --
+        +criado_em: datetime
+        +criado_por: User
+        +alterado_em: datetime
+        +alterado_por: User
+        +removido_em: datetime
     }
 
     Emprestimo "0..*" -- "1" User : "devolucao_ciente_por"
     Emprestimo "0..*" -- "1" Bem : "bem"
     Emprestimo "0..*" -- "1" Aluno : "aluno"
 
+    Ocorrencia "0..*" -- "1" User : "cancelado_por"
     Ocorrencia "0..*" -- "1" TipoOcorrencia : "tipo"
     Ocorrencia "0..*" -- "1" Emprestimo : "emprestimo"
 }
