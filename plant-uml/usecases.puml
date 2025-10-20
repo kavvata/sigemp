@@ -10,7 +10,6 @@
     rectangle "Autenticação e Perfil" {
         user -r-> (Fazer login)
         user --> (Fazer log-off)
-        user --> (Manter cadastro)
     }
 
     /' Membro '/
