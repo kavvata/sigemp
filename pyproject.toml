@@ -1,0 +1,33 @@
+[project]
+name = ""
+version = "0.0.1"
+requires-python = "~=3.13"
+dependencies = [
+    "django",
+    "djangorestframework",
+    "markdown",
+    "defusedxml",
+    "django-tailwind[reload]",
+    "django-widget-tweaks",
+    "psycopg2-binary",
+    "django-weasyprint",
+    "django-crontab",
+    "django-filter",
+]
+
+[dependency-groups]
+dev = [
+    "django-stubs",
+    "pytest",
+    "pytest-django",
+    "pytest-cov",
+    "faker",
+    "django-filter-stubs",
+]
+
+[tool.uv]
+package = false
+
+[[tool.uv.index]]
+name = "pypi"
+url = "https://pypi.org/simple"
