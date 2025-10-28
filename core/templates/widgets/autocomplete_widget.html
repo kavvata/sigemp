@@ -1,0 +1,102 @@
+<div x-data="autocompleteWidget('{{ config.results_id }}', '{{ config.initial_label|escapejs }}', '{{ config.initial_value|escapejs }}')"
+     @submit.prevent="$el.closest('form').querySelector('.autocomplete-search').remove()"
+     tabindex="0"
+     @select-first="selectFirstResult()"
+     @click.outside="show = false"
+     class="relative w-full">
+    <input type="text"
+           x-model="selected"
+           name="{{ name }}"
+           id="{{ config.hidden_id }}"
+           hidden />
+    <div class="flex flex-row w-full justify-between min-w-0 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 has-[:focus]:ring-2 has-[:focus]:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:has-[:focus]:ring-blue-500"
+         @select-first="selectFirstResult()">
+        <input type="text"
+               name="q"
+               id="{{ config.visible_id }}"
+               class="autocomplete-search border-none bg-transparent shadow-none p-0 text-sm focus:outline-none focus:ring-0 w-full"
+               x-model="query"
+               hx-get="{{ config.endpoint }}"
+               hx-vals='{"app_label": "{{ config.app_label }}", "model_name": "{{ config.model_name }}", "field": "{{ config.field }}", "limit": {{ config.limit }}}'
+               @keydown.enter.prevent="handleEnterKey()"
+               @keydown.escape.prevent="handleEscapeKey()"
+               @keyup="handleKeyUp()"
+               @focus="handleFocus()"
+               @blur="handleBlur()"
+               hx-trigger="focus, keyup changed delay:{{ config.debounce }}ms"
+               hx-target="#{{ config.results_id }}"
+               hx-swap="innerHTML"
+               placeholder="{{ placeholder }}" />
+        <i class="material-symbols-outlined text-sm transform transition-transform duration-200 dark:text-gray-400"
+           :class="{ 'rotate-180': show && !invalid, 'text-red-500 dark:text-red-500' : invalid }"
+           x-text="icon"></i>
+    </div>
+    <ul x-show="show"
+        x-transition.duration.300ms.origin.top
+        @keyup.escape="show = !show"
+        id="{{ config.results_id }}"
+        class="absolute z-10 shadow-lg block mt-1 w-full min-w-0 rounded-lg border border-gray-300 bg-gray-50 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 max-h-60 overflow-auto">
+    </ul>
+</div>
+<script>
+function autocompleteWidget(resultsId, initialLabel, initialValue) {
+    return {
+        query: initialLabel,
+        selected: initialValue,
+        selected_label: initialLabel,
+        show: false,
+        invalid: false,
+        icon: 'expand_more',
+        minChars: 2,
+        resultsId: resultsId,
+        
+        selectFirstResult() {
+            const firstResult = document.querySelector(`#${this.resultsId}`)?.children[0];
+            if (firstResult && firstResult.hasAttribute('data-value')) {
+                this.selected = firstResult.dataset.value;
+                this.query = firstResult.innerText;
+                this.selected_label = firstResult.innerText;
+                this.show = false;
+                this.invalid = false;
+                this.icon = 'expand_more';
+            }
+        },
+        
+        handleEnterKey() {
+            const firstResult = document.querySelector(`#${this.resultsId}`)?.children[0];
+            if (firstResult) {
+                this.$dispatch('select-first');
+                this.$el.blur();
+            }
+        },
+        
+        handleEscapeKey() {
+            this.show = false;
+            this.$el.blur();
+        },
+        
+        handleKeyUp() {
+            this.show = this.query.length >= this.minChars;
+        },
+        
+        handleFocus() {
+            if (this.query.length >= this.minChars) {
+                this.show = true;
+            }
+        },
+        
+      handleBlur(event) {
+          setTimeout(() => {
+              this.show = false;
+              
+              if (!this.selected) {
+                  this.invalid = true;
+                  this.icon = 'error';
+              } else if (this.selected_label !== this.query && !this.invalid) {
+                  this.query = this.selected_label;
+              }
+          }, 300);
+      }
+    }
+}
+</script>

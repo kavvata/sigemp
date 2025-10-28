@@ -17,12 +17,11 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-RUN pip install --upgrade pip && pip install pipenv
+RUN pip install --upgrade pip && pip install uv
 
-COPY Pipfile.lock Pipfile ./
+COPY pyproject.toml uv.lock ./
 
-RUN pipenv requirements > requirements.txt
-RUN pip install -r requirements.txt
+RUN uv pip install --system -r ./pyproject.toml
 
 COPY . .
 

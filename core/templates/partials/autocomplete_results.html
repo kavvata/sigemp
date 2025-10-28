@@ -1,0 +1,14 @@
+{% load sigemp_utils %}
+{% for result in results %}
+    <li class="cursor-pointer px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+        data-value="{{ result.pk }}"
+        @click="selected = '{{ result.pk }}'; query = '{% if field == "__str__" %}{{ result|escapejs }}{% else %}{{ result|getattr:field|default:""|escapejs }}{% endif %}'; selected_label=query; show = false; invalid = false; icon='expand_more'">
+        {% if field == "__str__" %}
+            {{ result }}
+        {% else %}
+            {{ result|getattr:field|default:"" }}
+        {% endif %}
+    </li>
+{% empty %}
+    <li class="px-4 py-2 text-gray-500 dark:text-gray-400">Nenhum resultado encontrado.</li>
+{% endfor %}
