@@ -28,4 +28,8 @@ jobs:
         pipenv install && pipenv install --dev
     - name: Run Tests
       run: |
-        DJANGO_SETTINGS_MODULE=sigemp.test_settings pipenv run pytest
+        DJANGO_SETTINGS_MODULE=sigemp.test_settings pipenv run pytest --cov --cov-branch --cov-report=xml
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
