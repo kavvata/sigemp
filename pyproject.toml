@@ -23,6 +23,7 @@ dev = [
     "pytest-cov",
     "faker",
     "django-filter-stubs",
+    "django-browser-reload>=1.21.0",
 ]
 
 [tool.uv]

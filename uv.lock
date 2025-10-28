@@ -21,6 +21,7 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "django-browser-reload" },
     { name = "django-filter-stubs" },
     { name = "django-stubs" },
     { name = "faker" },
@@ -45,6 +46,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "django-browser-reload", specifier = ">=1.21.0" },
     { name = "django-filter-stubs" },
     { name = "django-stubs" },
     { name = "faker" },
