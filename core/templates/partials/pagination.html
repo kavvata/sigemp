@@ -2,10 +2,10 @@
     <div class="hidden md:block text-gray-600 dark:text-gray-400">
         Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
     </div>
-    <div class="flex space-x-2">
+    <div class="flex space-x-2 mr-2">
         {% if page_obj.has_previous %}
             <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}"
-               class="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-800">
+               class="inline-flex px-3 py-1 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-800">
                 <span class="material-symbols-outlined align-middle text-sm font-bold">arrow_back</span>
                 <span class="hidden md:block">Anterior</span>
             </a>
@@ -24,7 +24,7 @@
         {% endfor %}
         {% if page_obj.has_next %}
             <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}"
-               class="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-800">
+               class="inline-flex px-3 py-1 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-800">
                 <span class="material-symbols-outlined align-middle text-sm font-bold">arrow_forward</span>
                 <span class="hidden md:block">Próxima</span>
             </a>
