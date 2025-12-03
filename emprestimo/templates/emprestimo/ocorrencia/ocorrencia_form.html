@@ -2,13 +2,17 @@
 {% load widget_tweaks %}
 {% block page_title %}
     {% if form.instance.id %}
-        Editar {{ form.instance.tipo }}
+        {% if not form.motivo_cancelamento %}
+          Editar {{ form.instance.tipo }}
+        {% else %}
+          Cancelar Ocorrência
+        {% endif %}
     {% else %}
         Registrar Ocorrência
     {% endif %}
 {% endblock %}
 {% block actions %}
-    {% if form.instance.id %}
+    {% if form.instance.id and not form.motivo_cancelamento %}
         <a href="{% url 'emprestimo:remover_tipo_ocorrencia' form.instance.id %}"
            class="cursor-pointer flex items-center gap-2 rounded-md border border-red-500 bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 transition-all duration-300 ease-in-out hover:bg-red-100 hover:shadow-md hover:ring-2 hover:ring-red-300 dark:border-red-400 dark:bg-gray-800 dark:text-red-300 dark:hover:bg-gray-700 dark:hover:ring-red-500/40">
             <i class="material-symbols-outlined align-middle">delete</i>
